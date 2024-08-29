@@ -1,9 +1,13 @@
 const theme = {
     colors: {
-      primary: '#1877f2',
-      background: '#f0f2f5',
-      text: '#1c1e21',
+      header: '#F8F8F8',
+      background: '#F8F8F8',
+      text: '#333333',
+      icons: '#9933FF',
       error: '#ff3b30',
+    },
+    fonts: {
+      main: 'Arial, sans-serif',
     },
     breakpoints: {
       mobile: '480px',

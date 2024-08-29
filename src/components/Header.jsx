@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Bell, Menu, X } from 'lucide-react';
 import styled from 'styled-components';
+import Logo from './Logo';
 
 const HeaderWrapper = styled.header`
-  background-color: #2563eb;
-  color: white;
+  background-color: ${props => props.theme.colors.header};
+  color: ${props => props.theme.colors.text};
 `;
 
 const Container = styled.div`
@@ -16,20 +17,14 @@ const Container = styled.div`
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
 `;
 
 const LogoWrapper = styled.div`
   display: flex;
+  width: fit-content;
   align-items: center;
   gap: 0.5rem;
-`;
-
-const Logo = styled(Link)`
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-decoration: none;
-  color: white;
 `;
 
 // For Desktop:
@@ -44,6 +39,8 @@ const DesktopNav = styled.nav`
 
 const NavList = styled.ul`
   display: flex;
+  flex-basis: auto;
+  flex-grow: 1;
   gap: 1.5rem;
   list-style-type: none;
 `;
@@ -61,10 +58,15 @@ const NavItem = styled.li`
 
 const SearchWrapper = styled.div`
   position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
 `;
 
 const SearchInput = styled.input`
-  background-color: #3b82f6;
+  background-color: lightblue;
   color: white;
   padding: 0.5rem 1rem 0.5rem 2.5rem;
   border-radius: 9999px;
@@ -72,16 +74,29 @@ const SearchInput = styled.input`
   width: 16rem;
 
   &::placeholder {
-    color: #93c5fd;
+    color: white;
+    
+  }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    display: none;
   }
 `;
 
 const SearchIcon = styled(Search)`
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #93c5fd;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: none;
+  border: none;
+  color: ${props => props.theme.colors.icons};
+  cursor: pointer;
+ 
+
+  @media (min-width: 1023px) {
+    position: absolute;
+    left: 1.50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 `;
 
 const ButtonsIcon = styled.button`
@@ -89,7 +104,7 @@ const ButtonsIcon = styled.button`
   border-radius: 9999px;
   background: none;
   border: none;
-  color: white;
+  color: ${props => props.theme.colors.icons};
   cursor: pointer;
 
   &:hover {
@@ -151,14 +166,13 @@ const MenuButton = styled.button`
   border-radius: 9999px;
   background: none;
   border: none;
-  color: white;
+  color: ${props => props.theme.colors.icons};
   cursor: pointer;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
-
-  @media (min-width: 768px) and (max-width: 1023px) {
+   @media (max-width: 1023px) {
     display: block;
   }
 `;
@@ -207,12 +221,15 @@ const Header = () => {
   return (
     <HeaderWrapper>
       <Container>
-        <LogoWrapper>
-          <Logo to="/">FUSE</Logo>
-          <MenuButton onClick={toggleTabletMenu} aria-expanded={isTabletMenuOpen} aria-label="Toggle tablet menu">
+
+        <MenuButton onClick={toggleTabletMenu} aria-expanded={isTabletMenuOpen} aria-label="Toggle tablet menu">
             <Menu size={24} />
-          </MenuButton>
+        </MenuButton>
+
+        <LogoWrapper>
+          <Logo to="/"></Logo>       
         </LogoWrapper>
+        
 
         <DesktopNav>
           <NavList>
@@ -246,13 +263,14 @@ const Header = () => {
         </TabletIcons>
 
         <MobileIcons>
-          <ButtonsIcon  aria-label="Search">
+          {/* <ButtonsIcon  aria-label="Search">
             <Search size={20} />
-          </ButtonsIcon >
+          </ButtonsIcon > */}
           <ButtonsIcon  aria-label="Notifications">
             <Bell size={20} />
           </ButtonsIcon >
         </MobileIcons>
+
       </Container>
 
       {isTabletMenuOpen && (

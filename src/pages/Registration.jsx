@@ -58,12 +58,44 @@ import styled from 'styled-components';
 `;
 
 const RegistrationSchema = Yup.object().shape({
-  firstName: Yup.string().required('Required'),
-  surname: Yup.string().required('Required'),
-  phoneOrEmail: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(8, 'Must be at least 8 characters').required('Required'),
-  dateOfBirth: Yup.date().required('Required'),
-  gender: Yup.string().oneOf(['male', 'female', 'other'], 'Invalid gender').required('Required'),
+  firstName: Yup.string()
+  .trim()
+  .matches(/^[^\d]+$/,'Numbers are not allowed in this field')
+  .min(2, 'First name is too short.')
+  .max(16, 'First name is too long')
+  .required('First name cannot be empty.'),
+
+  surname: Yup.string()
+  .trim()
+  .matches(/^[^\d]+$/,'Numbers are not allowed in this field')
+  .min(2, 'Surname is too short.')
+  .max(16, 'Surname is too long')
+  .required('Surname cannot be empty.'),
+
+  phoneOrEmail: Yup.string()
+  .trim()
+  .test('phone-or-email', 'Enter a valid phone number or email', function(value) {
+    const phoneRegExp = /^\+?[1-9]\d{1,14}$/;
+    const emailRegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+    return phoneRegExp.test(value) || emailRegExp.test(value);
+  })
+  .required('Phone number or email is required'),
+
+  password: Yup.string()
+  .required('Password is required')
+  .min(7, 'Password must be at least 7 characters long')
+  .matches(
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).*$/,
+    'Password must contain at least 1 uppercase letter, 1 number, and 1 special character'
+  ),
+  dateOfBirth: Yup.date()
+  .required('Date of Birth is required')
+  .max(new Date(Date.now() - 16 * 365 * 24 * 60 * 60 * 1000), 'You must be at least 16 years old')
+  .min(new Date(Date.now() - 120 * 365 * 24 * 60 * 60 * 1000), 'Please enter a valid date of birth'),
+  
+  gender: Yup.string()
+  .oneOf(['male', 'female', 'other'], 'Invalid gender')
+  .required('Please select your gender'),
 });
 
 const Registration = () => {
@@ -95,7 +127,7 @@ const Registration = () => {
         {({ errors, touched, status }) => (
           <Form>
             <StyledField name="firstName" placeholder="First Name" />
-            {errors.name && touched.name && <StyledError>{errors.name}</StyledError>}
+            {errors.firstName && touched.firstName && <StyledError>{errors.firstName}</StyledError>}
 
             <StyledField name="surname" placeholder="Surname" />
             {errors.surname && touched.surname && <StyledError>{errors.surname}</StyledError>}

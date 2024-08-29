@@ -8,7 +8,8 @@ const MobileNav = styled.nav`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #2563eb;
+  background-color: ${props => props.theme.colors.header};
+  z-index: 100;
   padding: 0.5rem;
 
   @media (min-width: 768px) {
@@ -30,7 +31,7 @@ const NavItem = styled.li`
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: white;
+    color: ${props => props.theme.colors.icons};
     text-decoration: none;
     background: none;
     border: none;
@@ -74,12 +75,12 @@ const Navigation = () => {
               <IconLabel>Settings</IconLabel>
             </Link>
           </NavItem>
-          <NavItem>
+          {/* <NavItem>
             <Link to="/menu">
               <Menu size={24} />
               <IconLabel>Menu</IconLabel>
             </Link>
-          </NavItem>
+          </NavItem> */}
         </NavList>
       </MobileNav>
 
