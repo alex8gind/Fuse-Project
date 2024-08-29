@@ -19,18 +19,18 @@ import UserProvider from "../contexts/user.context";
 export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider]} />}>
-                        <Route path="/" element={<App />} errorElement={<PageNotFound />}>
-                                <Route index element={<HomeMobile/>}/>
-                                <Route path="profile" element={<UserProfile />}/>
-                                <Route path="docs" element={<Docs/>}/>
-                                <Route path="connections" element={<Connections/>}/>
-                                <Route path="settings" element={<Settings/>}/>
-                                <Route path="menu" element={<Menu/>}/>
-                                <Route path="notifications" element={<Notifications/>}/>
-                                <Route path="helpers" element={<Helpers/>}/>
+                        <Route element={<App />} errorElement={<PageNotFound />}>
+                                <Route path="/" element={<HomeMobile/>}/>
+                                <Route path="/profile" element={<UserProfile />}/>
+                                <Route path="/docs" element={<Docs/>}/>
+                                <Route path="/connections" element={<Connections/>}/>
+                                <Route path="/settings" element={<Settings/>}/>
+                                <Route path="/menu" element={<Menu/>}/>
+                                <Route path="/notifications" element={<Notifications/>}/>
+                                <Route path="/helpers" element={<Helpers/>}/>
                         </Route>
-                        <Route path="login" element={<Login/>}/>
-                        <Route path="register" element={<Registration/>}/>
+                        <Route path="/register" element={<Registration/>}/>
+                        <Route path="/login" element={<Login/>}/>
                     </Route>
         )
     )
