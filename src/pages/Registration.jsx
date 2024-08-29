@@ -24,7 +24,7 @@ import styled from 'styled-components';
 `;
 
  const StyledError = styled.div`
-  color: ${props => props.theme.colors.error};
+  color: red;
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
 `;
@@ -32,7 +32,7 @@ import styled from 'styled-components';
  const StyledButton = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: ${props => props.theme.colors.primary};
+  background-color: #1877f2;
   color: white;
   border: none;
   border-radius: 4px;
@@ -49,7 +49,7 @@ import styled from 'styled-components';
   display: block;
   text-align: center;
   margin-top: 1rem;
-  color: ${props => props.theme.colors.primary};
+  color: #166fe5;
   text-decoration: none;
 
   &:hover {
@@ -58,27 +58,14 @@ import styled from 'styled-components';
 `;
 
 const RegistrationSchema = Yup.object().shape({
-  name: Yup.string().required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
+  firstName: Yup.string().required('Required'),
+  surname: Yup.string().required('Required'),
+  phoneOrEmail: Yup.string().email('Invalid email').required('Required'),
   password: Yup.string().min(8, 'Must be at least 8 characters').required('Required'),
   dateOfBirth: Yup.date().required('Required'),
   gender: Yup.string().oneOf(['male', 'female', 'other'], 'Invalid gender').required('Required'),
 });
-// const Registration = () => {
-//     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
-//       try {
-      
-//         await new Promise(resolve => setTimeout(resolve, 1000));
-        
-//         console.log('Form submitted with values:', values);
-        
-//         setStatus({ success: 'Registration successful!' });
-//       } catch (error) {
-//         setStatus({ error: 'Registration failed. Please try again.' });
-//       } finally {
-//         setSubmitting(false);
-//       }
-//     };
+
 const Registration = () => {
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
@@ -107,16 +94,19 @@ const Registration = () => {
       >
         {({ errors, touched, status }) => (
           <Form>
-            <StyledField name="name" placeholder="Full Name" />
+            <StyledField name="firstName" placeholder="First Name" />
             {errors.name && touched.name && <StyledError>{errors.name}</StyledError>}
 
-            <StyledField name="email" type="email" placeholder="Email" />
-            {errors.email && touched.email && <StyledError>{errors.email}</StyledError>}
+            <StyledField name="surname" placeholder="Surname" />
+            {errors.surname && touched.surname && <StyledError>{errors.surname}</StyledError>}
+
+            <StyledField name="phoneOrEmail" placeholder="Phone or Email" />
+            {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
 
             <StyledField name="password" type="password" placeholder="Password" />
             {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
 
-            <StyledField name="dateOfBirth" type="date" />
+            <StyledField name="dateOfBirth" type="date" placeholder="Date of Birth" />
             {errors.dateOfBirth && touched.dateOfBirth && <StyledError>{errors.dateOfBirth}</StyledError>}
 
             <Field as="select" name="gender">
