@@ -3,6 +3,9 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import styled from 'styled-components';
+import Spinner from '../components/Spinner';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/api';
 
 const StyledForm = styled(Form)`
   display: flex;
@@ -14,9 +17,17 @@ const StyledForm = styled(Form)`
 const StyledField = styled(Field)`
   margin-bottom: 10px;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid ${props => (props.error && props.touched ? '#FF0000' : '#dddfe2')};
   border-radius: 4px;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => (props.error && props.touched ? '#FF0000' : '#1877f2')};
+    box-shadow: 0 0 0 2px ${props => (props.error && props.touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
+  }
 `;
+
 
 const StyledError = styled.div`
   color: red;
@@ -59,7 +70,7 @@ const CreateAccountButton = styled(StyledButton)`
 `;
 
 const LoginSchema = Yup.object().shape({
-  emailOrPhone: Yup.string()
+  phoneOrEmail: Yup.string()
     .trim()
     .required('Email or Phone is required')
     .test('email-or-phone', 'Enter a valid email or phone number', function(value) {
@@ -73,14 +84,14 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      const response = await axios.post('https://api.example.com/login', values);
-      console.log(response.data);
-      setStatus({ success: 'Login successful!' });
+      await login(values);
+      navigate('/profile');
     } catch (error) {
-      console.error('Login error:', error);
-      setStatus({ error: 'Login failed. Please try again.' });
+      setStatus({ error: error.response?.data?.error || 'An error occurred during login' });
     } finally {
       setSubmitting(false);
     }
@@ -94,14 +105,26 @@ const Login = () => {
     >
       {({ errors, touched, isSubmitting, status }) => (
         <StyledForm>
-          <StyledField name="emailOrPhone" placeholder="Email or Phone" />
-          {errors.emailOrPhone && touched.emailOrPhone && <StyledError>{errors.emailOrPhone}</StyledError>}
 
-          <StyledField name="password" type="password" placeholder="Password" />
+          <StyledField 
+          name="phoneOrEmail" 
+          placeholder="Email or Phone"
+          error={errors.phoneOrEmail}
+          touched={touched.phoneOrEmail}/>
+          {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
+
+          <StyledField 
+          name="password" 
+          type="password" 
+          placeholder="Password"
+          error={errors.password}
+          touched={touched.password} />
           {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
 
-          <StyledButton type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Logging in...' : 'Log In'}
+          <StyledButton 
+          type="submit" 
+          disabled={isSubmitting}>
+            {isSubmitting ? <><Spinner />Logging in...</>: 'Log In'}
           </StyledButton>
 
           {status && status.error && <StyledError>{status.error}</StyledError>}

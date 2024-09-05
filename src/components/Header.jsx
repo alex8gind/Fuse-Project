@@ -9,6 +9,7 @@ import Logo from './Logo';
 const HeaderWrapper = styled.header`
   background-color: ${props => props.theme.colors.header};
   color: ${props => props.theme.colors.text};
+  /* border-bottom: 1px solid rgba(206, 196, 196, 0.871); */
 `;
 
 const Container = styled.div`
@@ -47,7 +48,8 @@ const NavList = styled.ul`
 
 const NavItem = styled.li`
   a {
-    color: white;
+    color: ${props => props.theme.colors.icons};
+    font-weight: bold;
     text-decoration: none;
 
     &:hover {
@@ -66,7 +68,7 @@ const SearchWrapper = styled.div`
 `;
 
 const SearchInput = styled.input`
-  background-color: lightblue;
+  background-color: #dfceef;
   color: white;
   padding: 0.5rem 1rem 0.5rem 2.5rem;
   border-radius: 9999px;
@@ -83,7 +85,7 @@ const SearchInput = styled.input`
 `;
 
 const SearchIcon = styled(Search)`
-  padding: 0.5rem;
+  padding: 1rem;
   border-radius: 9999px;
   background: none;
   border: none;
@@ -100,7 +102,7 @@ const SearchIcon = styled(Search)`
 `;
 
 const ButtonsIcon = styled.button`
-  padding: 0.5rem;
+  padding: 1rem;
   border-radius: 9999px;
   background: none;
   border: none;
@@ -162,7 +164,7 @@ const TabletMenu = styled.div`
 
 const MenuButton = styled.button`
   display: none;
-  padding: 0.5rem;
+  padding: 1rem;
   border-radius: 9999px;
   background: none;
   border: none;
@@ -223,7 +225,7 @@ const Header = () => {
       <Container>
 
         <MenuButton onClick={toggleTabletMenu} aria-expanded={isTabletMenuOpen} aria-label="Toggle tablet menu">
-            <Menu size={24} />
+            <Menu size={25} />
         </MenuButton>
 
         <LogoWrapper>
@@ -248,17 +250,17 @@ const Header = () => {
             <SearchIcon size={20} />
           </SearchWrapper>
           <ButtonsIcon  aria-label="Notifications">
-            <Bell size={24} />
+            <Bell size={25} />
           </ButtonsIcon>
         </DesktopIcons>
 
         <TabletIcons>
           <SearchWrapper>
             <SearchInput type="text" placeholder="Search..." />
-            <SearchIcon size={20} />
+            <SearchIcon size={25} />
           </SearchWrapper>
           <ButtonsIcon  aria-label="Notifications">
-            <Bell size={24} />
+            <Bell size={25} />
           </ButtonsIcon >
         </TabletIcons>
 
@@ -267,7 +269,7 @@ const Header = () => {
             <Search size={20} />
           </ButtonsIcon > */}
           <ButtonsIcon  aria-label="Notifications">
-            <Bell size={20} />
+            <Bell size={25} />
           </ButtonsIcon >
         </MobileIcons>
 

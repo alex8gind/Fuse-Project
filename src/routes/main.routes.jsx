@@ -15,6 +15,7 @@ import PageNotFound from "../pages/PageNotFound";
 import Helpers from "../pages/Helpers";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
+import Security from "../pages/Security";
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
@@ -28,6 +29,7 @@ export const router = createBrowserRouter(
                                 <Route path="/menu" element={<Menu/>}/>
                                 <Route path="/notifications" element={<Notifications/>}/>
                                 <Route path="/helpers" element={<Helpers/>}/>
+                                <Route path="/security" element={<Security/>}/>
                         </Route>
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>

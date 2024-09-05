@@ -2,7 +2,10 @@ import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import Spinner from '../components/Spinner';
+import { register } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 
  const StyledForm = styled.div`
@@ -18,9 +21,15 @@ import styled from 'styled-components';
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  border: 1px solid #dddfe2;
+  border: 1px solid ${props => (props.error && props.touched ? '#FF0000' : '#dddfe2')};
   border-radius: 4px;
   font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => (props.error && props.touched ? '#FF0000' : '#1877f2')};
+    box-shadow: 0 0 0 2px ${props => (props.error && props.touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
+  }
 `;
 
  const StyledError = styled.div`
@@ -42,6 +51,11 @@ import styled from 'styled-components';
 
   &:hover {
     background-color: #166fe5;
+  }
+
+  &:disabled {
+    background-color: #7f7f7f;
+    cursor: not-allowed;
   }
 `;
 
@@ -99,17 +113,18 @@ const RegistrationSchema = Yup.object().shape({
 });
 
 const Registration = () => {
+  const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      const response = await axios.post('/api/register', values);
-      setStatus({ success: 'Registration successful!' });
+      await register(values);
+      navigate('/login');
     } catch (error) {
-      setStatus({ error: 'Registration failed. Please try again.' });
+      setStatus({ error: error.response?.data?.error || 'An error occurred during registration' });
     } finally {
       setSubmitting(false);
     }
   };
-
+  
   return (
     <StyledForm>
       <h1>Create an Account</h1>
@@ -124,24 +139,48 @@ const Registration = () => {
         validationSchema={RegistrationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, status }) => (
+        {({ errors, touched, status, isSubmitting }) => (
           <Form>
-            <StyledField name="firstName" placeholder="First Name" />
+            <StyledField 
+            name="firstName" 
+            placeholder="First Name"
+            error={errors.firstName}
+            touched={touched.firstName} />
             {errors.firstName && touched.firstName && <StyledError>{errors.firstName}</StyledError>}
 
-            <StyledField name="surname" placeholder="Surname" />
+            <StyledField 
+            name="surname" 
+            placeholder="Surname"
+            error={errors.surname}
+            touched={touched.surname} />
             {errors.surname && touched.surname && <StyledError>{errors.surname}</StyledError>}
 
-            <StyledField name="phoneOrEmail" placeholder="Phone or Email" />
+            <StyledField 
+            name="phoneOrEmail" 
+            placeholder="Phone or Email"
+            error={errors.phoneOrEmail}
+            touched={touched.phoneOrEmail}  />
             {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
 
-            <StyledField name="password" type="password" placeholder="Password" />
+            <StyledField 
+            name="password" 
+            type="password" 
+            placeholder="Password"
+            error={errors.password}
+            touched={touched.password}
+            />
             {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
 
-            <StyledField name="dateOfBirth" type="date" placeholder="Date of Birth" />
+            <StyledField 
+            name="dateOfBirth" 
+            type="date" 
+            placeholder="Date of Birth" 
+            error={errors.dateOfBirth}
+            touched={touched.dateOfBirth}/>
             {errors.dateOfBirth && touched.dateOfBirth && <StyledError>{errors.dateOfBirth}</StyledError>}
 
-            <Field as="select" name="gender">
+            <Field as="select" 
+            name="gender">              
               <option value="">Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -149,7 +188,9 @@ const Registration = () => {
             </Field>
             {errors.gender && touched.gender && <StyledError>{errors.gender}</StyledError>}
 
-            <StyledButton type="submit">Sign Up</StyledButton>
+            <StyledButton type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <><Spinner />Submitting...</> : 'Sign Up'}
+            </StyledButton>
 
             {status && status.success && <div>{status.success}</div>}
             {status && status.error && <StyledError>{status.error}</StyledError>}

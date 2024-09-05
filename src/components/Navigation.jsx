@@ -8,9 +8,10 @@ const MobileNav = styled.nav`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: ${props => props.theme.colors.header};
+  background-color: ${props => props.theme.colors.navigation};
   z-index: 100;
   padding: 0.5rem;
+  border-top: 1px solid rgba(196, 191, 191, 0.615);
 
   @media (min-width: 768px) {
     display: none;
