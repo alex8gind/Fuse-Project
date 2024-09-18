@@ -1,75 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import styled, { keyframes } from 'styled-components';
-import Spinner from '../components/Spinner';
-import { register } from '../services/api';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from '../../components/Spinner/Spinner';
+import { register } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { StyledForm, StyledField, StyledSuccess, StyledError, StyledButton, StyledLink } from './Registration.style';
 
-
- const StyledForm = styled.div`
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
- const StyledField = styled(Field)`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid ${props => (props.error && props.touched ? '#FF0000' : '#dddfe2')};
-  border-radius: 4px;
-  font-size: 1rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => (props.error && props.touched ? '#FF0000' : '#1877f2')};
-    box-shadow: 0 0 0 2px ${props => (props.error && props.touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
-  }
-`;
-
- const StyledError = styled.div`
-  color: red;
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-`;
-
- const StyledButton = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #1877f2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #166fe5;
-  }
-
-  &:disabled {
-    background-color: #7f7f7f;
-    cursor: not-allowed;
-  }
-`;
-
-  const StyledLink = styled.a`
-  display: block;
-  text-align: center;
-  margin-top: 1rem;
-  color: #166fe5;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 const RegistrationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -114,18 +52,48 @@ const RegistrationSchema = Yup.object().shape({
 
 const Registration = () => {
   const navigate = useNavigate();
-  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+
+  useEffect(() => {
+    // Clear toasts when component unmounts
+    return () => {
+      toast.dismiss();
+    };
+  }, []);
+
+  const handleSubmit = async (values, { setSubmitting, setStatus, resetForm }) => {
     try {
       await register(values);
-      navigate('/login');
+      setStatus({ success: 'Registration successful!' });
+      toast.success('Registration successful! Redirecting to login...', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      setTimeout(() => {
+        resetForm();
+        navigate('/login');
+      }, 3000); // Redirect after 3 seconds
     } catch (error) {
       setStatus({ error: error.response?.data?.error || 'An error occurred during registration' });
+      toast.error(error.response?.data?.error || 'An error occurred during registration', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setSubmitting(false);
     }
   };
   
   return (
+  <>
+    <ToastContainer />
     <StyledForm>
       <h1>Create an Account</h1>
       <Formik
@@ -199,6 +167,7 @@ const Registration = () => {
       </Formik>
       <StyledLink href="/login">Already have an account?</StyledLink>
     </StyledForm>
+    </>
   );
 };
 

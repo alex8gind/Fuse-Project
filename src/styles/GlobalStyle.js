@@ -1,6 +1,14 @@
 import { createGlobalStyle } from 'styled-components';
+import CustomFont from '../assets/fonts/aqua.ttf';
 
 const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'aqua';
+    src: url(${CustomFont}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
   body {   
     margin: 0;
     padding: 0;

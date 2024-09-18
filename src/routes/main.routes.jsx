@@ -1,7 +1,6 @@
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 
 import App from '../App';
-import Navigation from "../components/Navigation";
 import HomeMobile from "../pages/HomeMobile";
 import UserProfile from "../pages/UserProfile";
 import Docs from "../pages/Docs";
@@ -9,8 +8,8 @@ import Connections from "../pages/Connections";
 import Settings from "../pages/Settings";
 import Menu from "../pages/Menu";
 import Notifications from "../pages/Notifications";
-import Login from "../pages/Login";
-import Registration from "../pages/Registration";
+import Login from "../pages/Login/Login";
+import Registration from "../pages/Registration/Registration";
 import PageNotFound from "../pages/PageNotFound";
 import Helpers from "../pages/Helpers";
 import ContextProvider from "../contexts/context.provider";

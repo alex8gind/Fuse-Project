@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL
 });
 
 
@@ -79,7 +79,7 @@ export const resetPassword = async (token, newPassword) => {
 };
 
 export const verifyEmail = async (token) => {
-  return await api.get(`/api/auth/verify-email/${token}`);
+  return await api.post(`/api/auth/verify-email/${token}`);
 };
 
 export { logout };

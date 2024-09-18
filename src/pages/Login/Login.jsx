@@ -1,73 +1,14 @@
-import React from 'react';
-import { Formik, Form, Field } from 'formik';
+import React, { useEffect } from 'react';
+import { Formik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import styled from 'styled-components';
-import Spinner from '../components/Spinner';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from '../../components/Spinner/Spinner';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/api';
-
-const StyledForm = styled(Form)`
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  margin: 0 auto;
-`;
-
-const StyledField = styled(Field)`
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid ${props => (props.error && props.touched ? '#FF0000' : '#dddfe2')};
-  border-radius: 4px;
-  font-size: 1rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => (props.error && props.touched ? '#FF0000' : '#1877f2')};
-    box-shadow: 0 0 0 2px ${props => (props.error && props.touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
-  }
-`;
+import { login } from '../../services/api';
+import { StyledForm, StyledField, StyledSuccess, StyledError, StyledButton, StyledLink, CreateAccountButton } from './Login.style';
 
 
-const StyledError = styled.div`
-  color: red;
-  font-size: 0.8em;
-  margin-bottom: 10px;
-`;
-
-const StyledButton = styled.button`
-  background-color: #1877f2;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  margin-bottom: 10px;
-
-  &:hover {
-    background-color: #166fe5;
-  }
-`;
-
-const StyledLink = styled.a`
-  color: #1877f2;
-  text-decoration: none;
-  font-size: 0.9em;
-  margin-bottom: 10px;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const CreateAccountButton = styled(StyledButton)`
-  background-color: #42b72a;
-
-  &:hover {
-    background-color: #36a420;
-  }
-`;
 
 const LoginSchema = Yup.object().shape({
   phoneOrEmail: Yup.string()
@@ -86,18 +27,47 @@ const LoginSchema = Yup.object().shape({
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+  useEffect(() => {
+    // Clear status when component unmounts
+    return () => {
+      toast.dismiss();
+    };
+  }, []);
+
+  const handleSubmit = async (values, { setSubmitting, setStatus, resetForm }) => {
     try {
       await login(values);
-      navigate('/profile');
+      setStatus({ success: 'Login successful!' });
+      toast.success('Login successful! Redirecting...', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      resetForm();
+      setTimeout(() => {
+        navigate('/profile');
+      }, 2000); // Redirect after 2 seconds
     } catch (error) {
       setStatus({ error: error.response?.data?.error || 'An error occurred during login' });
+      toast.error(error.response?.data?.error || 'An error occurred during login', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
+  <>
+    <ToastContainer />
     <Formik
       initialValues={{ emailOrPhone: '', password: '' }}
       validationSchema={LoginSchema}
@@ -132,12 +102,16 @@ const Login = () => {
 
           <StyledLink href="/forgot-password">Forgot password?</StyledLink>
 
-          <CreateAccountButton type="button" onClick={() => { /* Handle create account logic */ }}>
+          <CreateAccountButton type="button" onClick={() => {
+              resetForm();
+              navigate('/register');
+          }}>
             Create New Account
           </CreateAccountButton>
         </StyledForm>
       )}
     </Formik>
+  </>
   );
 };
 
