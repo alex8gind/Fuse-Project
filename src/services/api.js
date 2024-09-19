@@ -7,9 +7,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -25,8 +25,9 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         const response = await api.post('/api/auth/refresh-token', { refreshToken });
-        localStorage.setItem('token', response.data.token);
-        originalRequest.headers['Authorization'] = `Bearer ${response.data.token}`;
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // If refresh token fails, log the user out
@@ -38,25 +39,41 @@ api.interceptors.response.use(
   }
 );
 
+export const register = async (userData) => {
+  try {
+    const response = await api.post('/api/auth/register', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Full error object:', error);
+    console.error('Error response:', error.response);
+    if (error.response && error.response.status === 409) {
+      throw new Error('User already exists. Please use a different email or phone number.');
+    } else if (error.response && error.response.data && error.response.data.error) {
+      throw new Error(error.response.data.error);
+    } else {
+      throw new Error('An unexpected error occurred during registration');
+    }
+  }
+};
+
 export const login = async (credentials) => {
-  const response = await api.post('/api/auth/login', credentials);
-  localStorage.setItem('token', response.data.token);
-  localStorage.setItem('refreshToken', response.data.refreshToken);
-  return response;
+  try {
+    const response = await api.post('/api/auth/login', credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error.response?.data);
+    throw error;
+  }
 };
 
 // Function to handle logout
-const logout = () => {
+export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     // Redirect to login page
     window.location.href = '/login';
   };
   
-
-export const register = async (userData) => {
-  return await api.post('/api/auth/register', userData);
-};
 
 export const getUserProfile = async () => {
   return await api.get('/api/users/profile');
@@ -82,6 +99,5 @@ export const verifyEmail = async (token) => {
   return await api.post(`/api/auth/verify-email/${token}`);
 };
 
-export { logout };
 
 export default api;

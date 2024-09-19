@@ -11,17 +11,16 @@ export const StyledForm = styled(Form)`
 export const StyledField = styled(Field)`
   margin-bottom: 10px;
   padding: 8px;
-  border: 1px solid ${props => (props.error && props.touched ? '#FF0000' : '#dddfe2')};
+  border: 1px solid ${props => (props.$error && props.$touched ? '#FF0000' : '#dddfe2')};
   border-radius: 4px;
   font-size: 1rem;
 
   &:focus {
     outline: none;
-    border-color: ${props => (props.error && props.touched ? '#FF0000' : '#1877f2')};
-    box-shadow: 0 0 0 2px ${props => (props.error && props.touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
+    border-color: ${props => (props.$error && props.$touched ? '#FF0000' : '#1877f2')};
+    box-shadow: 0 0 0 2px ${props => (props.$error && props.$touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
   }
 `;
-
 
 export const StyledError = styled.div`
   color: red;

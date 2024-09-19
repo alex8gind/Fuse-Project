@@ -15,6 +15,7 @@ import Helpers from "../pages/Helpers";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
 import Security from "../pages/Security";
+import ForgotPass from "../pages/ForgotPass/ForgotPass";
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
@@ -32,6 +33,7 @@ export const router = createBrowserRouter(
                         </Route>
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>
+                        <Route path="/forgot-password" element={<ForgotPass/>}/>
                     </Route>
         )
     )

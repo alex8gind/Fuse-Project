@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
@@ -36,7 +37,10 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting, setStatus, resetForm }) => {
     try {
-      await login(values);
+      console.log('Submitting values:', values);
+      const response = await login(values);
+      console.log('Login response:', response);
+  
       setStatus({ success: 'Login successful!' });
       toast.success('Login successful! Redirecting...', {
         position: "top-right",
@@ -46,13 +50,45 @@ const Login = () => {
         pauseOnHover: true,
         draggable: true,
       });
-      resetForm();
+  
+      // Store the token in localStorage or a secure storage method
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+  
       setTimeout(() => {
-        navigate('/profile');
-      }, 2000); // Redirect after 2 seconds
+        resetForm();
+        navigate('/forgot-password'); 
+      }, 2000);
+  
     } catch (error) {
-      setStatus({ error: error.response?.data?.error || 'An error occurred during login' });
-      toast.error(error.response?.data?.error || 'An error occurred during login', {
+      console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
+  
+      let errorMessage = 'An error occurred during login';
+  
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        // if (error.response.status === 400) {
+        //   errorMessage = error.response.data.error || 'Invalid credentials';
+        // } else if (error.response.status === 401) {
+        //   errorMessage = 'Unauthorized. Please check your credentials.';
+        // } else if (error.response.status === 404) {
+        //   errorMessage = 'User not found. Please check your email/phone.';
+        // } else if (error.response.status === 429) {
+        //   errorMessage = 'Too many login attempts. Please try again later.';
+        // }
+        errorMessage = error.response.data.error;
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = 'No response from server. Please check your internet connection.';
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        errorMessage = error.message;
+      }
+  
+      setStatus({ error: errorMessage });
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -69,38 +105,40 @@ const Login = () => {
   <>
     <ToastContainer />
     <Formik
-      initialValues={{ emailOrPhone: '', password: '' }}
+      initialValues={{ phoneOrEmail: '', password: '' }}
       validationSchema={LoginSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched, isSubmitting, status }) => (
+      {({ errors, touched, isSubmitting, status, resetForm }) => (
         <StyledForm>
 
-          <StyledField 
-          name="phoneOrEmail" 
-          placeholder="Email or Phone"
-          error={errors.phoneOrEmail}
-          touched={touched.phoneOrEmail}/>
-          {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
+        <StyledField 
+        name="phoneOrEmail" 
+        placeholder="Email or Phone"
+        $error={errors.phoneOrEmail}
+        $touched={touched.phoneOrEmail}
+        />
+        {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
 
-          <StyledField 
-          name="password" 
-          type="password" 
-          placeholder="Password"
-          error={errors.password}
-          touched={touched.password} />
-          {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
-
-          <StyledButton 
+        <StyledField 
+        name="password" 
+        type="password" 
+        placeholder="Password"
+        $error={errors.password}
+        $touched={touched.password}
+        />
+        {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
+          
+        <StyledButton 
           type="submit" 
           disabled={isSubmitting}>
             {isSubmitting ? <><Spinner />Logging in...</>: 'Log In'}
-          </StyledButton>
+        </StyledButton>
 
-          {status && status.error && <StyledError>{status.error}</StyledError>}
-          {status && status.success && <div>{status.success}</div>}
+          {status && status.error && typeof status.error === 'string' && <StyledError>{status.error}</StyledError>}
+          {status && status.success && typeof status.success === 'string' && <StyledSuccess>{status.success}</StyledSuccess>}
 
-          <StyledLink href="/forgot-password">Forgot password?</StyledLink>
+          <StyledLink as={Link} to="/forgot-password">Forgot password?</StyledLink>
 
           <CreateAccountButton type="button" onClick={() => {
               resetForm();
