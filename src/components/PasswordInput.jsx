@@ -1,21 +1,21 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Field } from 'formik';
 import { Eye, EyeOff } from 'lucide-react';
-import React, { useState } from 'react';
 
-const FieldWrapper = styled.div`
+const PasswordWrapper = styled.div`
   position: relative;
   width: 100%;
 `;
 
-const StyledInput = styled(Field)`
-  margin-bottom: 10px;
+const StyledPasswordField = styled(Field)`
+  width: 100%;
   padding: 8px;
-  padding-right: ${props => props.type === 'password' ? '40px' : '8px'};
+  padding-right: 40px;
   border: 1px solid ${props => (props.$error && props.$touched ? '#FF0000' : '#dddfe2')};
   border-radius: 4px;
   font-size: 1rem;
-  width: 100%;
+  margin-bottom: 10px;
 
   &:focus {
     outline: none;
@@ -34,7 +34,7 @@ const ToggleButton = styled.button`
   cursor: pointer;
 `;
 
-export const StyledField = ({ name, type, placeholder, $error, $touched, ...props }) => {
+const PasswordInput = ({ name, placeholder, $error, $touched, $hasError, ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
@@ -42,22 +42,20 @@ export const StyledField = ({ name, type, placeholder, $error, $touched, ...prop
   };
 
   return (
-    <FieldWrapper>
-      <StyledInput
+    <PasswordWrapper>
+      <StyledPasswordField
         name={name}
-        type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
+        type={showPassword ? 'text' : 'password'}
         placeholder={placeholder}
-        $error={$error}
+        $error={$error || $hasError}
         $touched={$touched}
         {...props}
       />
-      {type === 'password' && (
-        <ToggleButton type="button" onClick={toggleShowPassword}>
-          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-        </ToggleButton>
-      )}
-    </FieldWrapper>
+      <ToggleButton type="button" onClick={toggleShowPassword}>
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+      </ToggleButton>
+    </PasswordWrapper>
   );
 };
 
-export default StyledField;
+export default PasswordInput;

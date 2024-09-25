@@ -1,15 +1,19 @@
 import axios from 'axios';
+import {store} from '../store/store';
+import {handleApiError, handleAuthError, refreshToken} from '../store/userActions';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
-
 
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -23,25 +27,22 @@ api.interceptors.response.use(
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await api.post('/api/auth/refresh-token', { refreshToken });
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
+        await store.dispatch(refreshToken());
         return api(originalRequest);
       } catch (refreshError) {
-        // If refresh token fails, log the user out
-        logout();
+        console.log("DEBUG: refresh error", refreshError);
+        store.dispatch(handleAuthError(refreshError.response.data));
         return Promise.reject(refreshError);
       }
     }
+    store.dispatch(handleApiError(error));
     return Promise.reject(error);
   }
 );
 
 export const register = async (userData) => {
   try {
-    const response = await api.post('/api/auth/register', userData);
+    const response = await api.post('/auth/register', userData);
     return response.data;
   } catch (error) {
     console.error('Full error object:', error);
@@ -58,7 +59,7 @@ export const register = async (userData) => {
 
 export const login = async (credentials) => {
   try {
-    const response = await api.post('/api/auth/login', credentials);
+    const response = await api.post('/auth/login', credentials);
     return response.data;
   } catch (error) {
     console.error('Login error:', error.response?.data);
@@ -75,20 +76,21 @@ export const logout = () => {
   };
   
 
+
 export const getUserProfile = async () => {
-  return await api.get('/api/users/profile');
+  return await api.get('/users/profile');
 };
 
 export const updateUserProfile = async (userData) => {
-  return await api.put('/api/users/profile', userData);
+  return await api.put('/users/profile', userData);
 };
 
 export const changePassword = async (passwordData) => {
-  return await api.put('/api/users/change-password', passwordData);
+  return await api.put('/users/change-password', passwordData);
 };
 
 export const forgotPassword = async (email) => {
-  return await api.post('/api/auth/forgot-password', { email });
+  return await api.post('/auth/forgot-password', { email });
 };
 
 export const resetPassword = async (token, newPassword) => {
@@ -96,7 +98,7 @@ export const resetPassword = async (token, newPassword) => {
 };
 
 export const verifyEmail = async (token) => {
-  return await api.post(`/api/auth/verify-email/${token}`);
+  return await api.post(`/auth/verify-email/${token}`);
 };
 
 

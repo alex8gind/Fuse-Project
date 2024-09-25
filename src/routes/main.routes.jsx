@@ -10,17 +10,25 @@ import Menu from "../pages/Menu";
 import Notifications from "../pages/Notifications";
 import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
-import PageNotFound from "../pages/PageNotFound";
+import PageNotFound from "../pages/PageNotFound/PageNotFound";
 import Helpers from "../pages/Helpers";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
 import Security from "../pages/Security";
 import ForgotPass from "../pages/ForgotPass/ForgotPass";
+import IdVerification from "../pages/IdentityVarification/1.IdVerification/IdVerification";
+import IdDocsFotoOptions from "../pages/IdentityVarification/2.IdDocsFotoOptions/IdDocsFotoOptions";
+import CaptureInstructions from "../pages/IdentityVarification/3.CaptureInstructions/CaptureInstructions";
+import UploadResult from "../pages/IdentityVarification/UploadResult/UploadResult";
+import VerificationSuccess from "../pages/IdentityVarification/6.VerificationSuccess/VerificationSuccess";
+import IdentityChecking from "../pages/IdentityVarification/5.IdentityChecking/IdentityChecking";
+import SelfieCheck from "../pages/IdentityVarification/4.SelfieCheck/SelfieCheck";
+
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider]} />}>
-                        <Route element={<App />} errorElement={<PageNotFound />}>
+                        <Route element={<App />}>
                                 <Route path="/" element={<HomeMobile/>}/>
                                 <Route path="/profile" element={<UserProfile />}/>
                                 <Route path="/docs" element={<Docs/>}/>
@@ -34,6 +42,14 @@ export const router = createBrowserRouter(
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/forgot-password" element={<ForgotPass/>}/>
+                        <Route path="/id-verification" element={<IdVerification />} />
+                        <Route path="/choose-id-option" element={<IdDocsFotoOptions />} />
+                        <Route path="/capture-instructions" element={<CaptureInstructions />} />
+                        <Route path="/upload-result/:documentType/:result" element={<UploadResult />} />
+                        <Route path="/selfie-check" element={<SelfieCheck />} />
+                        <Route path="/verification-success" element={<VerificationSuccess />} />
+                        <Route path="/identity-checking" element={<IdentityChecking />} />
+                        <Route path="/*" element={<PageNotFound />} />
                     </Route>
         )
     )

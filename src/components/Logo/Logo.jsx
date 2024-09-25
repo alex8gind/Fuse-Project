@@ -17,6 +17,11 @@ const LogoContainer = styled.div`
     width: 140px;
     height: 56px;
   }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    width: 150px;
+    height: 64px;
+  }
 `;
 
 const LogoSVG = styled.svg`
@@ -38,6 +43,10 @@ const LogoText = styled.text`
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     font-size: 32px;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    font-size: 36px;
   }
 `;
 

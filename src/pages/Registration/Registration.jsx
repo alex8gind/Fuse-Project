@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css?inline';
 import Spinner from '../../components/Spinner/Spinner';
-import { register } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../../store/userActions';
+import { setError } from '../../store/userSlice';
 import { StyledForm, StyledField, StyledSuccess, StyledError, StyledButton, StyledLink } from './Registration.style';
-
+import PasswordInput from '../../components/PasswordInput';
 
 const RegistrationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -53,22 +54,35 @@ const RegistrationSchema = Yup.object().shape({
 
 const Registration = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector(state => state.user);
 
   useEffect(() => {
-    // Clear toasts when component unmounts
     return () => {
+      dispatch(setError(null));
       toast.dismiss();
     };
-  }, []);
+  }, [dispatch]);
 
-  const handleSubmit = async (values, { setSubmitting, setStatus, resetForm }) => {
+  useEffect(() => {
+    if (error) {
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  }, [error]);
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       console.log('Submitting values:', values);
-      const response = await register(values);
-      console.log('Registration response:', response);
-  
-      if (response && response.user) {
-        setStatus({ success: 'Registration successful!' });
+      const resultAction = await dispatch(registerUser(values));
+      if (registerUser.fulfilled.match(resultAction)) {
+        // console.log('Registration response:', resultAction.payload);
         toast.success('Registration successful! Redirecting to login...', {
           position: "top-right",
           autoClose: 3000,
@@ -77,36 +91,18 @@ const Registration = () => {
           pauseOnHover: true,
           draggable: true,
         });
-        setTimeout(() => {
-          resetForm();
-          navigate('/login');
-        }, 3000);
+        resetForm();
+        setTimeout(() => navigate('/login'), 3000);
       } else {
-        throw new Error('Unexpected response from server');
+        throw new Error(resultAction.error.message || 'Registration failed');
       }
     } catch (error) {
-      console.error('Full error object:', error);
-      let errorMessage = error.message || 'An error occurred during registration';
-      
-      // Check if the error is due to an existing user
-      if (error.response && error.response.status === 409) {
-        errorMessage = 'User already exists. Please use a different email or phone number.';
-      }
-      
-      setStatus({ error: errorMessage });
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      console.error('Registration error:', error);
+      // Error is now handled by the Redux store and displayed via the useEffect above
     } finally {
       setSubmitting(false);
     }
   };
-  
   return (
 <>
 <ToastContainer />
@@ -125,7 +121,7 @@ const Registration = () => {
         validationSchema={RegistrationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, status, isSubmitting }) => (
+        {({ errors, touched, isSubmitting }) => (
 
       <Form>
         <div>
@@ -156,9 +152,9 @@ const Registration = () => {
         </div>
 
         <div>
-            <StyledField 
+            <PasswordInput 
             name="password" 
-            type="password" 
+            // type="password" 
             placeholder="Password"
             $hasError={errors.password && touched.password}
             />
@@ -186,26 +182,15 @@ const Registration = () => {
             {errors.gender && touched.gender && <StyledError>{errors.gender}</StyledError>}
         </div>
 
-      <StyledButton type="submit" disabled={isSubmitting}>
-        {isSubmitting ? <><Spinner />Submitting...</> : 'Sign Up'}
-      </StyledButton>
-
-      {status && status.success && typeof status.success === 'string' && (
-        <StyledSuccess>{status.success}</StyledSuccess>
-      )}
-
-      {status && status.error && typeof status.error === 'string' && (
-        <StyledError>{status.error}</StyledError>
-      )}
-
-      </Form>
-
-      )}
-    </Formik>
-
-    <StyledLink as={Link} to="/login">Already have an account?</StyledLink>
-  
-  </StyledForm>
+        <StyledButton type="submit" disabled={isSubmitting || loading}>
+                {isSubmitting || loading ? <><Spinner />Submitting...</> : 'Sign Up'}
+              </StyledButton>
+              {error && <StyledError>{error}</StyledError>}
+            </Form>
+          )}
+        </Formik>
+        <StyledLink as={Link} to="/login">Already have an account?</StyledLink>
+      </StyledForm>
 </>
   );
 };

@@ -9,7 +9,7 @@ export const MobileNav = styled.nav`
   z-index: 100;
   padding: 0.5rem 0;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
     display: none;
   }
 `;

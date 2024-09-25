@@ -4,8 +4,16 @@ import { Form, Field } from 'formik';
 export const StyledForm = styled(Form)`
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 280px;
   margin: 0 auto;
+
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    width: 300px;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: 320px;
+  }
 `;
 
 export const StyledField = styled(Field)`
@@ -13,7 +21,11 @@ export const StyledField = styled(Field)`
   padding: 8px;
   border: 1px solid ${props => (props.$error && props.$touched ? '#FF0000' : '#dddfe2')};
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 0.9rem;
+
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    font-size: 1rem;
+  }
 
   &:focus {
     outline: none;
@@ -21,6 +33,7 @@ export const StyledField = styled(Field)`
     box-shadow: 0 0 0 2px ${props => (props.$error && props.$touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
   }
 `;
+
 
 export const StyledError = styled.div`
   color: red;
@@ -47,6 +60,10 @@ export const StyledButton = styled.button`
   cursor: pointer;
   font-size: 1em;
   margin-bottom: 10px;
+
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    font-size: 1.1em;
+  }
 
   &:hover {
     background-color: #166fe5;
