@@ -5,22 +5,22 @@ const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 120px;
-  height: 40px;
+  width: 140px;
+  height: 56px;
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    width: 130px;
-    height: 48px;
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.md}) {
     width: 140px;
     height: 56px;
   }
 
-  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
     width: 150px;
     height: 64px;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    width: 160px;
+    height: 76px;
   }
 `;
 

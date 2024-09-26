@@ -4,21 +4,28 @@ import { Search } from 'lucide-react';
 export const HeaderWrapper = styled.header`
   background-color: ${props => props.theme.colors.header};
   color: ${props => props.theme.colors.text};
+  display: flex;
+  padding: .5em;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  /* background-color: purple; */
 `;
 
 export const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0.5rem 1rem;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-evenly;
+  padding: .4rem 0;
+  /* background-color: green; */
 `;
 
 export const LogoWrapper = styled.div`
   display: flex;
-  /* flex-basis: auto; */
-  /* flex-grow: 2; */
+  flex: 0 1 auto; // Don't grow, can shrink, auto basis
   width: fit-content;
   align-items: center;
   gap: 0.5rem;
@@ -29,6 +36,7 @@ export const DesktopNav = styled.nav`
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
     display: block;
+    flex: 1 1 auto; // Can grow and shrink, auto basis
   }
 `;
 
@@ -83,8 +91,8 @@ export const SearchInput = styled.input`
 
 
 const baseButtonStyle = css`
-  padding: 0.75rem;
-  border-radius: 9999px;
+  padding: 1rem;
+  border-radius: 100vh;
   background: none;
   border: none;
   color: ${props => props.$isActive 
@@ -124,6 +132,7 @@ export const DesktopIcons = styled.div`
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
     display: flex;
     gap: 1rem;
+    flex: 0 1 auto; // Don't grow, can shrink, auto basis
   }
 `;
 
@@ -155,51 +164,3 @@ export const MenuButton = styled.button`
   }
 `;
 
-export const TabletMenu = styled.div`
-  position: fixed;
-  top: 4rem;
-  left: 0;
-  width: 16rem;
-  height: calc(100vh - 4rem);
-  background-color: #2563eb;
-  z-index: 50;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  display: none;
-
-  @media (min-width: ${props => props.theme.breakpoints.md}) and (max-width: ${props => props.theme.breakpoints.lg}) {
-    display: block;
-  }
-
-  nav ul {
-    list-style-type: none;
-    padding: 1rem;
-    margin: 0;
-  }
-
-  nav ul li {
-    margin-bottom: 1rem;
-  }
-
-  nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 1.125rem;
-
-    &:hover {
-      color: #e5e7eb;
-    }
-  }
-`;
-
-export const CloseButton = styled.button`
-  ${baseButtonStyle}
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  color: white;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-`;

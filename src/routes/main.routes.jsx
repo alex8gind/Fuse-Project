@@ -27,7 +27,7 @@ export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider]} />}>
                         <Route element={<App />}>
-                            <Route element={<ProtectedRoute />}>
+                            {/* <Route element={<ProtectedRoute />}> */}
                                 <Route path="/" element={<Home/>}/>
                                 <Route path="/profile" element={<Profile />}/>
                                 <Route path="/docs" element={<Docs/>}/>
@@ -35,7 +35,7 @@ export const router = createBrowserRouter(
                                 <Route path="/settings" element={<Settings/>}/>
                                 <Route path="/notifications" element={<Notifications/>}/>
                                 <Route path="/security" element={<Security/>}/>
-                            </Route>
+                            {/* </Route> */}
                         </Route>
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>

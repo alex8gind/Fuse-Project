@@ -1,5 +1,6 @@
 const theme = {
     colors: {
+      primaryOrange: '#E86C25',
       header: '#F8f8f8',
       background: '#F5f5f5',
       navigation_bg: '#F8f8f8',
