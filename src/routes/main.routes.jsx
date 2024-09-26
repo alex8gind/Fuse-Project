@@ -1,17 +1,15 @@
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 
 import App from '../App';
-import HomeMobile from "../pages/HomeMobile";
-import UserProfile from "../pages/UserProfile";
-import Docs from "../pages/Docs";
-import Connections from "../pages/Connections";
-import Settings from "../pages/Settings";
-import Menu from "../pages/Menu";
-import Notifications from "../pages/Notifications";
+import Home from "../pages/Home/Home";
+import Profile from "../pages/Profile/Profile";
+import Docs from "../pages/Docs/Docs";
+import Connections from "../pages/Connections/Connections";
+import Settings from "../pages/Settings/Settings";
+import Notifications from "../pages/Notifications/Notifications";
 import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import PageNotFound from "../pages/PageNotFound/PageNotFound";
-import Helpers from "../pages/Helpers";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
 import Security from "../pages/Security";
@@ -23,21 +21,21 @@ import UploadResult from "../pages/IdentityVarification/UploadResult/UploadResul
 import VerificationSuccess from "../pages/IdentityVarification/6.VerificationSuccess/VerificationSuccess";
 import IdentityChecking from "../pages/IdentityVarification/5.IdentityChecking/IdentityChecking";
 import SelfieCheck from "../pages/IdentityVarification/4.SelfieCheck/SelfieCheck";
-
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider]} />}>
                         <Route element={<App />}>
-                                <Route path="/" element={<HomeMobile/>}/>
-                                <Route path="/profile" element={<UserProfile />}/>
+                            <Route element={<ProtectedRoute />}>
+                                <Route path="/" element={<Home/>}/>
+                                <Route path="/profile" element={<Profile />}/>
                                 <Route path="/docs" element={<Docs/>}/>
                                 <Route path="/connections" element={<Connections/>}/>
                                 <Route path="/settings" element={<Settings/>}/>
-                                <Route path="/menu" element={<Menu/>}/>
                                 <Route path="/notifications" element={<Notifications/>}/>
-                                <Route path="/helpers" element={<Helpers/>}/>
                                 <Route path="/security" element={<Security/>}/>
+                            </Route>
                         </Route>
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>

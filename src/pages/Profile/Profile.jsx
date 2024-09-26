@@ -12,7 +12,7 @@ const ProfileField = styled.div`
   margin-bottom: 10px;
 `;
 
-const UserProfile = () => {
+const Profile = () => {
   const user = useSelector((state) => state.user.currentUser);
 
   if (!user) {
@@ -41,4 +41,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default Profile;

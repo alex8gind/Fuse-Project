@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -10,6 +10,8 @@ import { loginUser } from '../../store/userActions';
 import { setError } from '../../store/userSlice';
 import { StyledForm, StyledField, StyledError, StyledButton, StyledLink, CreateAccountButton } from './Login.style';
 import PasswordInput from '../../components/PasswordInput';
+import { UserContext } from '../../contexts/user.context';
+
 
 const LoginSchema = Yup.object().shape({
   phoneOrEmail: Yup.string()
@@ -26,6 +28,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
+  const {login} = useContext(UserContext);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
   const { loading, error } = useSelector(state => state.user);
@@ -54,8 +57,8 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       console.log('Submitting values:', values);
-      const response = await dispatch(loginUser(values)).unwrap();
-      console.log('Login response:', response);
+      const data = await login(values);
+      console.log('Login data:', data);
       toast.success('Login successful! Redirecting...', {
         position: "top-right",
         autoClose: 2000,
@@ -66,7 +69,7 @@ const Login = () => {
       });
       setTimeout(() => {
         resetForm();
-        navigate('/profile');
+        navigate('/');
       }, 2000);
     } catch (error) {
       console.error('Login error:', error);
