@@ -21,21 +21,20 @@ import UploadResult from "../pages/IdentityVarification/UploadResult/UploadResul
 import VerificationSuccess from "../pages/IdentityVarification/6.VerificationSuccess/VerificationSuccess";
 import IdentityChecking from "../pages/IdentityVarification/5.IdentityChecking/IdentityChecking";
 import SelfieCheck from "../pages/IdentityVarification/4.SelfieCheck/SelfieCheck";
-import ProtectedRoute from "../components/ProtectedRoute";
+import Private from "../components/Private";
+
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider]} />}>
-                        <Route element={<App />}>
-                            {/* <Route element={<ProtectedRoute />}> */}
-                                <Route path="/" element={<Home/>}/>
-                                <Route path="/profile" element={<Profile />}/>
-                                <Route path="/docs" element={<Docs/>}/>
-                                <Route path="/connections" element={<Connections/>}/>
-                                <Route path="/settings" element={<Settings/>}/>
-                                <Route path="/notifications" element={<Notifications/>}/>
-                                <Route path="/security" element={<Security/>}/>
-                            {/* </Route> */}
+                        <Route element={<App />}>                           
+                            <Route path="/" element={<Private><Home/></Private>}/>                           
+                            <Route path="/profile" element={<Private><Profile /></Private>}/>
+                            <Route path="/docs" element={<Private><Docs/></Private>}/>
+                            <Route path="/connections" element={<Private><Connections/></Private>}/>
+                            <Route path="/settings" element={<Private><Settings/></Private>}/>
+                            <Route path="/notifications" element={<Private><Notifications/></Private>}/>
+                            <Route path="/security" element={<Private><Security/></Private>}/>                          
                         </Route>
                         <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>

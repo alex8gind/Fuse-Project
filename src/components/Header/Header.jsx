@@ -16,7 +16,7 @@ const Header = () => {
 
   const toggleSideMenu = () => {
     setIsSideMenuOpen(!isSideMenuOpen);
-    setActiveButtons(prev => ({ ...prev, menu: !prev.menu }));
+    // setActiveButtons(prev => ({ ...prev, menu: !prev.menu }));
   };
 
   const handleButtonClick = (buttonName) => {
@@ -42,7 +42,7 @@ const Header = () => {
             onClick={toggleSideMenu} 
             aria-expanded={isSideMenuOpen} 
             aria-label="Toggle side menu"
-            $isActive={activeButtons.menu}
+            // $isActive={activeButtons.menu}
           >
             <Menu size={27} />
           </MenuButton>
@@ -54,11 +54,10 @@ const Header = () => {
           <DesktopNav>
             <NavList>
               <NavItem $isActive={location.pathname === '/'}><Link to="/">Home</Link></NavItem>
-              <NavItem $isActive={location.pathname === '/profile'}><Link to="/profile">My Profile</Link></NavItem>
+              <NavItem $isActive={location.pathname === '/profile'}><Link to="/profile">Profile</Link></NavItem>
               <NavItem $isActive={location.pathname === '/documents'}><Link to="/documents">Documents</Link></NavItem>
               <NavItem $isActive={location.pathname === '/connections'}><Link to="/connections">Connections</Link></NavItem>
               <NavItem $isActive={location.pathname === '/settings'}><Link to="/settings">Settings</Link></NavItem>
-              <NavItem $isActive={location.pathname === '/helpers'}><Link to="/helpers">Helpers</Link></NavItem>
             </NavList>
           </DesktopNav>
 
@@ -106,9 +105,10 @@ const Header = () => {
       </HeaderWrapper>
 
       <SideMenu 
-        userName="User Name" // Replace with actual user name
+        userName="John Doe" // Replace with actual user name
         onLogout={handleLogout}
         isOpen={isSideMenuOpen}
+        onClose={() => setIsSideMenuOpen(false)}
       />
     </>
   );

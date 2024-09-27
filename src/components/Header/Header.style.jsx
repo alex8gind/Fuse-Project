@@ -12,6 +12,11 @@ export const HeaderWrapper = styled.header`
   right: 0;
   z-index: 100;
   /* background-color: purple; */
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    position: static;
+    padding: 0 3em;
+  }
 `;
 
 export const Container = styled.div`
@@ -21,6 +26,10 @@ export const Container = styled.div`
   justify-content: space-evenly;
   padding: .4rem 0;
   /* background-color: green; */
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    padding: 0.1em 1em;
+  }
 `;
 
 export const LogoWrapper = styled.div`
@@ -29,13 +38,16 @@ export const LogoWrapper = styled.div`
   width: fit-content;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem;
 `;
 
 export const DesktopNav = styled.nav`
   display: none;
+  padding: 0.5rem;
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    display: block;
+    display: flex;
+    /* background-color: purple; */
     flex: 1 1 auto; // Can grow and shrink, auto basis
   }
 `;
@@ -43,31 +55,45 @@ export const DesktopNav = styled.nav`
 
 export const NavList = styled.ul`
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-basis: auto;
   flex-grow: 1;
-  gap: 1.5rem;
+  gap: 1rem;
   list-style-type: none;
+  /* background-color: green; */
 `;
 
 export const NavItem = styled.li`
   a {
     color: ${props => props.$isActive 
-      ? props.theme.colors.navigation_clicked_button
+      ? props.theme.colors.primaryOrange
       : props.theme.colors.navigation_button};
+    font-size: 1.2em;
     font-weight: bold;
     text-decoration: none;
-    transition: color 0.3s ease;
+    padding: 1rem 1.5em;
+    border-radius: 10vh;
+    transition: color 0.1s ease, background-color 0.1s ease;
 
     &:hover {
-      color: ${props => props.theme.colors.navigation_clicked_button};
+      background-color: rgba(235, 234, 233, 0.991); // Light grey background on hover
     }
+
+    &:active {
+      background-color: rgba(235, 234, 233, 0.991); // Slightly darker grey when clicked
+    }
+
+    ${props => props.$isActive && css`
+      color: ${props.theme.colors.primaryOrange};
+    `}
   }
 `;
 
 export const SearchWrapper = styled.div`
   position: relative;
   display: flex;
-  gap: 0.5rem;
+  /* gap: 0.5rem; */
   align-items: center;
   justify-content: center;
   padding: 0.5rem;
@@ -76,7 +102,7 @@ export const SearchWrapper = styled.div`
 export const SearchInput = styled.input`
   background-color: transparent;
   color: ${props => props.theme.colors.text};
-  padding: 0.5rem 2rem;
+  padding: 0.5rem 2.5rem; // Increased left padding to accommodate the icon
   border-radius: 9999px;
   border: 1px solid ${props => props.theme.colors.icons};
   width: 10rem;
@@ -87,7 +113,8 @@ export const SearchInput = styled.input`
   
   @media (min-width: ${props => props.theme.breakpoints.md}) and (max-width: ${props => props.theme.breakpoints.lg}) {
     display: none;
-  }`;
+  }
+`;
 
 
 const baseButtonStyle = css`
@@ -113,16 +140,28 @@ const baseButtonStyle = css`
 export const ButtonsIcon = styled.button`
   ${baseButtonStyle}
 `;
-
 export const SearchIcon = styled(Search)`
-  ${baseButtonStyle}
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${props => props.theme.colors.icons};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 50%;
+
+  &:hover, &:focus {
+    color: ${props => props.theme.colors.primaryOrange};
+    background-color: ${props => props.theme.colors.primaryOrange}20; // 20 is for 12.5% opacity
+  }
+
+  &:active {
+    background-color: ${props => props.theme.colors.primaryOrange}40; // 40 is for 25% opacity
+  }
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    position: absolute;
-    left: 7%;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 0;
+    left: 0.75rem;
   }
 `;
 
