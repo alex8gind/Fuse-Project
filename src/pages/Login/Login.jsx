@@ -1,17 +1,36 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { UserContext } from '../../contexts/user.context';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css?inline';
+import { Eye, EyeOff } from 'lucide-react';
 import Spinner from '../../components/Spinner/Spinner';
-import { loginUser } from '../../store/userActions';
+import GoogleSvg from "../../assets/icons/google.svg";
+import { CustomToastStyles } from '../../styles/CustomToastStyles';
 import { setError } from '../../store/userSlice';
-import { StyledForm, StyledField, StyledError, StyledButton, StyledLink, CreateAccountButton } from './Login.style';
-import PasswordInput from '../../components/PasswordInput';
-import { UserContext } from '../../contexts/user.context';
-
+import { 
+  StyledForm, 
+  FieldWrapper,
+  StyledField, 
+  StyledError, 
+  StyledButton, 
+  StyledLink, 
+  CheckboxLinkContainer,
+  CheckboxContainer,
+  StyledCheckbox,
+  CheckboxLabel,
+  ForgotPasswordContainer,
+  OrDivider,
+  GoogleButton,
+  GoogleIcon,
+  CreateAccountButton,
+  PasswordWrapper,
+  StyledPasswordField,
+  ToggleButton
+} from './Login.style';
 
 const LoginSchema = Yup.object().shape({
   phoneOrEmail: Yup.string()
@@ -25,6 +44,7 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string()
     .required('Password is required')
     .min(7, 'Password must be at least 7 characters'),
+  staySignedIn: Yup.boolean()
 });
 
 const Login = () => {
@@ -32,11 +52,11 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
   const { loading, error } = useSelector(state => state.user);
+  const [showPassword, setShowPassword] = useState(false);
 
- 
   useEffect(() => {
     return () => {
-      dispatch(setError(null)); // Clear any existing errors when component unmounts
+      dispatch(setError(null));
       toast.dismiss();
     };
   }, [dispatch]);
@@ -50,6 +70,7 @@ const Login = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
+        className: 'custom-toast-container',
       });
     }
   }, [error]);
@@ -66,6 +87,7 @@ const Login = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
+        className: 'custom-toast-container',
       });
       setTimeout(() => {
         resetForm();
@@ -73,51 +95,78 @@ const Login = () => {
       }, 2000);
     } catch (error) {
       console.error('Login error:', error);
-      // Error is now handled by the Redux store and displayed via the useEffect above
     } finally {
       setSubmitting(false);
     }
   };
 
-
   return (
-  <>
-    <ToastContainer />
-    <Formik
-      initialValues={{ phoneOrEmail: '', password: '' }}
-      validationSchema={LoginSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ errors, touched, isSubmitting, resetForm }) => (
-        <StyledForm>
+    <>
+      <CustomToastStyles />
+      <ToastContainer />
+      <Formik
+        initialValues={{ phoneOrEmail: '', password: '', staySignedIn: false }}
+        validationSchema={LoginSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched, isSubmitting, resetForm }) => (
+          <StyledForm>
+            <FieldWrapper>
+              <StyledField 
+                name="phoneOrEmail" 
+                placeholder="Email or Phone"
+                $error={errors.phoneOrEmail}
+                $touched={touched.phoneOrEmail}
+              />
+              {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
+            </FieldWrapper>
 
-        <StyledField 
-        name="phoneOrEmail" 
-        placeholder="Email or Phone"
-        $error={errors.phoneOrEmail}
-        $touched={touched.phoneOrEmail}
-        />
-        {errors.phoneOrEmail && touched.phoneOrEmail && <StyledError>{errors.phoneOrEmail}</StyledError>}
+            <FieldWrapper>
+              <PasswordWrapper>
+                <StyledPasswordField
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  $error={errors.password}
+                  $touched={touched.password}
+                />
+                <ToggleButton type="button" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                </ToggleButton>
+              </PasswordWrapper>
+              {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
+            </FieldWrapper>
+            
+            <CheckboxLinkContainer>
+              <CheckboxContainer>
+                <StyledCheckbox type="checkbox" name="staySignedIn" id="staySignedIn" />
+                <CheckboxLabel htmlFor="staySignedIn">Stay signed in</CheckboxLabel>
+              </CheckboxContainer>
+            
+              <ForgotPasswordContainer>
+                <StyledLink as={Link} to="/forgot-password">Forgot password?</StyledLink>
+              </ForgotPasswordContainer>           
+            </CheckboxLinkContainer>
 
-        <PasswordInput 
-        name="password" 
-        // type="password" 
-        placeholder="Password"
-        $error={errors.password}
-        $touched={touched.password}
-        />
-        {errors.password && touched.password && <StyledError>{errors.password}</StyledError>}
-          
-        <StyledButton 
+            <StyledButton 
               type="submit" 
-              disabled={isSubmitting || loading}>
-                {isSubmitting || loading ? <><Spinner />Logging in...</> : 'Log In'}
+              disabled={isSubmitting || loading}
+            >
+              {isSubmitting || loading ? <><Spinner />Logging in...</> : 'Log In'}
             </StyledButton>
+
             {error && <StyledError>{error}</StyledError>}
-            <StyledLink as={Link} to="/forgot-password">Forgot password?</StyledLink>
+
+            <OrDivider>OR</OrDivider>
+
+            <GoogleButton type="button">
+              <GoogleIcon src={GoogleSvg} alt="Google" />
+              Continue with Google
+            </GoogleButton>
+
             <CreateAccountButton type="button" onClick={() => {
-                resetForm();
-                navigate('/register');
+              resetForm();
+              navigate('/register');
             }}>
               Create New Account
             </CreateAccountButton>

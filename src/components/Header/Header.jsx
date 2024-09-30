@@ -55,7 +55,7 @@ const Header = () => {
             <NavList>
               <NavItem $isActive={location.pathname === '/'}><Link to="/">Home</Link></NavItem>
               <NavItem $isActive={location.pathname === '/profile'}><Link to="/profile">Profile</Link></NavItem>
-              <NavItem $isActive={location.pathname === '/documents'}><Link to="/documents">Documents</Link></NavItem>
+              <NavItem $isActive={location.pathname === '/documents'}><Link to="/docs">Documents</Link></NavItem>
               <NavItem $isActive={location.pathname === '/connections'}><Link to="/connections">Connections</Link></NavItem>
               <NavItem $isActive={location.pathname === '/settings'}><Link to="/settings">Settings</Link></NavItem>
             </NavList>

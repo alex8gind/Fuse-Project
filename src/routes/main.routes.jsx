@@ -22,6 +22,10 @@ import VerificationSuccess from "../pages/IdentityVarification/6.VerificationSuc
 import IdentityChecking from "../pages/IdentityVarification/5.IdentityChecking/IdentityChecking";
 import SelfieCheck from "../pages/IdentityVarification/4.SelfieCheck/SelfieCheck";
 import Private from "../components/Private";
+import VerificationEmailOrPhone from "../pages/VerificationEmailOrPhone/VerificationEmailOrPhone";
+import VerificationResult from "../pages/VerificationEmailOrPhone/VerificationResult";
+import MedDocsUploader from "../pages/MedDocsUploader/MedDocsUploader"
+import Contacts from "../pages/Contacts/Contacts"
 
 
 export const router = createBrowserRouter(
@@ -30,22 +34,27 @@ export const router = createBrowserRouter(
                         <Route element={<App />}>                           
                             <Route path="/" element={<Private><Home/></Private>}/>                           
                             <Route path="/profile" element={<Private><Profile /></Private>}/>
+                            <Route path="/docs/med" element={<Private><MedDocsUploader/></Private>}/>
                             <Route path="/docs" element={<Private><Docs/></Private>}/>
                             <Route path="/connections" element={<Private><Connections/></Private>}/>
+                            <Route path="/connection/:id" element={<Private><Contacts/></Private>}/>
+                            <Route path="/settings" element={<Private><Settings/></Private>}/>
                             <Route path="/settings" element={<Private><Settings/></Private>}/>
                             <Route path="/notifications" element={<Private><Notifications/></Private>}/>
                             <Route path="/security" element={<Private><Security/></Private>}/>                          
                         </Route>
-                        <Route path="/register" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>
+                        <Route path="/register" element={<Registration/>}/>
+                        <Route path="/verify" element={<VerificationEmailOrPhone/>}/>
+                        <Route path="/verify/:result" element={<VerificationResult/>}/>
                         <Route path="/forgot-password" element={<ForgotPass/>}/>
                         <Route path="/id-verification" element={<IdVerification />} />
                         <Route path="/choose-id-option" element={<IdDocsFotoOptions />} />
                         <Route path="/capture-instructions" element={<CaptureInstructions />} />
                         <Route path="/upload-result/:documentType/:result" element={<UploadResult />} />
                         <Route path="/selfie-check" element={<SelfieCheck />} />
-                        <Route path="/verification-success" element={<VerificationSuccess />} />
                         <Route path="/identity-checking" element={<IdentityChecking />} />
+                        <Route path="/verification-success" element={<VerificationSuccess />} />
                         <Route path="/*" element={<PageNotFound />} />
                     </Route>
         )

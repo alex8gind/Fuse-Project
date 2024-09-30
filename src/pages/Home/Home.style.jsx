@@ -4,7 +4,7 @@ import { ShieldCheck } from 'lucide-react'
 export const PageContainer = styled.div`
   width: 95%;
   min-height: calc(86vh - 100px); // Adjust 100px to match your Navigation height
-  margin: 105px auto;
+  margin: 90px auto;
   background-color: ${props => props.theme.colors.navigation_bg};
   color: ${props => props.theme.colors.text};
   border-radius: 20px;
@@ -19,9 +19,9 @@ export const PageContainer = styled.div`
   /* background-color: purple; */
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    /* width: fit-content; */
-    padding: 3em;
-    gap: 40px;
+    margin: 30px auto;
+    max-width: 85%;
+    min-height: 86vh;
   }
 `;
 

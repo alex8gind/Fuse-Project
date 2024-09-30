@@ -7,8 +7,10 @@ export const MobileNav = styled.nav`
   right: 0;
   background-color: ${props => props.theme.colors.navigation_bg};
   z-index: 100;
-  padding: 1rem;
-  height: 80px; 
+  padding: .1em;
+  height: 65px; 
+  border-top: 0.2px solid ${props => props.theme.colors.navigation_clicked_button};
+  /* background-color: green; */
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     display: none;
@@ -60,7 +62,7 @@ export const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px; // Fixed height for icon container
+  height: 30px; // Fixed height for icon container
   margin-bottom: 4px;
 `;
 

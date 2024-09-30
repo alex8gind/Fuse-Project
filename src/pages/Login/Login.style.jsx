@@ -4,87 +4,212 @@ import { Form, Field } from 'formik';
 export const StyledForm = styled(Form)`
   display: flex;
   flex-direction: column;
-  width: 280px;
-  margin: 0 auto;
-
-  @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    width: 300px;
-  }
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 310px;
+  height: 80vh;
+  border-radius: 6px;
+  margin: auto;
+  padding: 1em 2em;
+  background-color: ${props => props.theme.colors.navigation_bg};
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    width: 320px;
+    max-width: 340px;
   }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    max-width: 360px;
+  }
+`;
+
+export const FieldWrapper = styled.div`
+  width: 100%;
+  margin-bottom: 1em;
 `;
 
 export const StyledField = styled(Field)`
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid ${props => (props.$error && props.$touched ? '#FF0000' : '#dddfe2')};
-  border-radius: 4px;
-  font-size: 0.9rem;
-
-  @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    font-size: 1rem;
-  }
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid ${props => (props.$error && props.$touched ? props.theme.colors.error : '#ddd')};
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
-    border-color: ${props => (props.$error && props.$touched ? '#FF0000' : '#1877f2')};
-    box-shadow: 0 0 0 2px ${props => (props.$error && props.$touched ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
+    border-color: ${props => (props.$error && props.$touched ? props.theme.colors.error : props.theme.colors.primaryOrange)};
+    box-shadow: 0 0 0 2px ${props => (props.$error && props.$touched ? 'rgba(255, 59, 48, 0.2)' : 'rgba(232, 108, 37, 0.2)')};
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 14px;
   }
 `;
 
-
 export const StyledError = styled.div`
-  color: red;
-  font-size: 0.8em;
-  margin-bottom: 10px;
-`;
-
-export const StyledSuccess = styled.div`
-  color: #4caf50;
-  background-color: #e8f5e9;
-  border: 1px solid #4caf50;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  color: ${props => props.theme.colors.error};
+  font-size: 0.7em;
+  margin-top: 0.25em;
+  min-height: 1em;
 `;
 
 export const StyledButton = styled.button`
-  background-color: #1877f2;
-  color: white;
-  padding: 10px;
+  background-color: ${props => props.theme.colors.primaryOrange};
+  color: ${props => props.theme.colors.navigation_bg};
+  padding: .75rem .5em;
   border: none;
-  border-radius: 4px;
+  border-radius: 20vh;
+  box-sizing: border-box;
   cursor: pointer;
-  font-size: 1em;
-  margin-bottom: 10px;
-
-  @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    font-size: 1.1em;
-  }
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  transition: background-color 0.2s;
 
   &:hover {
-    background-color: #166fe5;
+    background-color: #000;
+  }
+
+  &:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 14px;
   }
 `;
 
 export const StyledLink = styled.a`
-  color: #1877f2;
+  color: #222;
   text-decoration: none;
-  font-size: 0.9em;
-  margin-bottom: 10px;
+  font-size: 14px;
+  margin-left: 0.5rem;
 
   &:hover {
     text-decoration: underline;
   }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 12px;
+  }
+`;
+
+export const CheckboxLinkContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+  width: 100%;
+`;
+
+export const CheckboxContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.5em;
+  padding-bottom: 2em;
+`;
+
+export const StyledCheckbox = styled(Field)`
+  margin-right: 0.5rem;
+`;
+
+export const CheckboxLabel = styled.label`
+  font-size: .9em;
+  display: flex;
+  align-items: center;
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 12px;
+  }
+`;
+
+export const ForgotPasswordContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.5em;
+  padding-bottom: 2em;
+`;
+
+export const OrDivider = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 14px;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #151313;
+  }
+
+  &::before {
+    margin-right: 0.5em;
+  }
+
+  &::after {
+    margin-left: 0.5em;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 12px;
+  }
+`;
+
+export const GoogleButton = styled(StyledButton)`
+  background-color: white;
+  color: ${props => props.theme.colors.text};
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+export const GoogleIcon = styled.img`
+  width: 2rem;
+  height: 2rem;
+  padding-right: 0.5rem;
 `;
 
 export const CreateAccountButton = styled(StyledButton)`
-  background-color: #42b72a;
+  background-color: white;
+  color: #222;
+  border: 1px solid #222;
+  margin-top: 1rem;
 
   &:hover {
-    background-color: #36a420;
+    background-color: #f5f5f5;
   }
 `;
+
+export const PasswordWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+export const StyledPasswordField = styled(StyledField)`
+  padding-right: 40px;
+`;
+
+export const ToggleButton = styled.button`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+`;
+

@@ -5,7 +5,7 @@ export const HeaderWrapper = styled.header`
   background-color: ${props => props.theme.colors.header};
   color: ${props => props.theme.colors.text};
   display: flex;
-  padding: .5em;
+  padding: .1em 0.5em;
   position: fixed;
   top: 0;
   left: 0;
@@ -24,7 +24,7 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  padding: .4rem 0;
+  padding: .2rem 0;
   /* background-color: green; */
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
@@ -38,7 +38,8 @@ export const LogoWrapper = styled.div`
   width: fit-content;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.2rem;
+  /* background-color: red; */
 `;
 
 export const DesktopNav = styled.nav`
@@ -59,7 +60,7 @@ export const NavList = styled.ul`
   align-items: center;
   flex-basis: auto;
   flex-grow: 1;
-  gap: 1rem;
+  gap: 1.5em;
   list-style-type: none;
   /* background-color: green; */
 `;
@@ -68,21 +69,12 @@ export const NavItem = styled.li`
   a {
     color: ${props => props.$isActive 
       ? props.theme.colors.primaryOrange
-      : props.theme.colors.navigation_button};
-    font-size: 1.2em;
-    font-weight: bold;
+      : props.theme.colors.navigation_clicked_button};
+    font-size: 1.5em;
     text-decoration: none;
-    padding: 1rem 1.5em;
+    padding: .5em;
     border-radius: 10vh;
     transition: color 0.1s ease, background-color 0.1s ease;
-
-    &:hover {
-      background-color: rgba(235, 234, 233, 0.991); // Light grey background on hover
-    }
-
-    &:active {
-      background-color: rgba(235, 234, 233, 0.991); // Slightly darker grey when clicked
-    }
 
     ${props => props.$isActive && css`
       color: ${props.theme.colors.primaryOrange};
@@ -93,7 +85,7 @@ export const NavItem = styled.li`
 export const SearchWrapper = styled.div`
   position: relative;
   display: flex;
-  /* gap: 0.5rem; */
+  /* background-color: green; */
   align-items: center;
   justify-content: center;
   padding: 0.5rem;
@@ -105,7 +97,7 @@ export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem; // Increased left padding to accommodate the icon
   border-radius: 9999px;
   border: 1px solid ${props => props.theme.colors.icons};
-  width: 10rem;
+  width: 17em;
 
   &::placeholder {
     color: ${props => props.theme.colors.icons};

@@ -1,12 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
-const LogoContainer = styled.div`
+const LogoContainer = styled(Link)`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 140px;
   height: 56px;
+  text-decoration: none;
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
     width: 140px;
@@ -52,7 +54,7 @@ const LogoText = styled.text`
 
 const Logo = () => {
   return (
-    <LogoContainer>
+    <LogoContainer to="/">
       <LogoSVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40">
         <LogoText x="50" y="20">
           FUSE

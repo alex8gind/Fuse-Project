@@ -1,63 +1,83 @@
 import styled from 'styled-components';
-import { Field } from 'formik';
+import { Field, Form } from 'formik';
 
-export const StyledForm = styled.div`
+export const StyledForm = styled(Form)`
+  width: 100%;
   max-width: 300px;
-  margin: 2rem auto;
+  margin: 1rem auto;
   padding: 1rem;
-  background-color: white;
+  background-color: ${props => props.theme.colors.background};
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
     max-width: 400px;
-    padding: 2rem;
+    padding: 1.5rem;
+    margin: 2rem auto;
   }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     max-width: 500px;
+    padding: 2rem;
   }
+`;
+
+export const FieldWrapper = styled.div`
+  width: 100%;
+  margin-bottom: 1em;
 `;
 
 export const StyledField = styled(Field)`
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid ${props => (props.$hasError ? '#FF0000' : '#dddfe2')};
-  border-radius: 4px;
-  font-size: 0.9rem;
-
-  @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    font-size: 1rem;
-  }
+  padding: 0.75rem;
+  border: 1px solid ${props => (props.$error && props.$touched ? props.theme.colors.error : '#ddd')};
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: white;
+  color: ${props => props.theme.colors.text};
 
   &:focus {
     outline: none;
-    border-color: ${props => (props.$hasError ? '#FF0000' : '#1877f2')};
-    box-shadow: 0 0 0 2px ${props => (props.$hasError ? 'rgba(255, 0, 0, 0.2)' : 'rgba(24, 119, 242, 0.2)')};
+    border-color: ${props => (props.$error && props.$touched ? props.theme.colors.error : props.theme.colors.primaryOrange)};
+    box-shadow: 0 0 0 2px ${props => (props.$error && props.$touched ? 'rgba(255, 59, 48, 0.2)' : 'rgba(232, 108, 37, 0.2)')};
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    font-size: 14px;
   }
 `;
 
-export const StyledError = styled.div`
-color: red;
-font-size: 0.8rem;
-margin-bottom: 0.5rem;
+export const PasswordWrapper = styled.div`
+  position: relative;
+  width: 100%;
 `;
 
-export const StyledSuccess = styled.div`
-  color: #4caf50;
-  background-color: #e8f5e9;
-  border: 1px solid #4caf50;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-weight: bold;
+export const StyledPasswordField = styled(StyledField)`
+  padding-right: 40px;
+`;
+
+export const ToggleButton = styled.button`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+`;
+
+export const StyledError = styled.div`
+  color: ${props => props.theme.colors.error};
+  font-size: 0.7em;
+  margin-top: 0.25em;
+  min-height: 1em;
 `;
 
 export const StyledButton = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: #1877f2;
+  background-color: ${props => props.theme.colors.primaryOrange};
   color: white;
   border: none;
   border-radius: 4px;
@@ -65,29 +85,25 @@ export const StyledButton = styled.button`
   cursor: pointer;
   transition: background-color 0.2s;
 
-  @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    font-size: 1.1rem;
-  }
-
   &:hover {
-    background-color: #166fe5;
+    background-color: #d15a1f;
   }
 
   &:disabled {
-    background-color: #7f7f7f;
+    background-color: ${props => props.theme.colors.icons};
     cursor: not-allowed;
   }
 `;
 
-
 export const StyledLink = styled.a`
-display: block;
-text-align: center;
-margin-top: 1rem;
-color: #166fe5;
-text-decoration: none;
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: ${props => props.theme.colors.primaryOrange};
+  text-decoration: none;
+  font-size: 0.9rem;
 
-&:hover {
-  text-decoration: underline;
-}
+  &:hover {
+    text-decoration: underline;
+  }
 `;
