@@ -1,5 +1,14 @@
 import React from 'react';
-import { PageContainer, UserInfo, UserPhoto, VerifiedBadge, VerifiedIcon, ButtonsContainer, Button, ConnectionRequestButton, DocumentsButton } from './Home.style';
+import SendRequestBtn from "../../components/SendRequestBtn"
+import { PageContainer, 
+  UserInfo, 
+  UserPhoto, 
+  VerifiedBadge, 
+  VerifiedIcon, 
+  ButtonsContainer, 
+  Button, 
+  DocumentsButton 
+} from './Home.style';
 import BackBtn from "../../components/BackBtn"
 
 const Home = () => {
@@ -19,7 +28,7 @@ const Home = () => {
       </ButtonsContainer>
 
       <DocumentsButton>Documents</DocumentsButton>
-      <ConnectionRequestButton>Send Connection Request</ConnectionRequestButton>
+      <SendRequestBtn isContactsPage={false} />
       
     </PageContainer>
   );

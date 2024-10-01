@@ -3,6 +3,7 @@ import './App.css'
 import { Outlet } from 'react-router-dom'
 import Header from './components/Header/Header'
 import Navigation from './components/Navigation/Navigation'
+// import Background from './components/Background'
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 function App() {
@@ -14,7 +15,9 @@ function App() {
                 </Helmet>
                 <div className='App'>
                     <Header />
-                    <Outlet />
+                    {/* <Background> */}
+                        <Outlet />
+                    {/* </Background> */}
                     <Navigation />
                 </div>
             </div>

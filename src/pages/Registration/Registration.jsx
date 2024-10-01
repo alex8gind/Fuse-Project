@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css?inline';
 import { Eye, EyeOff } from 'lucide-react';
-import Spinner from '../../components/Spinner/Spinner';
+import Spinner from '../../components/Spinner';
 import { registerUser } from '../../store/userActions';
 import { setError } from '../../store/userSlice';
 import { CustomToastStyles } from '../../styles/CustomToastStyles';

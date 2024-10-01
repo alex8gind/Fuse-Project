@@ -5,14 +5,12 @@ import Home from "../pages/Home/Home";
 import Profile from "../pages/Profile/Profile";
 import Docs from "../pages/Docs/Docs";
 import Connections from "../pages/Connections/Connections";
-import Settings from "../pages/Settings/Settings";
 import Notifications from "../pages/Notifications/Notifications";
 import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import PageNotFound from "../pages/PageNotFound/PageNotFound";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
-import Security from "../pages/Security";
 import ForgotPass from "../pages/ForgotPass/ForgotPass";
 import IdVerification from "../pages/IdentityVarification/1.IdVerification/IdVerification";
 import IdDocsFotoOptions from "../pages/IdentityVarification/2.IdDocsFotoOptions/IdDocsFotoOptions";
@@ -24,8 +22,15 @@ import SelfieCheck from "../pages/IdentityVarification/4.SelfieCheck/SelfieCheck
 import Private from "../components/Private";
 import VerificationEmailOrPhone from "../pages/VerificationEmailOrPhone/VerificationEmailOrPhone";
 import VerificationResult from "../pages/VerificationEmailOrPhone/VerificationResult";
-import MedDocsUploader from "../pages/MedDocsUploader/MedDocsUploader"
-import Contacts from "../pages/Contacts/Contacts"
+import MedDocsUploader from "../pages/MedDocsUploader/MedDocsUploader";
+import Contacts from "../pages/Contacts/Contacts";
+import Settings from "../pages/Settings/Settings";
+import Account from "../pages/Settings/AccountSettings";
+import NotificationsSettings from "../pages/Settings/NotificationSettings";
+import PrivacyAndSecurity from "../pages/Settings/Privacy&Security";
+import HelpAndSupport from "../pages/Settings/SupportSettings";
+import EditProfile from "../pages/EditProfile/EditProfile";
+
 
 
 export const router = createBrowserRouter(
@@ -39,9 +44,12 @@ export const router = createBrowserRouter(
                             <Route path="/connections" element={<Private><Connections/></Private>}/>
                             <Route path="/connection/:id" element={<Private><Contacts/></Private>}/>
                             <Route path="/settings" element={<Private><Settings/></Private>}/>
-                            <Route path="/settings" element={<Private><Settings/></Private>}/>
-                            <Route path="/notifications" element={<Private><Notifications/></Private>}/>
-                            <Route path="/security" element={<Private><Security/></Private>}/>                          
+                            <Route path="/settings/account" element={<Private><Account /></Private>} />
+                            <Route path="/settings/edit-profile" element={<Private><EditProfile /></Private>} />
+                            <Route path="/settings/notifications" element={<Private><NotificationsSettings /></Private>} />
+                            <Route path="/settings/privacy" element={<Private><PrivacyAndSecurity /></Private>} />
+                            <Route path="/settings/help" element={<Private><HelpAndSupport /></Private>} />
+                            <Route path="/notifications" element={<Private><Notifications/></Private>}/>                       
                         </Route>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Registration/>}/>

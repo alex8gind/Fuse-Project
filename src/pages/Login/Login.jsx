@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css?inline';
 import { Eye, EyeOff } from 'lucide-react';
-import Spinner from '../../components/Spinner/Spinner';
+import Spinner from '../../components/Spinner';
 import GoogleSvg from "../../assets/icons/google.svg";
 import { CustomToastStyles } from '../../styles/CustomToastStyles';
 import { setError } from '../../store/userSlice';

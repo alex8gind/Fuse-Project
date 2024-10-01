@@ -5,10 +5,10 @@ import Male from '../../assets/icons/male.png';
 import Neutral from '../../assets/icons/neutral.png';
 import BackBtn from '../../components/BackBtn';
 
+
 import {
   PageContainer,
   UserPhoto,
-  EditButton,
   FieldsContainer,
   Field,
   FieldIcon,
@@ -17,7 +17,6 @@ import {
   PasswordToggle,
   LogoutButton
 } from './Profile.style';
-import { useSelector } from 'react-redux';
 import { UserContext } from '../../contexts/user.context';
 
 const Profile = () => {
@@ -44,13 +43,11 @@ const Profile = () => {
     setShowPassword(!showPassword);
   };
 
-
   return (
     <PageContainer>
       <BackBtn/>
     
       <UserPhoto style={{ backgroundImage: `url(${user.profilePicture})` }} />
-      <EditButton>Edit profile</EditButton>
 
       <FieldsContainer>
         <Field>

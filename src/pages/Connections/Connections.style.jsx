@@ -70,3 +70,4 @@ export const ConnectionsList = styled.div`
     width: 40%;
   }
 `;
+

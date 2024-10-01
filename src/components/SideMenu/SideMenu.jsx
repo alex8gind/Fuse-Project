@@ -1,6 +1,14 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { Overlay, SidebarContainer, CloseButton, UserContainer, UserAvatar, UserName, NavLink, LogoutButton } from './SideMenu.style';
+import { 
+  Overlay, 
+  SidebarContainer, 
+  CloseButton, 
+  UserContainer, 
+  UserAvatar, 
+  UserName, 
+  NavLink, 
+  LogoutButton } from './SideMenu.style';
 
 const SideMenu = ({ userName, onLogout, isOpen, onClose }) => {
   const handleNavClick = () => {
@@ -18,6 +26,7 @@ const SideMenu = ({ userName, onLogout, isOpen, onClose }) => {
           <UserAvatar>{userName.charAt(0)}</UserAvatar>
           <UserName>{userName}</UserName>
         </UserContainer>
+        <NavLink to="/" onClick={handleNavClick}>Home</NavLink>
         <NavLink to="/profile" onClick={handleNavClick}>Profile</NavLink>
         <NavLink to="/connections" onClick={handleNavClick}>Connections</NavLink>
         <NavLink to="/docs" onClick={handleNavClick}>Documents</NavLink>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ChevronLeft, Check, Upload } from 'lucide-react';
-import Logo from '../../../components/Logo/Logo.jsx';
+import Logo from '../../../components/Logo.jsx';
 import {
   PageContainer, Header, BackButton, Title, Subtitle, StepList, 
   StepItem, StepIcon, StepText, StepAction, NextButton, WhyLink,

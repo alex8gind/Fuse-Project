@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Bell, Menu, X, Search } from 'lucide-react';
-import Logo from '../Logo/Logo.jsx';
+import Logo from '../Logo.jsx';
 import SideMenu from '../SideMenu/SideMenu.jsx';
 import {
   HeaderWrapper, Container, MenuButton, LogoWrapper, DesktopNav, NavList, NavItem, 

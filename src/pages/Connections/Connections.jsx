@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionCard from '../../components/ConnectionCard/ConnectionCard';
 import BackBtn from "../../components/BackBtn"
+import SendRequestBtn from "../../components/SendRequestBtn"
 import {
   PageContainer, 
   SearchInput, 
@@ -38,6 +39,7 @@ const Connections = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+      <SendRequestBtn isContactsPage={false} />
       <ConnectionsList>
         {filteredConnections.map(connection => (
           <ConnectionCard
@@ -46,6 +48,7 @@ const Connections = () => {
             name={connection.name}
             lastInteraction={connection.lastInteraction}
             status={connection.status}
+            isBlocked={connection.isBlocked}
             onClick={() => handleCardClick(connection.id)}
           />
         ))}

@@ -41,3 +41,9 @@ export const Status = styled.span`
   font-size: 0.8rem;
   color: ${props => props.theme.colors.primary};
 `;
+
+export const BlockedIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

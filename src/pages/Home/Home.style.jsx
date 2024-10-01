@@ -115,23 +115,6 @@ export const Button = styled.button`
   }
 `;
 
-export const ConnectionRequestButton = styled(Button)`
- padding: 0.5em 1em;
- width: fit-content;
- background-color: ${props => props.theme.colors.primaryOrange};
- color: ${props => props.theme.colors.background};
- border: 2px solid ${props => props.theme.colors.navigation_bg};
- outline: 2px solid ${props => props.theme.colors.primaryOrange};
- border-radius: 1.1vh;
- font-size: 1.3rem;
- font-family: ${props => props.theme.fonts.main};
-
-  @media (min-width: ${props => props.theme.breakpoints.md}) {
-    font-size: 1.8rem;
-    padding: 1em 1.7em;
-  }
-`;
-
 export const DocumentsButton = styled(Button)`
  padding: 0.5em 1em;
  width: fit-content;
