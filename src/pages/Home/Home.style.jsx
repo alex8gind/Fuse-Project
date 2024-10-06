@@ -12,11 +12,10 @@ export const PageContainer = styled.div`
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 30px;
-  overflow-y: auto; // In case content exceeds viewport height
-  /* background-color: purple; */
+  overflow-y: auto; 
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     margin: 30px auto;
@@ -46,6 +45,7 @@ export const UserPhoto = styled.div`
   outline: 2px solid ${props => props.theme.colors.navigation_button};
   margin: 0;
   background-color: ${props => props.theme.colors.background};
+  background-image: url(${props => props.$photoUrl || 'default-profile-picture.jpg'});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -108,12 +108,20 @@ export const Button = styled.button`
   border-radius: 1.1vh;
   font-size: 1.3rem;
   font-family: ${props => props.theme.fonts.main};
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.theme.colors.primaryOrange};
+    color: ${props => props.theme.colors.background};
+  }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     font-size: 1.7rem;
     padding: 1em 1.7em;
   }
 `;
+
 
 export const DocumentsButton = styled(Button)`
  padding: 0.5em 1em;
@@ -126,8 +134,36 @@ export const DocumentsButton = styled(Button)`
  font-size: 1.3rem;
  font-family: ${props => props.theme.fonts.main};
 
+  &:hover {
+    background-color: ${props => props.theme.colors.background};
+    color: ${props => props.theme.colors.primaryOrange};
+  }
+
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     font-size: 1.8rem;
     padding: 1em 1.7em;
+  }
+`;
+
+export const LogoutButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  background-color: transparent;
+  color: ${props => props.theme.colors.primaryOrange};
+  border: none;
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: auto;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: ${props => props.theme.colors.error};
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 1.2rem;
   }
 `;

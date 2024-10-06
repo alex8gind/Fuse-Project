@@ -16,30 +16,29 @@ const PopupOverlay = styled.div`
 const PopupContent = styled.div`
   background-color: ${props => props.theme.colors.background};
   display: flex;
-  flex-direction: ${props => props.isContactsPage ? 'row' : 'column'};
-  justify-content: ${props => props.isContactsPage ? 'space-between' : 'center'};
+  flex-direction: ${props => props.$isContactsPage ? 'row' : 'column'};
+  justify-content: ${props => props.$isContactsPage ? 'space-between' : 'center'};
   align-items: center;
-  gap: ${props => props.isContactsPage ? '0.5em' : '.8em'};
-  padding: ${props => props.isContactsPage ? '10px 15px' : '20px'};
+  gap: ${props => props.$isContactsPage ? '0.5em' : '.8em'};
+  padding: ${props => props.$isContactsPage ? '10px 15px' : '20px'};
   border-radius: 2vh;
-  width: ${props => props.isContactsPage ? 'auto' : '300px'};
+  width: ${props => props.$isContactsPage ? 'auto' : '300px'};
   position: relative;
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    width: ${props => props.isContactsPage ? 'auto' : '400px'};
-    gap: ${props => props.isContactsPage ? '1em' : '1em'};
+    width: ${props => props.$isContactsPage ? 'auto' : '400px'};
+    gap: ${props => props.$isContactsPage ? '1em' : '1em'};
   }
-
 `;
 
 const Title = styled.h3`
   margin: 0;
-  padding: ${props => props.isContactsPage ? '0' : '.4em'};
+  padding: ${props => props.$isContactsPage ? '0' : '.4em'};
   color: ${props => props.theme.colors.text};
-  font-size: ${props => props.isContactsPage ? '1em' : '1.5em'};
-  display: ${props => props.isContactsPage ? 'none' : 'block'};
-
+  font-size: ${props => props.$isContactsPage ? '1em' : '1.5em'};
+  display: ${props => props.$isContactsPage ? 'none' : 'block'};
 `;
+
 
 const CloseButton = styled.button`
   position: absolute;
@@ -50,7 +49,7 @@ const CloseButton = styled.button`
   font-size: 1.5rem;
   cursor: pointer;
   color: ${props => props.theme.colors.text};
-  display: ${props => props.isContactsPage ? 'none' : 'block'};
+  display: ${props => props.$isContactsPage ? 'none' : 'block'};
 `;
 
 const Input = styled.input`
@@ -65,16 +64,16 @@ const Input = styled.input`
 const Button = styled.button`
   background-color: ${props => props.theme.colors.primaryOrange};
   color: ${props => props.theme.colors.background};
-  font-size: ${props => props.isContactsPage ? '0.8em' : '1em'};
-  padding: ${props => props.isContactsPage ? '.3em .6em' : '.5em 1em'};
+  font-size: ${props => props.$isContactsPage ? '0.8em' : '1em'};
+  padding: ${props => props.$isContactsPage ? '.3em .6em' : '.5em 1em'};
   border: none;
   border-radius: 1vh;
   cursor: pointer;
   white-space: nowrap;
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    font-size: ${props => props.isContactsPage ? '0.9em' : '1.2em'};
-    padding: ${props => props.isContactsPage ? '.4em .8em' : '.7em 1.2em'};
+    font-size: ${props => props.$isContactsPage ? '0.9em' : '1.2em'};
+    padding: ${props => props.$isContactsPage ? '.4em .8em' : '.7em 1.2em'};
   }
 `;
 
@@ -108,7 +107,7 @@ const ContactMessage = styled.p`
 `;
 
 
-const ConnectionRequestPopup = ({ onClose, onSendRequest, isContactsPage, contactName }) => {
+const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnections, isContactsPage, isHomePage, contactName }) => {
   const [username, setUsername] = useState('');
   const popupRef = useRef(null);
 
@@ -136,14 +135,24 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, isContactsPage, contac
 
   return (
     <PopupOverlay>
-      <PopupContent ref={popupRef} isContactsPage={isContactsPage}>
-        <CloseButton isContactsPage={isContactsPage} onClick={onClose}>&times;</CloseButton>
-        <Title isContactsPage={isContactsPage}>Send Connection Request</Title>
-        {isContactsPage ? (
+      <PopupContent ref={popupRef} $isContactsPage={isContactsPage} $isHomePage={isHomePage}>
+        <CloseButton $isContactsPage={isContactsPage} onClick={onClose}>&times;</CloseButton>
+        <Title $isContactsPage={isContactsPage} $isHomePage={isHomePage}>
+          {isHomePage ? 'Connect with Others' : 'Send Connection Request'}
+        </Title>
+        {isHomePage ? (
+          <>
+            <Button onClick={() => alert('Bluetooth connection not implemented')}>
+              Connect via Bluetooth
+            </Button>
+            <OrDivider>OR</OrDivider>
+            <Button onClick={onNavigateToConnections}>Send Request from Your Connections</Button>
+          </>
+        ) : isContactsPage ? (
           <>
             <ContactMessage>Send request to {contactName}?</ContactMessage>
-            <Button isContactsPage={isContactsPage} onClick={handleSendRequest}>Yes</Button>
-            <Button isContactsPage={isContactsPage} onClick={onClose}>Cancel</Button>
+            <Button $isContactsPage={isContactsPage} onClick={handleSendRequest}>Yes</Button>
+            <Button $isContactsPage={isContactsPage} onClick={onClose}>Cancel</Button>
           </>
         ) : (
           <>
@@ -161,7 +170,6 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, isContactsPage, contac
             <Button onClick={onClose}>Cancel</Button>
           </>
         )}
-        
       </PopupContent>
     </PopupOverlay>
   );

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
+import { UserContext } from '../../contexts/user.context';
 import { 
   Overlay, 
   SidebarContainer, 
@@ -10,10 +12,24 @@ import {
   NavLink, 
   LogoutButton } from './SideMenu.style';
 
-const SideMenu = ({ userName, onLogout, isOpen, onClose }) => {
-  const handleNavClick = () => {
-    onClose();
-  }; 
+  const SideMenu = ({ isOpen, onClose }) => {
+    const { user, logout } = useContext(UserContext);
+    const navigate = useNavigate();
+  
+    const handleNavClick = () => {
+      onClose();
+    }; 
+    
+    const handleLogout = async () => {
+      try {
+        await logout();
+        onClose(); 
+        navigate('/login'); 
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // Optionally, you can show an error message to the user here
+      }
+    };
   
   return (
     <>
@@ -23,8 +39,10 @@ const SideMenu = ({ userName, onLogout, isOpen, onClose }) => {
           <X size={24} />
         </CloseButton>
         <UserContainer> 
-          <UserAvatar>{userName.charAt(0)}</UserAvatar>
-          <UserName>{userName}</UserName>
+          <UserAvatar $photoUrl={user?.profilePicture}>
+            {!user?.profilePicture && (user?.firstName?.charAt(0) || 'U')}
+          </UserAvatar>
+          <UserName>{user?.firstName} {user?.lastName}</UserName>
         </UserContainer>
         <NavLink to="/" onClick={handleNavClick}>Home</NavLink>
         <NavLink to="/profile" onClick={handleNavClick}>Profile</NavLink>
@@ -32,7 +50,7 @@ const SideMenu = ({ userName, onLogout, isOpen, onClose }) => {
         <NavLink to="/docs" onClick={handleNavClick}>Documents</NavLink>
         <NavLink to="/settings" onClick={handleNavClick}>Settings</NavLink>
         <NavLink to="/contact" onClick={handleNavClick}>Contact Us</NavLink>
-        <LogoutButton onClick={()=>{onLogout(); onClose(); }}>Log out</LogoutButton>
+        <LogoutButton onClick={handleLogout}>Log out</LogoutButton>
     </SidebarContainer>
   </>
   );

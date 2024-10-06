@@ -1,11 +1,13 @@
 import { createContext, useState, useEffect } from "react";
 import { maxios } from "../utils/maxios"; 
+import { generatePersonalId } from "../utils/pid";
 
 export const UserContext = createContext(null)
 
 export const mockUsers = [
     {
       userId: 1,
+      PId: 'A1B2', 
       firstName: 'Lee',
       lastName: 'May',
       DateOfBirth: '1990-05-15',
@@ -13,6 +15,7 @@ export const mockUsers = [
       phoneOrEmail: 'lee.may@example.com',
       password: 'hashedPassword123', 
       isVerified: true,
+      isBlocked: false,
       isAdmin: false,
       isActive: true,
       profilePicture: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
@@ -23,6 +26,7 @@ export const mockUsers = [
     },
     {
       userId: 2,
+      PId: 'A2B2', 
       firstName: 'Jane',
       lastName: 'Smith',
       DateOfBirth: '1988-09-22',
@@ -30,9 +34,10 @@ export const mockUsers = [
       phoneOrEmail: '+1234567890',
       password: 'hashedPassword456',
       isVerified: true,
+      isBlocked: false,
       isAdmin: true,
       isActive: true,
-      profilePicture: 'https://example.com/profiles/jane-smith.jpg',
+      profilePicture: 'https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       lastLogin: '2023-09-20T09:45:00Z',
       documents: [104, 105],
       createdAt: '2023-02-15T14:30:00Z',
@@ -40,6 +45,7 @@ export const mockUsers = [
     },
     {
       userId: 3,
+      PId: 'A3B2', 
       firstName: 'Alex',
       lastName: 'Johnson',
       DateOfBirth: '1995-12-03',
@@ -47,9 +53,10 @@ export const mockUsers = [
       phoneOrEmail: 'alex.j@example.com',
       password: 'hashedPassword789',
       isVerified: false,
+      isBlocked: false,
       isAdmin: false,
       isActive: true,
-      profilePicture: 'https://example.com/profiles/alex-johnson.jpg',
+      profilePicture: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       lastLogin: '2023-09-18T16:20:00Z',
       documents: [106, 107, 108, 109],
       createdAt: '2023-04-05T16:20:00Z',
@@ -57,6 +64,7 @@ export const mockUsers = [
     },
     {
       userId: 4,
+      PId: 'A4B2', 
       firstName: 'Emily',
       lastName: 'Brown',
       DateOfBirth: '1992-07-18',
@@ -64,9 +72,10 @@ export const mockUsers = [
       phoneOrEmail: 'emily92@example.com',
       password: 'hashedPasswordABC',
       isVerified: true,
+      isBlocked: false,
       isAdmin: false,
       isActive: false,
-      profilePicture: 'https://example.com/profiles/emily-brown.jpg',
+      profilePicture: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       lastLogin: '2023-09-10T10:15:00Z',
       documents: [110],
       createdAt: '2023-03-20T13:40:00Z',
@@ -74,6 +83,7 @@ export const mockUsers = [
     },
     {
       userId: 5,
+      PId: 'A5B2', 
       firstName: 'Michael',
       lastName: 'Lee',
       DateOfBirth: '1985-11-30',
@@ -81,9 +91,10 @@ export const mockUsers = [
       phoneOrEmail: '+9876543210',
       password: 'hashedPasswordXYZ',
       isVerified: true,
+      isBlocked: false,
       isAdmin: false,
       isActive: true,
-      profilePicture: 'https://example.com/profiles/michael-lee.jpg',
+      profilePicture: 'https://images.pexels.com/photos/1819483/pexels-photo-1819483.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       lastLogin: '2023-09-21T08:50:00Z',
       documents: [111, 112, 113, 114, 115],
       createdAt: '2023-01-05T08:50:00Z',
@@ -97,6 +108,12 @@ function UserProvider({children}) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+      if (mockUsers.length === 0) {
+        console.warn('mockUsers is empty. This may cause issues in components that rely on this data.');
+      }
+    }, []);
+
+    useEffect(() => {
         // Simulate checking for a stored session
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
@@ -105,29 +122,26 @@ function UserProvider({children}) {
           setLoading(false);
         }
       }, []);
+    
 
-      useEffect(()=>{
-        console.log("DEBUGG in UserProvider: user", user);
-    }, [user])
-
-      const getUserProfile = async () => {
+const getUserProfile = async () => {
         try {
           // const response = api.get('/users/profile')
           const response = await maxios.get('success', { user: mockUsers[0] });
-          console.log("DEBUGG:getUserProfile", response.data.user);
           setUser(response.data.user);
         } catch (err) {
           setError('Failed to fetch user profile');
         } finally {
           setLoading(false);
         }
-      };
+};
 
-      const register = async (userData) => {
+const register = async (userData) => {
         try {
           const newUser = {
             ...userData,
             userId: mockUsers.length + 1,
+            PId: generatePersonalId(),
             isVerified: false,
             isAdmin: false,
             isActive: true,
@@ -141,10 +155,9 @@ function UserProvider({children}) {
           setError('Registration failed');
           throw err;
         }
-      };
+};
     
-    
-      const login = async (credentials) => {
+const login = async (credentials) => {
         try {
           if (credentials) {         
             const response = await maxios.post('success', { 
@@ -162,9 +175,9 @@ function UserProvider({children}) {
           setError(err.message || 'Login failed');
           throw err;
         }
-      };
+};
     
-      const logout = async () => {
+const logout = async () => {
         try {
           await maxios.post('success', { message: 'Logged out successfully' });
           setUser(null);
@@ -172,11 +185,11 @@ function UserProvider({children}) {
           localStorage.removeItem('accessToken');
         } catch (err) {
           setError('Logout failed');
+          throw err; 
         }
-      };
-    
+};
 
-      const updateUserProfile = async (userData) => {
+const updateUserProfile = async (userData) => {
         try {
           const updatedUser = { ...user, ...userData, updatedAt: new Date().toISOString() };
           const response = await maxios.put('success', { user: updatedUser });
@@ -186,9 +199,91 @@ function UserProvider({children}) {
           setError('Failed to update profile');
           throw err;
         }
-      };
-    
-      const changePassword = async (passwordData) => {
+};
+
+const updateProfilePicture = async (photoFile) => {
+  try {
+      // In a real scenario, you'd upload the file to a server here
+      const photoUrl = URL.createObjectURL(photoFile);
+      const updatedUser = { ...user, profilePicture: photoUrl, updatedAt: new Date().toISOString() };
+      const response = await maxios.put('success', { user: updatedUser });
+      setUser(response.data.user);
+      return response.data.user;
+  } catch (err) {
+      setError('Failed to update profile picture');
+      throw err;
+  }
+};
+
+const deactivateAccount = async () => {
+        try {
+          const response = await maxios.post('success', { message: 'Account deactivated successfully' });
+          setUser(prevUser => ({ ...prevUser, isActive: false }));
+          return response.data;
+        } catch (err) {
+          setError('Failed to deactivate account');
+          throw err;
+        }
+};
+
+const reactivateAccount = async () => {
+      try {
+        const response = await maxios.post('success', { message: 'Account reactivated successfully' });
+        setUser(prevUser => ({ ...prevUser, isActive: true }));
+        return response.data;
+      } catch (err) {
+        setError('Failed to reactivate account');
+        throw err;
+      }
+};
+
+const deleteAccount = async () => {
+      try {
+        const response = await maxios.delete('success', { message: 'Account deleted successfully' });
+        setUser(null);
+        localStorage.removeItem('accessToken');
+        return response.data;
+      } catch (err) {
+        setError('Failed to delete account');
+        throw err;
+      }
+};
+
+const getAllUsers = async () => {
+    try {
+      const response = await maxios.get('success', { users: mockUsers });
+      return response.data.users;
+    } catch (err) {
+      setError('Failed to fetch all users');
+      throw err;
+    }
+};
+
+const getReportedUsers = async () => {
+    try {
+      // For this mock version, we'll return an empty array
+      // In a real implementation, you'd fetch this from the backend
+      const response = await maxios.get('success', { reportedUsers: [] });
+      return response.data.reportedUsers;
+    } catch (err) {
+      setError('Failed to fetch reported users');
+      throw err;
+    }
+};
+
+const getBlockedUsers = async () => {
+  try {
+    // For this mock version, we'll return an empty array
+    // In a real implementation, you'd fetch this from the backend
+    const response = await maxios.get('success', { blockedUsers: [] });
+    return response.data.blockedUsers;
+  } catch (err) {
+    setError('Failed to fetch blocked users');
+    throw err;
+  }
+};
+
+const changePassword = async (passwordData) => {
         try {
           // In a real app, you'd hash the password here
           const response = await maxios.put('success', { message: 'Password changed successfully' });
@@ -197,9 +292,9 @@ function UserProvider({children}) {
           setError('Failed to change password');
           throw err;
         }
-      };
+};
     
-      const forgotPassword = async (email) => {
+const forgotPassword = async (email) => {
         try {
           const response = await maxios.post('success', { message: 'Password reset instructions sent' });
           return response.data;
@@ -207,9 +302,9 @@ function UserProvider({children}) {
           setError('Failed to process forgot password request');
           throw err;
         }
-      };
+};
     
-      const resetPassword = async (token, newPassword) => {
+const resetPassword = async (token, newPassword) => {
         try {
           const response = await maxios.post('success', { message: 'Password reset successfully' });
           return response.data;
@@ -217,9 +312,9 @@ function UserProvider({children}) {
           setError('Failed to reset password');
           throw err;
         }
-      };
+};
     
-      const verifyEmail = async (token) => {
+const verifyEmail = async (token) => {
         try {
           const response = await maxios.post('success', { message: 'Email verified successfully' });
           return response.data;
@@ -227,32 +322,28 @@ function UserProvider({children}) {
           setError('Failed to verify email');
           throw err;
         }
-      };
+};
 
-    // const [loggedinUser, setLoggedinUser] = useState({
-    //     uid: "2",
-    //     createdAt: 1718289241,
-    //     firstname: "Sara",
-    //     lastname: "Smith",
-    //     profilePic: "path/to/pic",
-    //     documents: [],
-    //     connections: []
-    // })
-    // return (
-    //     <UserContext.Provider value={{loggedinUser, setLoggedinUser}}>
-    //         {children}
-    //     </UserContext.Provider>
-    // )
 
     return (
         <UserContext.Provider value={{
           user,
+          mockUsers: mockUsers.length > 0 ? mockUsers : [],
+          setUser,
+          getUserProfile,
           loading,
           error,
           login,
           logout,
           register,
           updateUserProfile,
+          updateProfilePicture,
+          deactivateAccount,
+          reactivateAccount,
+          deleteAccount,
+          getAllUsers,
+          getReportedUsers,
+          getBlockedUsers,
           changePassword,
           forgotPassword,
           resetPassword,
@@ -261,6 +352,6 @@ function UserProvider({children}) {
           {children}
         </UserContext.Provider>
       );
-    }
+}
 
 export default UserProvider

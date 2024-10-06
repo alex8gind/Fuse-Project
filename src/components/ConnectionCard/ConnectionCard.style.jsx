@@ -26,6 +26,12 @@ export const UserInfo = styled.div`
   flex-grow: 1;
 `;
 
+export const PersonalId = styled.p`
+  margin: 0;
+  font-size: 0.8rem;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
 export const UserName = styled.h3`
   margin: 0;
   font-size: 1rem;

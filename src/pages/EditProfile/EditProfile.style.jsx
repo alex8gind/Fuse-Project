@@ -78,6 +78,8 @@ export const Field = styled.div`
 
 
 export const EditField = styled.input`
+  display: flex;
+  align-items: center;
   width: 100%; 
   flex-grow: 1;
   font-size: 1rem;
@@ -87,7 +89,6 @@ export const EditField = styled.input`
   border-radius: 4px;
   background-color: ${props => props.theme.colors.background};
   color: ${props => props.theme.colors.text};
-  /* background-color: yellowgreen; */
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     font-size: 1.1rem;
@@ -96,7 +97,23 @@ export const EditField = styled.input`
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
     font-size: 1.2rem;
   }
+
+  &[type="date"] {
+    &::-webkit-calendar-picker-indicator {
+      background: transparent;
+      bottom: 0;
+      color: transparent;
+      cursor: pointer;
+      height: auto;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: auto;
+    }
+  }
 `;
+
 
 export const FieldIcon = styled.div`
   display: flex;
@@ -182,12 +199,53 @@ export const PhotoUploadButton = styled(Button)`
   }
 `;
 
-export const SaveButton = styled(Button)`
-  /* background-color: ${props => props.theme.colors.primaryOrange}; */
+export const PopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 `;
 
-export const CancelButton = styled(Button)`
-  /* background-color: ${props => props.theme.colors.error}; */
-
+export const PopupContent = styled.div`
+  position: relative;
+  background-color: ${props => props.theme.colors.navigation_bg};
+  padding: 2em;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  min-width: 300px;
 `;
 
+export const PopupMessage = styled.p`
+  color: ${props => props.$isSuccess ? props.theme.colors.primaryOrange : props.theme.colors.error};
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 250px;
+  word-wrap: break-word;
+`;
+
+export const PopupButton = styled(Button)`
+  width: 100px;
+`;
+
+export const PopupCloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${props => props.theme.colors.text};
+  
+  &:hover {
+    color: ${props => props.theme.colors.primaryOrange};
+  }
+`;

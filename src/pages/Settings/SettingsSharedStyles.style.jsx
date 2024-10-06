@@ -47,7 +47,7 @@ export const SettingsList = styled.div`
   }
 `;
 
-export const SettingItem = styled.div`
+export const SettingItem = styled.button`
   display: flex;
   align-items: center;
   padding: 15px;
@@ -55,9 +55,12 @@ export const SettingItem = styled.div`
   border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  border: none;
+  width: 100%;
+  text-align: left;
 
   &:hover {
-    background-color: ${props => props.theme.colors.navigation_bg};
+    background-color: ${props => props.theme.colors.backgroundHover};
   }
 `;
 
@@ -78,4 +81,48 @@ export const ChevronIcon = styled(ChevronRight)`
 export const SwitchWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const PopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const PopupContent = styled.div`
+  background-color: ${props => props.theme.colors.navigation_bg};
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 90%;
+  width: 300px;
+`;
+
+export const PopupMessage = styled.p`
+  margin-bottom: 20px;
+  text-align: center;
+`;
+
+export const PopupButtons = styled.div`
+  display: flex;
+  justify-content: space-around;
+`;
+
+export const PopupButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: ${props => props.theme.colors.primaryOrange};
+  color: white;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
+import { ConnectionContext } from '../contexts/connection.context';
 import styled from 'styled-components';
 
 const Overlay = styled.div`
@@ -48,14 +49,33 @@ const ActionButton = styled.button`
   margin-right: 10px;
 `;
 
-const PopUp = ({ onClose, onReportAndBlock }) => {
+const WarningText = styled.p`
+  color: ${props => props.theme.colors.error};
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+`;
+
+const PopUp = ({ onClose, userId }) => {
+  const [reason, setReason] = useState('');
+  const { reportUser } = useContext(ConnectionContext);
+
+  const handleReportAndBlock = () => {
+    reportUser(userId, reason);
+    onClose();
+  };
+
   return (
     <Overlay onClick={onClose}>
       <PopUpContainer onClick={e => e.stopPropagation()}>
         <CloseButton onClick={onClose}>&times;</CloseButton>
-        <h2>Report and Block User</h2>
-        <CommentField placeholder="Enter your reason for reporting..." />
-        <ActionButton onClick={onReportAndBlock}>Report and Block</ActionButton>
+        <h2>Report User</h2>
+        <WarningText>Warning: Reporting this user will automatically block them.</WarningText>
+        <CommentField 
+          placeholder="Enter your reason for reporting..." 
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <ActionButton onClick={handleReportAndBlock}>Report User</ActionButton>
       </PopUpContainer>
     </Overlay>
   );

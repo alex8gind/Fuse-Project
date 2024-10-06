@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { User, Calendar, Contact, Lock, LogOut, Eye, EyeOff } from 'lucide-react';
+import React, { useContext, useState } from 'react';
+import { CreditCard,User, Calendar, Contact, Lock, Pencil, Eye, EyeOff } from 'lucide-react';
 import Female from '../../assets/icons/female.png';
 import Male from '../../assets/icons/male.png';
 import Neutral from '../../assets/icons/neutral.png';
 import BackBtn from '../../components/BackBtn';
-
-
+import { UserContext } from '../../contexts/user.context';
+import { useNavigate } from 'react-router-dom';
 import {
   PageContainer,
   UserPhoto,
@@ -15,16 +15,15 @@ import {
   GenderIcon,
   FieldContent,
   PasswordToggle,
-  LogoutButton
+  EditButton
 } from './Profile.style';
-import { UserContext } from '../../contexts/user.context';
+
 
 const Profile = () => {
 
   const {user} = useContext(UserContext)
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(()=>{console.log("DEBUGGING: ", user);}, [user])
+  const navigate = useNavigate();
 
   if(!user) return <h2>Loading...</h2>
 
@@ -43,6 +42,10 @@ const Profile = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleEditProfile = () => {
+    navigate('/settings/edit-profile');
+  };
+
   return (
     <PageContainer>
       <BackBtn/>
@@ -50,6 +53,10 @@ const Profile = () => {
       <UserPhoto style={{ backgroundImage: `url(${user.profilePicture})` }} />
 
       <FieldsContainer>
+        <Field>
+          <FieldIcon><CreditCard size="1.5em" /></FieldIcon>
+          <FieldContent>{user.PId}</FieldContent>
+        </Field>
         <Field>
           <FieldIcon><User size="1.5em" /></FieldIcon>
           <FieldContent>{user.firstName + " " + user.lastName}</FieldContent>
@@ -75,10 +82,11 @@ const Profile = () => {
         </Field>
       </FieldsContainer>
 
-      <LogoutButton>
-        <LogOut size="1.5em" />
-        Log out
-      </LogoutButton>
+      <EditButton onClick={handleEditProfile}>
+        <Pencil size="1.5em" />
+        Edit Profile
+      </EditButton>
+
     </PageContainer>
   );
 };

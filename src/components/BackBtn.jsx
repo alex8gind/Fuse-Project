@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { ChevronLeft} from 'lucide-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const BackButton = styled.button`
   align-self: flex-start;
@@ -17,7 +18,15 @@ const BackButton = styled.button`
 `;
 
 export default function BackBtn() {
-  return (
-    <BackButton onClick={() => navigate(-1)}><ChevronLeft /></BackButton>
-  )
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(-1);
+  };
+
+ return (
+    <BackButton onClick={handleClick}>
+      <ChevronLeft />
+    </BackButton>
+  );
 }

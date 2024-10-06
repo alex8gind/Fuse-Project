@@ -62,22 +62,27 @@ export const UserContainer = styled.div`
 `;
 
 export const UserAvatar = styled.div`
-  width: 100px;
-  height: 100px;
-  border-radius: 100vh;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
   background-color: ${props => props.theme.colors.background};
-  border: 1px solid ${props => props.theme.colors.primaryOrange};
+  border: 2px solid ${props => props.theme.colors.primaryOrange};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   font-weight: bold;
+  color: ${props => props.theme.colors.text};
+  background-image: url(${props => props.$photoUrl});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
-  @media (min-width: ${props => props.theme.breakpoints.md}) and (max-width: ${props => props.theme.breakpoints.lg}) {
-    width: 150px;
-    height: 150px;
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
   }
-
 `;
 
 export const UserName = styled.h2`

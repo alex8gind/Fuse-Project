@@ -1,5 +1,6 @@
-import React, { useState, useContext } from 'react';
-import { User, UserPlus, Calendar, Contact, Lock, Camera, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, UserPlus, Calendar, Contact, Lock, Camera, Eye, EyeOff, X } from 'lucide-react';
 import Female from '../../assets/icons/female.png';
 import Male from '../../assets/icons/male.png';
 import Neutral from '../../assets/icons/neutral.png';
@@ -13,23 +14,86 @@ import {
   GenderIcon,
   Field,
   EditField,
-  SaveButton,
-  CancelButton,
   ButtonContainer,
+  Button,
   PhotoUploadButton,
   PasswordToggle,
-  PasswordField
+  PasswordField, 
+  PopupOverlay,
+  PopupContent,
+  PopupMessage,
+  PopupButton,
+  PopupCloseButton
 } from "./EditProfile.style"
 
+
 const EditProfile = ({ onCancel }) => {
-  const { user, updateUser } = useContext(UserContext);
+  const { user, updateUserProfile, updateProfilePicture } = useContext(UserContext);
   const [editedUser, setEditedUser] = useState({ ...user });
   const [showPassword, setShowPassword] = useState(false);
-  // const [password, setPassword] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(true);
+  const [showPhotoWarning, setShowPhotoWarning] = useState(false);
+  const navigate = useNavigate();
+  const popupRef = useRef(null);
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popupRef.current && !popupRef.current.contains(event.target)) {
+        handleClosePopup();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handlePhotoEdit = () => {
+    setShowPhotoWarning(true);
+  };
+
+  const handlePhotoWarningClose = () => {
+    setShowPhotoWarning(false);
+  };
+
+  const handlePhotoWarningConfirm = () => {
+    setShowPhotoWarning(false);
+    navigate('/selfie-check', { state: { isProfilePhotoUpdate: true } });
+  };
+
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        await updateProfilePicture(file);
+        setPopupMessage('Profile picture updated successfully. Redirecting to verification...');
+        setIsSuccess(true);
+        setShowPopup(true);
+        setTimeout(() => {
+          navigate('/selfie-check');
+        }, 2000);
+      } catch (error) {
+        console.error("Failed to update profile picture:", error);
+        setPopupMessage('Failed to update profile picture. Please try again.');
+        setIsSuccess(false);
+        setShowPopup(true);
+      }
+    }
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedUser({ ...editedUser, [name]: value });
+  };
+
+  const handleDateChange = (e) => {
+    const { value } = e.target;
+    setEditedUser({ ...editedUser, DateOfBirth: value });
   };
 
   const getGenderIcon = (gender) => {
@@ -47,15 +111,46 @@ const EditProfile = ({ onCancel }) => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateUser(editedUser);
-    onCancel();
+    try {
+      const updates = Object.keys(editedUser).filter(key => editedUser[key] !== user[key]);
+      if (updates.length === 0) {
+        setPopupMessage('No changes were made to the profile.');
+        setIsSuccess(true);
+        setShowPopup(true);
+        return;
+      }
+      
+      await updateUserProfile(editedUser);
+      
+      if (updates.length === 1) {
+        setPopupMessage(`Profile updated successfully! Changed: ${updates[0]}`);
+      } else if (updates.length > 1) {
+        setPopupMessage(`Profile updated successfully! Changed ${updates.length} fields.`);
+      } else {
+        setPopupMessage('Profile updated successfully!');
+      }
+      
+      setIsSuccess(true);
+      setShowPopup(true);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      setPopupMessage('Failed to update profile. Please try again.');
+      setIsSuccess(false);
+      setShowPopup(true);
+    }
   };
 
-  const handlePhotoUpload = (e) => {
-    // Handle photo upload logic here
-    console.log("Photo upload triggered");
+  const handleCancel = () => {
+    navigate('/settings/edit-profile');
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    if (isSuccess) {
+      navigate('/settings/edit-profile');
+    }
   };
 
   return (
@@ -63,10 +158,11 @@ const EditProfile = ({ onCancel }) => {
       <BackBtn/>
 
       <UserPhoto style={{ backgroundImage: `url(${user.profilePicture})` }} />
-      <PhotoUploadButton onClick={handlePhotoUpload}>
+      <PhotoUploadButton onClick={handlePhotoEdit}>
         <Camera size="1.5em" />
-        Upload Photo
+        Edit Photo
       </PhotoUploadButton>
+      
       <form onSubmit={handleSubmit}>
 
         <FieldsContainer>
@@ -99,12 +195,13 @@ const EditProfile = ({ onCancel }) => {
           </Field>
           <Field>
             <FieldIcon><Calendar size="1.5em" /></FieldIcon>
-            <EditField 
-              type="date"
-              name="DateOfBirth"
-              value={editedUser.DateOfBirth}
-              onChange={handleChange}
-            />
+              <EditField 
+                type="date"
+                name="DateOfBirth"
+                value={editedUser.DateOfBirth || ''}
+                onChange={handleDateChange}
+                placeholder="Date of Birth"
+              />
           </Field>
           <Field>
             <FieldIcon><Contact size="1.5em" /></FieldIcon>
@@ -132,10 +229,40 @@ const EditProfile = ({ onCancel }) => {
           </Field>
         </FieldsContainer>
         <ButtonContainer>
-          <SaveButton type="submit">Save Changes</SaveButton>
-          <CancelButton type="button" onClick={onCancel}>Cancel</CancelButton>
+          <Button type="submit">Save Changes</Button>
+          <Button type="button" onClick={handleCancel}>Cancel</Button>
         </ButtonContainer>
       </form>
+
+      {showPhotoWarning && (
+        <PopupOverlay>
+          <PopupContent ref={popupRef}>
+            <PopupCloseButton onClick={handlePhotoWarningClose}>
+              <X size="1.5em" />
+            </PopupCloseButton>
+            <PopupMessage>
+              Changing your profile photo will require re-verification. Do you want to proceed?
+            </PopupMessage>
+            <ButtonContainer>
+              <PopupButton onClick={handlePhotoWarningConfirm}>OK</PopupButton>
+              <PopupButton onClick={handlePhotoWarningClose}>Cancel</PopupButton>
+            </ButtonContainer>
+          </PopupContent>
+        </PopupOverlay>
+      )}
+
+      {showPopup && (
+        <PopupOverlay>
+          <PopupContent ref={popupRef}>
+            <PopupCloseButton onClick={handleClosePopup}>
+              <X size="1.5em" />
+            </PopupCloseButton>
+            <PopupMessage $isSuccess={isSuccess}>{popupMessage}</PopupMessage>
+            <PopupButton onClick={handleClosePopup}>OK</PopupButton>
+          </PopupContent>
+        </PopupOverlay>
+      )}
+
     </PageContainer>
   );
 };

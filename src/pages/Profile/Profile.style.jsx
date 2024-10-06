@@ -128,7 +128,7 @@ export const PasswordToggle = styled.button`
   justify-content: center;
 `;
 
-export const LogoutButton = styled.button`
+export const EditButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;

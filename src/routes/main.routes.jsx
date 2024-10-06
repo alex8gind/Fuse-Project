@@ -30,12 +30,13 @@ import NotificationsSettings from "../pages/Settings/NotificationSettings";
 import PrivacyAndSecurity from "../pages/Settings/Privacy&Security";
 import HelpAndSupport from "../pages/Settings/SupportSettings";
 import EditProfile from "../pages/EditProfile/EditProfile";
+import { ConnectionProvider } from "../contexts/connection.context";
 
 
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
-                    <Route element={<ContextProvider providers={[UserProvider]} />}>
+                    <Route element={<ContextProvider providers={[UserProvider, ConnectionProvider]} />}>
                         <Route element={<App />}>                           
                             <Route path="/" element={<Private><Home/></Private>}/>                           
                             <Route path="/profile" element={<Private><Profile /></Private>}/>

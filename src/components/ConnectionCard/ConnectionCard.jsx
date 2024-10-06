@@ -4,20 +4,20 @@ import {
     Card, 
     UserPhoto, 
     UserInfo, 
+    PersonalId,
     UserName, 
     LastInteraction, 
     Status,
     BlockedIcon
 } from "./ConnectionCard.style" 
 
-
-
-const ConnectionCard = ({ photo, name, lastInteraction, status, isBlocked, onClick }) => {
+const ConnectionCard = ({ PId, photo, name, lastInteraction, status, isBlocked, onClick }) => {
   return (
     <Card onClick={onClick}>
       <UserPhoto src={photo} alt={name} />
       <UserInfo>
         <UserName>{name}</UserName>
+        <PersonalId>PID: {PId}</PersonalId>
         <LastInteraction>{lastInteraction}</LastInteraction>
       </UserInfo>
       {isBlocked ? (
