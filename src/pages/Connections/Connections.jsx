@@ -42,7 +42,9 @@ const Connections = () => {
     console.log("Connections component: user", user);
     console.log("Connections component: mockUsers", mockUsers);
     console.log("Connections component: connections", connections);
-  }, [user, mockUsers, connections]);
+    console.log("Connections component: blockedUsers", blockedUsers);
+  }, [user, mockUsers, connections, blockedUsers]);
+
 
   const performSearch = () => {
     setHasSearched(true);
@@ -122,7 +124,7 @@ const Connections = () => {
 
 
   const handleCardClick = (id) => {
-    navigate(`/connection/${id}`);
+    navigate(`/contact/${id}`);
   };
 
   if (!user) {
@@ -147,7 +149,7 @@ const Connections = () => {
 
         <SearchInput
           type="text"
-          placeholder="Enter exact PID to search..."
+          placeholder="Enter a PID to connect..."
           value={searchTerm}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}

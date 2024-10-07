@@ -1,5 +1,4 @@
-import React, { useState, useContext } from 'react';
-import { ConnectionContext } from '../contexts/connection.context';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Overlay = styled.div`
@@ -37,6 +36,7 @@ const CommentField = styled.textarea`
   margin-bottom: 10px;
   padding: 5px;
   border-radius: 5px;
+  border: 1px solid ${props => props.$error ? props.theme.colors.error : props.theme.colors.border};
 `;
 
 const ActionButton = styled.button`
@@ -47,6 +47,7 @@ const ActionButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   margin-right: 10px;
+  opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
 const WarningText = styled.p`
@@ -55,13 +56,26 @@ const WarningText = styled.p`
   margin-bottom: 10px;
 `;
 
-const PopUp = ({ onClose, userId }) => {
-  const [reason, setReason] = useState('');
-  const { reportUser } = useContext(ConnectionContext);
+const ErrorMessage = styled.p`
+  color: ${props => props.theme.colors.error};
+  font-size: 0.9rem;
+  margin-top: 10px;
+`;
 
-  const handleReportAndBlock = () => {
-    reportUser(userId, reason);
-    onClose();
+const PopUp = ({ onClose, onReportAndBlock, loading, error }) => {
+  const [reason, setReason] = useState('');
+  const [validationError, setValidationError] = useState('');
+
+  const handleReportAndBlock = async () => {
+    if (!reason.trim()) {
+      setValidationError('Please provide a reason for reporting.');
+      return;
+    }
+    setValidationError('');
+    const success = await onReportAndBlock(reason);
+    if (success) {
+      onClose();
+    }
   };
 
   return (
@@ -73,9 +87,21 @@ const PopUp = ({ onClose, userId }) => {
         <CommentField 
           placeholder="Enter your reason for reporting..." 
           value={reason}
-          onChange={(e) => setReason(e.target.value)}
+          onChange={(e) => {
+            setReason(e.target.value);
+            if (validationError) setValidationError('');
+          }}
+          disabled={loading}
+          $error={!!validationError}
         />
-        <ActionButton onClick={handleReportAndBlock}>Report User</ActionButton>
+        {validationError && <ErrorMessage>{validationError}</ErrorMessage>}
+        <ActionButton 
+          onClick={handleReportAndBlock} 
+          disabled={loading || !reason.trim()}
+        >
+          {loading ? 'Processing...' : 'Report User'}
+        </ActionButton>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </PopUpContainer>
     </Overlay>
   );

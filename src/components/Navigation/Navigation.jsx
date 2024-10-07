@@ -18,7 +18,7 @@ const Navigation = () => {
         </Link>
       </NavItem>
       <NavItem $isActive={location.pathname === '/docs'}>
-        <Link to="/documents">
+        <Link to="/docs">
           <IconWrapper>
             <FileText size={24} />
           </IconWrapper>

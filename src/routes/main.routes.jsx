@@ -23,7 +23,7 @@ import Private from "../components/Private";
 import VerificationEmailOrPhone from "../pages/VerificationEmailOrPhone/VerificationEmailOrPhone";
 import VerificationResult from "../pages/VerificationEmailOrPhone/VerificationResult";
 import MedDocsUploader from "../pages/MedDocsUploader/MedDocsUploader";
-import Contacts from "../pages/Contacts/Contacts";
+import Contact from "../pages/Contact/Contact";
 import Settings from "../pages/Settings/Settings";
 import Account from "../pages/Settings/AccountSettings";
 import NotificationsSettings from "../pages/Settings/NotificationSettings";
@@ -43,7 +43,7 @@ export const router = createBrowserRouter(
                             <Route path="/docs/med" element={<Private><MedDocsUploader/></Private>}/>
                             <Route path="/docs" element={<Private><Docs/></Private>}/>
                             <Route path="/connections" element={<Private><Connections/></Private>}/>
-                            <Route path="/connection/:id" element={<Private><Contacts/></Private>}/>
+                            <Route path="/contact/:id" element={<Private><Contact/></Private>}/>
                             <Route path="/settings" element={<Private><Settings/></Private>}/>
                             <Route path="/settings/account" element={<Private><Account /></Private>} />
                             <Route path="/settings/edit-profile" element={<Private><EditProfile /></Private>} />

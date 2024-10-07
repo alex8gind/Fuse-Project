@@ -74,17 +74,17 @@ export const UserStatus = styled.p`
 `;
 
 export const ReportBtn = styled.button`
-  background-color: ${props => props.theme.colors.navigation_bg};;
+  background-color: ${props => props.theme.colors.error};
   color: ${props => props.theme.colors.text};
-  font-size: .9em;
-  border: 2px solid ${props => props.theme.colors.error};
-  padding: 1em 1.3em;
-  border-radius: 1vh;
+  font-size: 1em;
+  border: none;
+  padding: 0.8em 1.2em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: ${props => props.theme.colors.error};
-    color: ${props => props.theme.colors.text};
-    font-style: bold;
+    background-color: ${props => props.theme.colors.errorDark};
   }
 `;
 
@@ -119,3 +119,31 @@ export const BlockedBadge = styled.span`
   margin-left: 10px;
 `;
 
+export const ActionButtonsContainer = styled.div`
+  display: flex;
+  justify-content: ${props => props.children.length > 1 ? 'space-between' : 'flex-end'};
+  align-items: center;
+  width: 100%;
+  margin-top: 1rem;
+`;
+
+
+export const ActionButton = styled.button`
+  background-color: ${props => props.theme.colors.primaryOrange};
+  color: ${props => props.theme.colors.background};
+  font-size: 1em;
+  border: none;
+  padding: 0.8em 1.2em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.theme.colors.primaryOrangeDark};
+  }
+
+  &:disabled {
+    background-color: ${props => props.theme.colors.disabled};
+    cursor: not-allowed;
+  }
+`;

@@ -20,8 +20,13 @@ const StyledButton = styled.button`
   border-radius: 1.1vh;
   font-size: 1rem;
   font-family: ${props => props.theme.fonts.main};
-  cursor: ${props => props.$requestSent ? 'not-allowed' : 'pointer'};
-  opacity: ${props => props.$requestSent ? 0.7 : 1};
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.$requestSent ? props.theme.colors.primaryOrange : props.theme.colors.background};
+    color: ${props => props.$requestSent ? props.theme.colors.background : props.theme.colors.primaryOrange};
+  }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     font-size: 1.3rem;
@@ -75,20 +80,12 @@ const CloseButton = styled.button`
   justify-content: center;
 `;
 
-const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, selectedUser, userId }) => {
+const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, selectedUser, userId, isRequestSent }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const buttonRef = useRef(null);
-  const { sendConnectionRequest, isRequestSent } = useContext(ConnectionContext);
-  const [requestSent, setRequestSent] = useState(userId ? isRequestSent(userId) : false);
+  const { sendConnectionRequest, cancelSentRequest } = useContext(ConnectionContext);
   const navigate = useNavigate();
-
-
-  useEffect(() => {
-    if (userId) {
-      setRequestSent(isRequestSent(userId));
-    }
-  }, [userId, isRequestSent]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -104,9 +101,6 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
   }, []);
 
   const handleClick = () => {
-    if (requestSent) {
-      return; // Do nothing if request is already sent
-    }
     if (isHomePage) {
       setShowPopup(true);
     } else if (selectedUser || isContactsPage) {
@@ -120,14 +114,17 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
   const handleSendRequest = async () => {
     if (userId) {
       try {
-        await sendConnectionRequest(userId);
-        setRequestSent(true);
+        if (isRequestSent) {
+          await cancelSentRequest(userId);
+        } else {
+          await sendConnectionRequest(userId);
+        }
         if (onClick) {
           onClick();
         }
         setShowPopup(false);
       } catch (error) {
-        console.error('Failed to send connection request:', error);
+        console.error('Failed to send/cancel connection request:', error);
       }
     }
   };
@@ -138,8 +135,8 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
   
   return (
     <ButtonContainer ref={buttonRef}>
-      <StyledButton onClick={handleClick} $requestSent={requestSent}>
-      {requestSent ? 'Request Sent' : 'Send Connection Request'}
+      <StyledButton onClick={handleClick} $requestSent={isRequestSent}>
+        {isRequestSent ? 'Cancel Request' : 'Send Connection Request'}
       </StyledButton>
       {showWarning && (
         <WarningCloud>
@@ -157,6 +154,7 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
           isContactsPage={isContactsPage}
           isHomePage={isHomePage}
           contactName={contactName || (selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : '')}
+          requestSent={isRequestSent}
         />
       )}
     </ButtonContainer>

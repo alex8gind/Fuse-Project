@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { UserContext } from "./user.context";
 import { maxios } from "../utils/maxios";
 
@@ -7,7 +7,7 @@ export const ConnectionContext = createContext(null);
 export const ConnectionProvider = ({ children }) => {
   const [connections, setConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [sentRequests, setSentRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([{userId: "2", status: 'pending'}]);
   const [blockedUsers, setBlockedUsers] = useState({}); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +18,7 @@ export const ConnectionProvider = ({ children }) => {
       getUserConnections();
       getPendingRequests();
       getSentRequests();
+      getBlockedUsers();
     }
   }, [user]);
 
@@ -26,7 +27,27 @@ export const ConnectionProvider = ({ children }) => {
     try {
       setLoading(true);
       // In a real scenario, this would be an API call to fetch user's connections
-      const response = await maxios.get('success', { connections: [] });
+      const response = await maxios.get('success', { connections: [
+        {
+          userId: "2",
+          PId: 'A2B2', 
+          firstName: 'Jane',
+          lastName: 'Smith',
+          DateOfBirth: '1988-09-22',
+          gender: 'female',
+          phoneOrEmail: '+1234567890',
+          password: 'hashedPassword456',
+          isVerified: true,
+          isBlocked: false,
+          isAdmin: true,
+          isActive: true,
+          profilePicture: 'https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+          lastLogin: '2023-09-20T09:45:00Z',
+          documents: [104, 105],
+          createdAt: '2023-02-15T14:30:00Z',
+          updatedAt: '2023-03-01T11:45:00Z'
+        },
+      ] });
       setConnections(response.data.connections);
     } catch (err) {
       setError('Failed to fetch connections');
@@ -116,7 +137,11 @@ export const ConnectionProvider = ({ children }) => {
   const blockUser = async (userId) => {
     try {
       const response = await maxios.post('success', { message: 'User blocked successfully' });
-      setConnections(prev => prev.filter(conn => conn.userId !== userId));
+      setBlockedUsers(prev => ({ ...prev, [userId]: true }));
+      // Don't remove from connections list, just update the blocked status
+      setConnections(prev => prev.map(conn => 
+        conn.userId === userId ? { ...conn, isBlocked: true } : conn
+      ));
       return response.data;
     } catch (err) {
       setError('Failed to block user');
@@ -127,8 +152,11 @@ export const ConnectionProvider = ({ children }) => {
   const unblockUser = async (userId) => {
     try {
       const response = await maxios.post('success', { message: 'User unblocked successfully' });
-      // Note: In a real scenario, you might want to fetch the user's data again
-      // or update the connection status accordingly
+      setBlockedUsers(prev => {
+        const newBlockedUsers = { ...prev };
+        delete newBlockedUsers[userId];
+        return newBlockedUsers;
+      });
       return response.data;
     } catch (err) {
       setError('Failed to unblock user');
@@ -147,9 +175,18 @@ export const ConnectionProvider = ({ children }) => {
     }
   };
 
-  const isRequestSent = (userId) => {
-    return sentRequests.some(request => request.userId === userId);
+  const getBlockedUsers = async () => {
+    try {
+      const response = await maxios.get('success', { blockedUsers: {} });
+      setBlockedUsers(response.data.blockedUsers);
+    } catch (err) {
+      setError('Failed to fetch blocked users');
+    }
   };
+
+  const checkRequest = useCallback((userId) => {
+    return sentRequests.some(request => request.userId === userId);
+  }, [sentRequests]);
 
 
   return (
@@ -173,7 +210,7 @@ export const ConnectionProvider = ({ children }) => {
       unblockUser,
       reportUser,
       searchUsers,
-      isRequestSent
+      checkRequest
        }}>
       {children}
     </ConnectionContext.Provider>
