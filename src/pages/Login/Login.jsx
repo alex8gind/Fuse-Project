@@ -105,7 +105,7 @@ const Login = () => {
       <CustomToastStyles />
       <ToastContainer />
       <Formik
-        initialValues={{ phoneOrEmail: '', password: '', staySignedIn: false }}
+        initialValues={{ phoneOrEmail: 'alex87gind@gmail.com', password: 'Rabota7890!-', staySignedIn: true }}
         validationSchema={LoginSchema}
         onSubmit={handleSubmit}
       >

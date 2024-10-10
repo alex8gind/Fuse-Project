@@ -21,6 +21,7 @@ import {
   StyledPasswordField,
   ToggleButton
 } from './Registration.style';
+import { useUserContext } from '../../contexts/user.context';
 
 const RegistrationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -68,6 +69,7 @@ const Registration = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.user);
   const [showPassword, setShowPassword] = useState(false);
+  const {register} = useUserContext();
 
   useEffect(() => {
     return () => {
@@ -93,8 +95,8 @@ const Registration = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       console.log('Submitting values:', values);
-      const resultAction = await dispatch(registerUser(values));
-      if (registerUser.fulfilled.match(resultAction)) {
+      const user = await register(values);
+      if (user) {
         toast.success('Registration successful! Redirecting to login...', {
           position: "top-right",
           autoClose: 3000,
@@ -122,12 +124,12 @@ const Registration = () => {
       <ToastContainer />
       <Formik
         initialValues={{ 
-          firstName: '', 
-          lastName: '',
-          phoneOrEmail: '',
-          password: '', 
-          DateOfBirth: '', 
-          gender: '' 
+          firstName: 'Oleksandra', 
+          lastName: 'Gindina',
+          phoneOrEmail: 'alex8gind@gmail.com',
+          password: 'Rabota7890!-', 
+          DateOfBirth: '08.11.1988', 
+          gender: 'other' 
         }}
         validationSchema={RegistrationSchema}
         onSubmit={handleSubmit}

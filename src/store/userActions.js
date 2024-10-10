@@ -68,21 +68,21 @@ export const registerUser = createAsyncThunk(
 );
 
 
-export const loginUser = createAsyncThunk(
-  'user/login',
-  async (credentials, { dispatch }) => {
-    try {
-      const response = await login(credentials);
-      dispatch(setUser(response.user));
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      return response;
-    } catch (error) {
-      dispatch(setError(error.message));
-      throw error;
-    }
-  }
-);
+// export const loginUser = createAsyncThunk(
+//   'user/login',
+//   async (credentials, { dispatch }) => {
+//     try {
+//       const response = await login(credentials);
+//       dispatch(setUser(response.user));
+//       localStorage.setItem('accessToken', response.accessToken);
+//       localStorage.setItem('refreshToken', response.refreshToken);
+//       return response;
+//     } catch (error) {
+//       dispatch(setError(error.message));
+//       throw error;
+//     }
+//   }
+// );
 
 export const logoutUser = createAsyncThunk(
   'user/logout',

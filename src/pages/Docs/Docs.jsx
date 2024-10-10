@@ -19,7 +19,7 @@ const MyDocs = () => {
         <Title>My Documents</Title>
    
       <ButtonsContainer>
-        <DocumentButton onClick={() => navigate('/docs/uploader')}>
+        <DocumentButton onClick={() => navigate('/docs/med')}>
           <Stethoscope />
           Medical documents
         </DocumentButton>

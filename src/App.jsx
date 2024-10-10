@@ -6,6 +6,7 @@ import Navigation from './components/Navigation/Navigation'
 // import Background from './components/Background'
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
+
 function App() {
     return (
         <HelmetProvider>

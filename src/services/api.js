@@ -20,25 +20,25 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        await store.dispatch(refreshToken());
-        return api(originalRequest);
-      } catch (refreshError) {
-        console.log("DEBUG: refresh error", refreshError);
-        store.dispatch(handleAuthError(refreshError.response.data));
-        return Promise.reject(refreshError);
-      }
-    }
-    store.dispatch(handleApiError(error));
-    return Promise.reject(error);
-  }
-);
+// api.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+//     if (error.response.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true;
+//       try {
+//         await store.dispatch(refreshToken());
+//         return api(originalRequest);
+//       } catch (refreshError) {
+//         console.log("DEBUG: refresh error", refreshError);
+//         store.dispatch(handleAuthError(refreshError.response.data));
+//         return Promise.reject(refreshError);
+//       }
+//     }
+//     store.dispatch(handleApiError(error));
+//     return Promise.reject(error);
+//   }
+// );
 
 export const register = async (userData) => {
   try {
@@ -59,8 +59,9 @@ export const register = async (userData) => {
 
 export const login = async (credentials) => {
   try {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
+    // const response = await api.post('/auth/login', credentials);
+
+   return {}
   } catch (error) {
     console.error('Login error:', error.response?.data);
     throw error;
