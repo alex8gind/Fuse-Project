@@ -78,8 +78,8 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       console.log('Submitting values:', values);
-      const data = await login(values);
-      console.log('Login data:', data);
+      const loggedinUser = await login(values);
+      console.log('Login data:', loggedinUser);
       toast.success('Login successful! Redirecting...', {
         position: "top-right",
         autoClose: 2000,
@@ -89,10 +89,12 @@ const Login = () => {
         draggable: true,
         className: 'custom-toast-container',
       });
-      setTimeout(() => {
-        resetForm();
+      if(!loggedinUser.isAccountVerified) {
+        navigate('/verify');
+      } else {
         navigate('/');
-      }, 2000);
+      }
+      resetForm();
     } catch (error) {
       console.error('Login error:', error);
     } finally {
@@ -105,7 +107,7 @@ const Login = () => {
       <CustomToastStyles />
       <ToastContainer />
       <Formik
-        initialValues={{ phoneOrEmail: 'alex87gind@gmail.com', password: 'Rabota7890!-', staySignedIn: true }}
+        initialValues={{ phoneOrEmail: 'alex8gind@gmail.com', password: 'Rabota7890!-', staySignedIn: true }}
         validationSchema={LoginSchema}
         onSubmit={handleSubmit}
       >

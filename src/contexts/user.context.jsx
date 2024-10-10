@@ -107,6 +107,7 @@ function UserProvider({children}) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [verificationStatus, setVerificationStatus] = useState(null);
 
     useEffect(() => {
       if (mockUsers.length === 0) {
@@ -145,6 +146,7 @@ const register = async (userData) => {
           // const response = await maxios.post('success', { user: { ...newUser, password: undefined } });
           // mockUsers.push(newUser);
           console.log("REGISTRATION:", response.data);
+          setUser(response.data.user);
           return response.data.user;
         } catch (err) {
           setError(err.response?.data?.error || 'Registration failed');
@@ -326,16 +328,17 @@ const resetPassword = async (token, newPassword) => {
         }
 };
     
-const verifyEmail = async (token) => {
+const sendVerificationEmail = async () => {
         try {
           // const response = await maxios.post('success', { message: 'Email verified successfully' });
-          const response = await api.post(`/verify-email/${token}`);
-          return response.data;
+          const response = await api.post(`/verify-email`);
+          setVerificationStatus(response.data.status)
         } catch (err) {
           setError('Failed to verify email');
           throw err;
         }
 };
+
 
 
     return (
@@ -360,7 +363,9 @@ const verifyEmail = async (token) => {
           changePassword,
           forgotPassword,
           resetPassword,
-          verifyEmail
+          sendVerificationEmail,
+          verificationStatus
+
         }}>
           {children}
         </UserContext.Provider>

@@ -38,7 +38,8 @@ export const router = createBrowserRouter(
         createRoutesFromElements(
                     <Route element={<ContextProvider providers={[UserProvider, ConnectionProvider]} />}>
                         <Route element={<App />}>                           
-                            <Route path="/" element={<Private><Home/></Private>}/>                           
+                            <Route path="/" element={<Private><Home/></Private>}/>   
+                            <Route path="/verify" element={<Private><VerificationEmailOrPhone/></Private>}/>                        
                             <Route path="/profile" element={<Private><Profile /></Private>}/>
                             <Route path="/docs/med" element={<Private><MedDocsUploader/></Private>}/>
                             <Route path="/docs" element={<Private><Docs/></Private>}/>
@@ -55,8 +56,8 @@ export const router = createBrowserRouter(
                         </Route>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Registration/>}/>
-                        <Route path="/verify" element={<VerificationEmailOrPhone/>}/>
-                        <Route path="/verify/:result" element={<VerificationResult/>}/>
+                        
+                        <Route path="/verify/:token" element={<VerificationResult/>}/>
                         <Route path="/forgot-password" element={<ForgotPass/>}/>
                         <Route path="/id-verification" element={<IdVerification />} />
                         <Route path="/choose-id-option" element={<IdDocsFotoOptions />} />

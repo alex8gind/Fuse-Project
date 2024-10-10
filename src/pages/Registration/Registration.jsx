@@ -3,23 +3,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Field} from 'formik';
 import * as Yup from 'yup';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css?inline';
 import { Eye, EyeOff } from 'lucide-react';
 import Spinner from '../../components/Spinner';
-import { registerUser } from '../../store/userActions';
 import { setError } from '../../store/userSlice';
-import { CustomToastStyles } from '../../styles/CustomToastStyles';
 import { 
   StyledForm, 
   StyledField, 
-  StyledError, 
   StyledButton, 
   StyledLink,
+  StyledError,
   FieldWrapper,
   PasswordWrapper,
   StyledPasswordField,
-  ToggleButton
+  ToggleButton,
+  MessageContainer,
+  SuccessMessage,
+  ErrorMessage
 } from './Registration.style';
 import { useUserContext } from '../../contexts/user.context';
 
@@ -69,26 +68,18 @@ const Registration = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.user);
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const {register} = useUserContext();
 
   useEffect(() => {
     return () => {
       dispatch(setError(null));
-      toast.dismiss();
     };
   }, [dispatch]);
 
   useEffect(() => {
     if (error) {
-      toast.error(error, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: 'custom-toast-container',
-      });
+      setMessage({ type: 'error', text: error });
     }
   }, [error]);
 
@@ -96,18 +87,13 @@ const Registration = () => {
     try {
       console.log('Submitting values:', values);
       const user = await register(values);
-      if (user) {
-        toast.success('Registration successful! Redirecting to login...', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          className: 'custom-toast-container',
-        });
+      if(user){
+      setMessage({ 
+        type: 'success', 
+        text: 'Registration successful! You will be redirected to the verification page...' 
+      });
         resetForm();
-        setTimeout(() => navigate('/login'), 3000);
+        setTimeout(() => navigate('/verify'), { state: { email: values.phoneOrEmail } }), 2000;
       } else {
         throw new Error(resultAction.error.message || 'Registration failed');
       }
@@ -120,15 +106,13 @@ const Registration = () => {
 
   return (
     <>
-      <CustomToastStyles />
-      <ToastContainer />
       <Formik
         initialValues={{ 
           firstName: 'Oleksandra', 
           lastName: 'Gindina',
           phoneOrEmail: 'alex8gind@gmail.com',
           password: 'Rabota7890!-', 
-          DateOfBirth: '08.11.1988', 
+          DateOfBirth: "08.11.1988", 
           gender: 'other' 
         }}
         validationSchema={RegistrationSchema}
@@ -212,7 +196,16 @@ const Registration = () => {
             <StyledButton type="submit" disabled={isSubmitting || loading}>
               {isSubmitting || loading ? <><Spinner />Submitting...</> : 'Sign Up'}
             </StyledButton>
-            {error && <StyledError>{error}</StyledError>}
+
+            <MessageContainer $visible={!!message.text}>
+                {message.type === 'success' && (
+                  <SuccessMessage>{message.text}</SuccessMessage>
+                )}
+                {message.type === 'error' && (
+                  <ErrorMessage>{message.text}</ErrorMessage>
+                )}
+            </MessageContainer>
+            
           </StyledForm>
         )}
       </Formik>

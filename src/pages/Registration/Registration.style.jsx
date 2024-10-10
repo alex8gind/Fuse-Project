@@ -57,6 +57,13 @@ export const StyledPasswordField = styled(StyledField)`
   padding-right: 40px;
 `;
 
+export const StyledError = styled.div`
+  color: ${props => props.theme.colors.error};
+  font-size: 0.7em;
+  margin-top: 0.25em;
+  min-height: 1em;
+`;
+
 export const ToggleButton = styled.button`
   position: absolute;
   right: 8px;
@@ -65,13 +72,6 @@ export const ToggleButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-`;
-
-export const StyledError = styled.div`
-  color: ${props => props.theme.colors.error};
-  font-size: 0.7em;
-  margin-top: 0.25em;
-  min-height: 1em;
 `;
 
 export const StyledButton = styled.button`
@@ -107,3 +107,28 @@ export const StyledLink = styled.a`
     text-decoration: underline;
   }
 `;
+
+export const MessageContainer = styled.div`
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: opacity 0.3s ease-in-out;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+`;
+
+export const SuccessMessage = styled(MessageContainer)`
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+`;
+
+export const ErrorMessage = styled(MessageContainer)`
+  background-color: #f8d7da;
+  color: ${props => props.theme.colors.error};
+  border: 1px solid #f5c6cb;
+`;
+
+
+

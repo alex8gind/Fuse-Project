@@ -93,7 +93,7 @@ export const Divider = styled.div`
   }
 `;
 
-export const ResendLink = styled(Link)`
+export const CLink = styled(Link)`
   color: #2196F3;
   text-decoration: none;
   font-size: 0.8rem;
@@ -107,4 +107,27 @@ export const ResendLink = styled(Link)`
     font-size: 0.9rem;
     padding-left: 0.5rem;
   }
+`;
+
+
+export const MessageContainer = styled.div`
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: opacity 0.3s ease-in-out;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+`;
+
+export const SuccessMessage = styled(MessageContainer)`
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+`;
+
+export const ErrorMessage = styled(MessageContainer)`
+  background-color: #f8d7da;
+  color: ${props => props.theme.colors.error};
+  border: 1px solid #f5c6cb;
 `;
