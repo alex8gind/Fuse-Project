@@ -73,13 +73,13 @@ const Profile = () => {
           <FieldIcon><Contact size="1.5em" /></FieldIcon>
           <FieldContent>{user.phoneOrEmail}</FieldContent>
         </Field>
-        <Field>
+        {/* <Field>
           <FieldIcon><Lock size="1.5em" /></FieldIcon>
           <FieldContent>{showPassword ? user.password : '••••••••'}</FieldContent>
           <PasswordToggle onClick={togglePasswordVisibility}>
             {showPassword ? <Eye size="1.5em" /> : <EyeOff size="1.5em" />}
           </PasswordToggle>
-        </Field>
+        </Field> */}
       </FieldsContainer>
 
       <EditButton onClick={handleEditProfile}>

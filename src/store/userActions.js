@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setUser, clearUser, setLoading, setError } from './userSlice';
-import api, { register, login, logout as apiLogout } from '../services/api';
+import api, {  logout as apiLogout } from '../services/api';
 
 
 // Action creator for handling API errors

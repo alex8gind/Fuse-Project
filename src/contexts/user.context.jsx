@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { maxios } from "../utils/maxios"; 
+// import { maxios } from "../utils/maxios"; 
 import api from "../services/api";
 import axios from "axios";
 
@@ -129,7 +129,6 @@ function UserProvider({children}) {
 const getUserProfile = async () => {
         try {
           const response = api.get('/profile')
-          // const response = await maxios.get('success', { user: mockUsers[0] });
           setUser(response.data.user);
         } catch (err) {
           setError('Failed to fetch user profile');
@@ -141,11 +140,10 @@ const getUserProfile = async () => {
 
 const register = async (userData) => {
         try {
-          // const response = await api.post('/register', userData);
-          const response = await axios.post('http://localhost:5001/api/register', userData);
-          // const response = await maxios.post('success', { user: { ...newUser, password: undefined } });
-          // mockUsers.push(newUser);
+          const response = await api.post('/register', userData);
           console.log("REGISTRATION:", response.data);
+          localStorage.setItem('accessToken', response.data.accessToken);
+          localStorage.setItem('refreshToken', response.data.refreshToken);
           setUser(response.data.user);
           return response.data.user;
         } catch (err) {
@@ -156,12 +154,6 @@ const register = async (userData) => {
     
 const login = async (credentials) => {
         try {
-          // if (credentials) {         
-          //   const response = await api.post('success', { 
-          //     user: mockUsers[0],
-          //     accessToken: 'mock-access-token',
-          //     refreshToken: 'mock-refresh-token'
-          //   });
           console.log("CREDENTIALS:", credentials);
             const response = await api.post('/login', credentials);
             setUser(response.data.user );
@@ -172,10 +164,37 @@ const login = async (credentials) => {
           throw err;
         }
 };
+
+const refreshToken = async () => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    const response = await api.post("/refresh-token", { refreshToken });
+    localStorage.setItem('accessToken', response.data.accessToken);
+    localStorage.setItem('refreshToken', response.data.refreshToken);
+    setUser(response.data.user);
+    return response.data;
+  } catch (error) {
+    dispatch(setError(error.message));
+    dispatch(logoutUser());
+    throw error;
+  }
+};
+
+const sendVerificationEmail = async () => {
+  try {
+    const response = await api.post(`/verify-email`);
+    setVerificationStatus(response.data.status)
+  } catch (err) {
+    setError('Failed to verify email');
+    throw err;
+  }
+};
     
 const logout = async () => {
         try {
-          // await maxios.post('success', { message: 'Logged out successfully' });
           await api.post('/logout');
           setUser(null);
           localStorage.removeItem('userId');
@@ -189,7 +208,6 @@ const logout = async () => {
 const updateUserProfile = async (userData) => {
         try {
           const updatedUser = { ...user, ...userData, updatedAt: new Date().toISOString() };
-          // const response = await maxios.put('success', { user: updatedUser });
           const response = await api.put('/profile', updatedUser);
           setUser(response.data.user || response.data);
           return response.data.user || response.data;
@@ -201,10 +219,6 @@ const updateUserProfile = async (userData) => {
 
 const updateProfilePicture = async (photoFile) => {
   try {
-      // In a real scenario, you'd upload the file to a server here
-      // const photoUrl = URL.createObjectURL(photoFile);
-      // const updatedUser = { ...user, profilePicture: photoUrl, updatedAt: new Date().toISOString() };
-      // const response = await maxios.put('success', { user: updatedUser });
       const formData = new FormData();
             formData.append('profilePicture', photoFile);
             const response = await api.put('/users/profile-picture', formData, {
@@ -220,7 +234,6 @@ const updateProfilePicture = async (photoFile) => {
 
 const deactivateAccount = async () => {
         try {
-          // const response = await maxios.post('success', { message: 'Account deactivated successfully' });
           await api.post('/users/deactivate');
           setUser(prevUser => ({ ...prevUser, isActive: false }));
           localStorage.removeItem('accessToken');
@@ -233,7 +246,6 @@ const deactivateAccount = async () => {
 
 const reactivateAccount = async () => {
       try {
-        // const response = await maxios.post('success', { message: 'Account reactivated successfully' });
         const response = await api.post('/users/reactivate');
         setUser(prevUser => ({ ...prevUser, isActive: true }));
         localStorage.setItem('accessToken', response.data.accessToken);
@@ -246,7 +258,6 @@ const reactivateAccount = async () => {
 
 const deleteAccount = async () => {
       try {
-        // const response = await maxios.delete('success', { message: 'Account deleted successfully' });
         await api.delete('/:userId');
         setUser(null);
         localStorage.removeItem('accessToken');
@@ -259,7 +270,6 @@ const deleteAccount = async () => {
 
 const getAllUsers = async () => {
     try {
-      // const response = await maxios.get('success', { users: mockUsers });
       const response = await api.get('/users/all');
       return response.data.users;
     } catch (err) {
@@ -270,9 +280,6 @@ const getAllUsers = async () => {
 
 const getReportedUsers = async () => {
     try {
-      // For this mock version, we'll return an empty array
-      // In a real implementation, you'd fetch this from the backend
-      // const response = await maxios.get('success', { reportedUsers: [] });
       const response = await api.get('/users/reported');
       return response.data.reportedUsers;
     } catch (err) {
@@ -283,9 +290,6 @@ const getReportedUsers = async () => {
 
 const getBlockedUsers = async () => {
   try {
-    // For this mock version, we'll return an empty array
-    // In a real implementation, you'd fetch this from the backend
-    // const response = await maxios.get('success', { blockedUsers: [] });
     const response = await api.get('/users/blocked');
     return response.data.blockedUsers;
   } catch (err) {
@@ -296,8 +300,6 @@ const getBlockedUsers = async () => {
 
 const changePassword = async (passwordData) => {
         try {
-          // In a real app, you'd hash the password here
-          // const response = await maxios.put('success', { message: 'Password changed successfully' });
           const response = await api.put('/change-password', passwordData);
           return response.data;
         } catch (err) {
@@ -308,7 +310,6 @@ const changePassword = async (passwordData) => {
     
 const forgotPassword = async (email) => {
         try {
-          // const response = await maxios.post('success', { message: 'Password reset instructions sent' });
           const response = await api.post('/forgot-password', { email });
           return response.data;
         } catch (err) {
@@ -319,8 +320,6 @@ const forgotPassword = async (email) => {
     
 const resetPassword = async (token, newPassword) => {
         try {
-          // const response = await maxios.post('success', { message: 'Password reset successfully' });
-          const response = await api.post('/reset-password', { token, newPassword });
           return response.data;
         } catch (err) {
           setError('Failed to reset password');
@@ -328,19 +327,6 @@ const resetPassword = async (token, newPassword) => {
         }
 };
     
-const sendVerificationEmail = async () => {
-        try {
-          // const response = await maxios.post('success', { message: 'Email verified successfully' });
-          const response = await api.post(`/verify-email`);
-          setVerificationStatus(response.data.status)
-        } catch (err) {
-          setError('Failed to verify email');
-          throw err;
-        }
-};
-
-
-
     return (
         <UserContext.Provider value={{
           user,
@@ -352,6 +338,7 @@ const sendVerificationEmail = async () => {
           login,
           logout,
           register,
+          refreshToken,
           updateUserProfile,
           updateProfilePicture,
           deactivateAccount,
