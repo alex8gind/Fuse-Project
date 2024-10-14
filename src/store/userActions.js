@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setUser, clearUser, setLoading, setError } from './userSlice';
-import api, {  logout as apiLogout } from '../services/api';
 
 
 // Action creator for handling API errors
@@ -47,7 +46,6 @@ const handleAuthError = (errorData) => (dispatch) => {
     dispatch(refreshToken());
   } else {
     dispatch(setError('Authentication failed: ' + errorData.error));
-    dispatch(logoutUser());
   }
 };
 
@@ -68,21 +66,21 @@ export const registerUser = createAsyncThunk(
 );
 
 
-// export const loginUser = createAsyncThunk(
-//   'user/login',
-//   async (credentials, { dispatch }) => {
-//     try {
-//       const response = await login(credentials);
-//       dispatch(setUser(response.user));
-//       localStorage.setItem('accessToken', response.accessToken);
-//       localStorage.setItem('refreshToken', response.refreshToken);
-//       return response;
-//     } catch (error) {
-//       dispatch(setError(error.message));
-//       throw error;
-//     }
-//   }
-// );
+export const loginUser = createAsyncThunk(
+  'user/login',
+  async (credentials, { dispatch }) => {
+    try {
+      const response = await login(credentials);
+      dispatch(setUser(response.user));
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+      return response;
+    } catch (error) {
+      dispatch(setError(error.message));
+      throw error;
+    }
+  }
+);
 
 export const logoutUser = createAsyncThunk(
   'user/logout',

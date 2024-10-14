@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
-// import { maxios } from "../utils/maxios"; 
 import api from "../services/api";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 export const UserContext = createContext(null)
 
@@ -107,7 +107,7 @@ function UserProvider({children}) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [verificationStatus, setVerificationStatus] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
       if (mockUsers.length === 0) {
@@ -184,21 +184,35 @@ const refreshToken = async () => {
 };
 
 const sendVerificationEmail = async () => {
+  console.log("FRONT END JUST SENT VERIFICATION EMAIL");
   try {
     const response = await api.post(`/verify-email`);
-    setVerificationStatus(response.data.status)
+    // setVerificationStatus(response.data.status)
   } catch (err) {
     setError('Failed to verify email');
     throw err;
   }
 };
     
+const verifyEmail = async (token) => {
+  try {
+    const response = await api.post(`/verify-email/${token}`);
+    console.log("Email verification response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error('Email verification error:', err);
+    setError(err.response?.data?.error || 'Email verification failed');
+    throw err;
+  }
+};
+
 const logout = async () => {
         try {
           await api.post('/logout');
           setUser(null);
           localStorage.removeItem('userId');
           localStorage.removeItem('accessToken');
+          navigate('/login');
         } catch (err) {
           setError('Logout failed');
           throw err; 
@@ -330,7 +344,6 @@ const resetPassword = async (token, newPassword) => {
     return (
         <UserContext.Provider value={{
           user,
-          mockUsers: mockUsers.length > 0 ? mockUsers : [],
           setUser,
           getUserProfile,
           loading,
@@ -351,7 +364,7 @@ const resetPassword = async (token, newPassword) => {
           forgotPassword,
           resetPassword,
           sendVerificationEmail,
-          verificationStatus
+          verifyEmail
 
         }}>
           {children}

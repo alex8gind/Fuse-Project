@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { useUserContext } from '../../contexts/user.context'; 
+import {Link} from 'react-router-dom';
 import {
   Container,
   CardContainer,
@@ -73,7 +74,10 @@ if (verificationStatus === 'pending') {
         </Title>
         <Message>
         {verificationStatus === 'success' 
-            ? 'Your email has been successfully verified. You will be redirected to the login page shortly.' 
+            ? 
+            <>'Your email has been successfully verified. You may ' 
+            <Link to="/login">Login now</Link>
+            </>
             : 'We couldn\'t verify your email. Please try again.'}
         </Message>
       </CardContainer>

@@ -3,6 +3,7 @@ import {store} from '../store/store';
 import {handleApiError, handleAuthError } from '../store/userActions';
 import { useUserContext } from '../contexts/user.context';
 
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
   headers: {
@@ -11,7 +12,7 @@ const api = axios.create({
 });
 
 export function useInterceptors(){
-  const {refreshToken} = useUserContext();
+  const {refreshToken, logout} = useUserContext();
 
   api.interceptors.request.use(
   (config) => {
@@ -36,6 +37,7 @@ export function useInterceptors(){
       } catch (refreshError) {
         console.log("DEBUG: refresh error", refreshError);
         store.dispatch(handleAuthError(refreshError.response.data));
+        logout();
         return Promise.reject(refreshError);
       }
     }
@@ -73,12 +75,12 @@ export function useInterceptors(){
 // };
 
 // Function to handle logout
-export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    // Redirect to login page
-    window.location.href = '/login';
-  };
+// export const logout = () => {
+//     localStorage.removeItem('token');
+//     localStorage.removeItem('refreshToken');
+//     // Redirect to login page
+//     window.location.href = '/login';
+//   };
   
 
 

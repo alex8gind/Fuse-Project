@@ -10,7 +10,7 @@ import theme from './styles/theme';
 import { router } from './routes/main.routes.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>  
+  // <React.StrictMode>  
     <Provider store={store}> {/* Add this wrapper */}
       <HelmetProvider>
         <ThemeProvider theme={theme}>
@@ -19,5 +19,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </ThemeProvider>
       </HelmetProvider>
     </Provider>
-  </React.StrictMode>
+  // </React.StrictMode>
 )
