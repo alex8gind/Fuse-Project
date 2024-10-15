@@ -72,6 +72,9 @@ import {
 
     useEffect(() => {
       console.log("VerificytionState", verificationState);
+      if (typeof verificationState.message !== 'string') {
+        alert(typeof verificationState.message);
+      }
     }, [verificationState])
 
     const handleResendEmail = async () => {
@@ -79,25 +82,48 @@ import {
       setIsResending(true);
       try {
         const response = await sendVerificationEmail();
-        if (response.status === 200) {
-          setMessage({ type: 'success', text: 'Verification email resent successfully.' });
-        } else if (response.status === 400) {
-          setMessage({ type: 'info', text: response.data.error.message || 'Failed to resend verification email' });
-        }
+        setMessage({ 
+          type: 'success', 
+          text: 'Verification email resent successfully.' 
+        });
+        setVerificationState({
+          status: 'success',
+          message: 'Verification email resent successfully.'
+        });
       } catch (error) {
-        setMessage({ type: 'error', text: error.response?.data?.error || 'Failed to resend verification email' });
+        console.error("ERROR:::", error);
+        let errorMessage = 'Failed to resend verification email';
+        if (typeof error === 'string') {
+          errorMessage = String(error);
+        } else if (error instanceof Error) {
+          errorMessage = String(error.message);
+        } else if (error.response?.data?.error.message) {
+          errorMessage = String(error.response.data.error.message);
+        }
+    
+        if (errorMessage === 'Please wait before requesting another verification email.') {
+          setMessage({ 
+            type: 'info', 
+            text: errorMessage
+          });
+        } else {
+          setMessage({ 
+            type: 'error', 
+            text: errorMessage
+          });
+        }
       } finally {
         setIsResending(false);
       }
     };
 
-    // if (verificationState.status === 'loading') {
-    //   return (
-    //     <VerificationContainer>
-    //       <Message>Loading...</Message>
-    //     </VerificationContainer>
-    //   );
-    // }
+    if (verificationState.status === 'loading') {
+      return (
+        <VerificationContainer>
+          <Message>Loading...</Message>
+        </VerificationContainer>
+      );
+    }
 
 
     return (
@@ -115,80 +141,41 @@ import {
         )}
         </IconWrapper>
 
-        {verificationState.status === 'loading' && (
-          <>
-            <Title>Please wait..</Title>
-          </>
+      <Title>
+        {verificationState.status === 'loading' ? 'Please wait...' :
+         verificationState.status === 'success' ? 'Email Confirmation' :
+         verificationState.status === 'already-sent' ? 'Link has been sent earlier' :
+         'Verification Status'}
+      </Title>
+
+      <Message>
+        {verificationState.status === 'loading' ? 'Sending verification email...' :
+         verificationState.status === 'success' ? 
+           `We have sent an email to ${user?.phoneOrEmail}. To confirm the validity of your email address, please follow the link provided to complete your registration.` :
+         verificationState.status === 'already-sent' ?
+           `We have already sent a verification link to ${user?.phoneOrEmail} earlier. Please check your email and follow the link provided to complete your registration.` :
+         verificationState.message}
+      </Message>
+
+      {(verificationState.status === 'success' || verificationState.status === 'already-sent') && (
+        <>
+          <Divider />
+          <Message>
+            If you haven't received the email, please click 
+            <CLink onClick={handleResendEmail} disabled={isResending}>
+              {isResending ? 'Resending...' : 'Resend confirmation email'}
+            </CLink>
+          </Message>
+        </>
       )}
-
-        {verificationState.status === 'success' && (
-          <>
-            <Title>Email Confirmation</Title>
-          </>
-        )}
-
-        {verificationState.status === 'already-sent' && (
-          <>
-            <Title>Link has been sent earlier...</Title>
-          </>
-        )}
-
-        {verificationState.status === 'loading' && (
-          <>
-            <Message>Sending verification email...</Message>
-          </>
-      )}
-  
-        {verificationState.status === 'success' && (
-          <>
-            <Message>
-              We have sent an email to <strong>{user?.phoneOrEmail}</strong>. To confirm
-              the validity of your email address, please follow the link provided to complete your registration.
-            </Message>
-
-            <Divider />
-
-            <Message>
-              If you haven't received the email, please 
-              <CLink onClick={handleResendEmail} disabled={isResending}>
-                {isResending ? 'Resending...' : 'Resend confirmation email'}
-              </CLink>
-            </Message>
-          </>
-        )}
-
-        {verificationState.status === 'already-sent' && (
-          <>
-            <Message>
-              We have already sent a verification link to <strong>{user?.phoneOrEmail}</strong> earlier. Please check 
-              your email and follow the link provided to complete your registration.
-            </Message>
-
-            <Divider />
-
-            <Message>
-              If you haven't received the email, please 
-              <CLink onClick={handleResendEmail} disabled={isResending}>
-                {isResending ? 'Resending...' : 'Resend confirmation email'}
-              </CLink>
-            </Message>
-          </>
-        )}
-  
-        {verificationState.status === 'info' && (
-          <>
-            <Message>
-              {verificationState.message}
-              <CLink onClick={() => navigate('/login')}>Login</CLink>
-            </Message>
-          </>
-        )}
   
         <MessageContainer $visible={!!message.text}>
           {message.type === 'success' && <SuccessMessage>{message.text}</SuccessMessage>}
           {message.type === 'error' && <ErrorMessage>{message.text}</ErrorMessage>}
           {message.type === 'info' && <Message>{message.text}</Message>}
+          {message.type === 'already-sent' && <Message>{message.text}</Message>}
         </MessageContainer>
+
       </VerificationContainer>
     );
   };
