@@ -89,7 +89,7 @@ const Login = () => {
         draggable: true,
         className: 'custom-toast-container',
       });
-      if(!loggedinUser.isAccountVerified) {
+      if(!loggedinUser?.isPhoneOrEmailVerified) {
         navigate('/verify');
       } else {
         navigate('/');

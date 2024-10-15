@@ -19,6 +19,7 @@ export const VerificationContainer = styled.div`
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     width: fit-content;
     max-width: 400px;
+
     margin: 2rem auto;
     padding: 2rem;
   }

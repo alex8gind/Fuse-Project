@@ -16,21 +16,28 @@ const VerificationResult = () => {
 const { token } = useParams();
 const navigate = useNavigate();
 const { verifyEmail } = useUserContext();
-const [verificationStatus, setVerificationStatus] = useState('pending');
+const [verificationState, setVerificationState] = useState({
+  status: 'pending',
+  message: ''
+});
 
 useEffect(() => {
   const verifyToken = async () => {
     if (!token) {
-      setVerificationStatus('failed');
+      setVerificationState({ status: 'failed', message: 'No verification token provided.' });
       return;
     }
 
     try {
-      await verifyEmail(token);
-      setVerificationStatus('success');
+      const result = await verifyEmail(token);
+      if (result.message === 'Email already verified') {
+        setVerificationState({ status: 'already-verified', message: 'Your email was already verified.' });
+      } else {
+        setVerificationState({ status: 'success', message: 'Your email has been successfully verified.' });
+      }
     } catch (error) {
       console.error('Verification failed:', error);
-      setVerificationStatus('failed');
+      setVerificationState({ status: 'failed', message: 'We couldn\'t verify your email. Please try again.' });
     }
   };
 
@@ -38,21 +45,21 @@ useEffect(() => {
 }, [token, verifyEmail]);
 
 
-useEffect(() => {
-  if (verificationStatus === 'success') {
-    const timer = setTimeout(() => {
-      navigate('/login');
-    }, 2000);
+// useEffect(() => {
+//   if (verificationState.status === 'success' || verificationState.status === 'already-verified') {
+//     const timer = setTimeout(() => {
+//       navigate('/login');
+//     }, 2000);
 
-    return () => clearTimeout(timer);
-  }
-}, [verificationStatus, navigate]);
+//     return () => clearTimeout(timer);
+//   }
+// }, [verificationState.status, navigate]);
 
 const onClose = () => {
-  navigate(verificationStatus === 'success' ? '/login' : '/register');
+  navigate(verificationState.status === 'success' || verificationState.status === 'already-verified' ? '/login' : '/register');
 };
 
-if (verificationStatus === 'pending') {
+if (verificationState.status === 'pending') {
   return (
     <Container>
       <CardContainer>
@@ -66,19 +73,18 @@ if (verificationStatus === 'pending') {
   return (
     <Container>
       <CardContainer>
-        <IconWrapper $success={verificationStatus === 'success'}>
-          {verificationStatus === 'success' ? <Check size={24} color="white" /> : <X size={24} color="white" />}
+        <IconWrapper $success={verificationState.status === 'success' || verificationState.status === 'already-verified'}>
+          {verificationState.status === 'success' || verificationState.status === 'already-verified' ? <Check size={24} color="white" /> : <X size={24} color="white" />}
         </IconWrapper>
         <Title>
-          {verificationStatus === 'success' ? 'Verification Successful' : 'Verification Failed'}
+        {verificationState.status === 'success' ? 'Verification Successful' : 
+           verificationState.status === 'already-verified' ? 'Already Verified' : 'Verification Failed'}
         </Title>
         <Message>
-        {verificationStatus === 'success' 
-            ? 
-            <>'Your email has been successfully verified. You may ' 
-            <Link to="/login">Login now</Link>
-            </>
-            : 'We couldn\'t verify your email. Please try again.'}
+          {verificationState.message} 
+          {(verificationState.status === 'success' || verificationState.status === 'already-verified') && 
+            <> You may <Link to="/login">Login now</Link></>
+          }
         </Message>
       </CardContainer>
       <CloseButton onClick={onClose}>×</CloseButton>

@@ -39,7 +39,7 @@ export const router = createBrowserRouter(
                     <Route element={<ContextProvider providers={[UserProvider, ConnectionProvider]} />}>
                         <Route element={<App />}>                           
                             <Route path="/" element={<Private><Home/></Private>}/>   
-                            <Route path="/verify" element={<Private><VerificationEmailOrPhone/></Private>}/>                        
+                            <Route path="/verify" element={<VerificationEmailOrPhone/>}/>                        
                             <Route path="/profile" element={<Private><Profile /></Private>}/>
                             <Route path="/docs/med" element={<Private><MedDocsUploader/></Private>}/>
                             <Route path="/docs" element={<Private><Docs/></Private>}/>

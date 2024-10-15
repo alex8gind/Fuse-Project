@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { nav } from "framer-motion/client";
 
 
 export const UserContext = createContext(null)
@@ -116,23 +117,42 @@ function UserProvider({children}) {
     }, []);
 
     useEffect(() => {
-        // Simulate checking for a stored session
+      const checkAuthStatus = async () => {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
-          getUserProfile();
+          await getUserProfile();
         } else {
           setLoading(false);
         }
-      }, []);
+      };
+    
+      checkAuthStatus();
+    }, []);
     
 
 const getUserProfile = async () => {
+        setLoading(true);
         try {
-          const response = api.get('/profile')
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            throw new Error('No access token found');
+          }
+      
+          const response = await api.get('/profile', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+      
           setUser(response.data.user);
         } catch (err) {
-          setError('Failed to fetch user profile');
           console.error('Error fetching user profile:', err);
+          setError(err.response?.data?.error || 'Failed to fetch user profile');
+          // If the token is invalid or expired, clear it and the user data
+          if (err.response?.status === 401) {
+            localStorage.removeItem('accessToken');
+            setUser(null);
+          }
         } finally {
           setLoading(false);
         }
@@ -142,8 +162,8 @@ const register = async (userData) => {
         try {
           const response = await api.post('/register', userData);
           console.log("REGISTRATION:", response.data);
+          localStorage.clear();
           localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('refreshToken', response.data.refreshToken);
           setUser(response.data.user);
           return response.data.user;
         } catch (err) {
@@ -158,6 +178,7 @@ const login = async (credentials) => {
             const response = await api.post('/login', credentials);
             setUser(response.data.user );
             localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
             return response.data.user;
         } catch (err) {
           setError(err.response?.data?.error || 'Login failed');
@@ -187,7 +208,7 @@ const sendVerificationEmail = async () => {
   console.log("FRONT END JUST SENT VERIFICATION EMAIL");
   try {
     const response = await api.post(`/verify-email`);
-    // setVerificationStatus(response.data.status)
+    return response;
   } catch (err) {
     setError('Failed to verify email');
     throw err;
