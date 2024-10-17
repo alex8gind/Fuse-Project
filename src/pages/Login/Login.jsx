@@ -4,13 +4,11 @@ import { UserContext } from '../../contexts/user.context';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css?inline';
 import { Eye, EyeOff } from 'lucide-react';
 import Spinner from '../../components/Spinner';
 import GoogleSvg from "../../assets/icons/google.svg";
-import { CustomToastStyles } from '../../styles/CustomToastStyles';
 import { setError } from '../../store/userSlice';
+import ErrorNotification from '../../components/ErrorNotification';
 import { 
   StyledForm, 
   FieldWrapper,
@@ -53,25 +51,17 @@ const Login = () => {
   const dispatch = useDispatch(); 
   const { loading, error } = useSelector(state => state.user);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorNotification, setErrorNotification] = useState(null);
 
   useEffect(() => {
     return () => {
       dispatch(setError(null));
-      toast.dismiss();
     };
   }, [dispatch]);
 
   useEffect(() => {
     if (error) {
-      toast.error(error, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: 'custom-toast-container',
-      });
+      setErrorNotification({ type: 'error', message: error });
     }
   }, [error]);
 
@@ -80,15 +70,7 @@ const Login = () => {
       console.log('Submitting values:', values);
       const loggedinUser = await login(values);
       console.log('Login data:', loggedinUser);
-      toast.success('Login successful! Redirecting...', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: 'custom-toast-container',
-      });
+      setErrorNotification({ type: 'success', message: 'Login successful! Redirecting...' });
       if(!loggedinUser?.isPhoneOrEmailVerified) {
         navigate('/verify');
       } else {
@@ -97,6 +79,7 @@ const Login = () => {
       resetForm();
     } catch (error) {
       console.error('Login error:', error);
+      setErrorNotification({ type: 'error', message: 'Login failed. Please try again.' });
     } finally {
       setSubmitting(false);
     }
@@ -104,8 +87,13 @@ const Login = () => {
 
   return (
     <>
-      <CustomToastStyles />
-      <ToastContainer />
+       {errorNotification && (
+        <ErrorNotification
+          type={errorNotification.type}
+          message={errorNotification.message}
+          onClose={() => setErrorNotification(null)}
+        />
+      )}
       <Formik
         initialValues={{ phoneOrEmail: 'alex8gind@gmail.com', password: 'Rabota7890!-', staySignedIn: true }}
         validationSchema={LoginSchema}

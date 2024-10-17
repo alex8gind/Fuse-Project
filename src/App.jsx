@@ -6,11 +6,10 @@ import Navigation from './components/Navigation/Navigation'
 // import Background from './components/Background'
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { use } from 'framer-motion/client'
-import { useInterceptors } from './services/api'
+
 
 
 function App() {
-    useInterceptors();
     return (
         <HelmetProvider>
             <div>

@@ -121,6 +121,12 @@ export const MessageContainer = styled.div`
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 `;
 
+export const InfoMessage = styled(MessageContainer)`
+  background-color: #e1f5fe;
+  color: #0288d1;
+  border: 1px solid #b3e5fc;
+`;
+
 export const SuccessMessage = styled(MessageContainer)`
   background-color: #d4edda;
   color: #155724;

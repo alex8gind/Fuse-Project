@@ -198,8 +198,8 @@ const refreshToken = async () => {
     setUser(response.data.user);
     return response.data;
   } catch (error) {
-    dispatch(setError(error.message));
-    dispatch(logoutUser());
+    setError(error.message);
+    logout();
     throw error;
   }
 };
@@ -210,11 +210,22 @@ const sendVerificationEmail = async () => {
     const response = await api.post(`/verify-email`);
     return response;
   } catch (err) {
-    setError('Failed to verify email');
-    throw err;
+    if (err.response) {
+      if (err.response.status === 400) {
+        throw new Error(err.response.data.error || 'Bad request: Please try again later.');
+      } else {
+        throw new Error(err.response.data.error || 'An error occurred while sending the verification email.');
+      }
+    } else if (err.request) {
+      // The request was made but no response was received
+      throw new Error('No response received from server. Please check your connection.');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      throw new Error('Error sending verification email: ' + err.message);
+    }
   }
 };
-    
+
 const verifyEmail = async (token) => {
   try {
     const response = await api.post(`/verify-email/${token}`);
