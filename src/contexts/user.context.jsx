@@ -304,7 +304,7 @@ const reactivateAccount = async () => {
 
 const deleteAccount = async () => {
       try {
-        await api.delete('/:userId');
+        await api.delete(`/${user.userId}`);
         setUser(null);
         localStorage.removeItem('accessToken');
         return response.data;
@@ -372,6 +372,54 @@ const resetPassword = async (token, newPassword) => {
           throw err;
         }
 };
+
+const uploadDocument = async (file, documentType) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+
+    const response = await api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    // Update the user's documents in the context
+    setUser(prevUser => ({
+      ...prevUser,
+      documents: [...prevUser.documents, response.data.document]
+    }));
+
+    return response.data.document;
+  } catch (err) {
+    setError('Failed to upload document');
+    throw err;
+  }
+};
+
+const getUserDocuments = async () => {
+  try {
+    const response = await api.get('/med');
+    return response.data.documents;
+  } catch (err) {
+    setError('Failed to fetch user documents');
+    throw err;
+  }
+};
+
+const deleteDocument = async (docId) => {
+  try {
+    await api.delete(`/doc/${docId}`);
+    // Update the user's documents in the context
+    setUser(prevUser => ({
+      ...prevUser,
+      documents: prevUser.documents.filter(doc => doc.docId !== docId)
+    }));
+  } catch (err) {
+    setError('Failed to delete document');
+    throw err;
+  }
+};
+
     
     return (
         <UserContext.Provider value={{
@@ -396,7 +444,10 @@ const resetPassword = async (token, newPassword) => {
           forgotPassword,
           resetPassword,
           sendVerificationEmail,
-          verifyEmail
+          verifyEmail,
+          uploadDocument,
+          getUserDocuments,
+          deleteDocument,
 
         }}>
           {children}

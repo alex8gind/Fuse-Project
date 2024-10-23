@@ -14,7 +14,6 @@ import {
   FieldIcon,
   GenderIcon,
   FieldContent,
-  PasswordToggle,
   EditButton
 } from './Profile.style';
 
@@ -22,10 +21,28 @@ import {
 const Profile = () => {
 
   const {user} = useContext(UserContext)
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   if(!user) return <h2>Loading...</h2>
+
+   // Format date function
+   const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      return date.toLocaleString("de-DE", {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
+  };
 
   const getGenderIcon = (gender) => {
     switch (gender.toLowerCase()) {
@@ -36,10 +53,6 @@ const Profile = () => {
       default:
         return <GenderIcon src={Neutral} alt="Neutral" />;
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   const handleEditProfile = () => {
@@ -67,19 +80,13 @@ const Profile = () => {
         </Field>
         <Field>
           <FieldIcon><Calendar size="1.5em" /></FieldIcon>
-          <FieldContent>{user.DateOfBirth}</FieldContent>
+          <FieldContent>{formatDate(user.DateOfBirth)}</FieldContent>
         </Field>
         <Field>
           <FieldIcon><Contact size="1.5em" /></FieldIcon>
           <FieldContent>{user.phoneOrEmail}</FieldContent>
         </Field>
-        {/* <Field>
-          <FieldIcon><Lock size="1.5em" /></FieldIcon>
-          <FieldContent>{showPassword ? user.password : '••••••••'}</FieldContent>
-          <PasswordToggle onClick={togglePasswordVisibility}>
-            {showPassword ? <Eye size="1.5em" /> : <EyeOff size="1.5em" />}
-          </PasswordToggle>
-        </Field> */}
+
       </FieldsContainer>
 
       <EditButton onClick={handleEditProfile}>
