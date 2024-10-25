@@ -99,17 +99,18 @@ export const EditField = styled.input`
   }
 
   &[type="date"] {
+    position: relative;
+    
     &::-webkit-calendar-picker-indicator {
-      background: transparent;
-      bottom: 0;
-      color: transparent;
-      cursor: pointer;
-      height: auto;
-      left: 0;
       position: absolute;
       right: 0;
-      top: 0;
-      width: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      padding: 0.5em;
+      opacity: 0;
+      width: 2em;
+      height: 2em;
     }
   }
 `;
@@ -137,26 +138,6 @@ export const GenderIcon = styled.img`
   filter: invert(34%) sepia(0%) saturate(1%) hue-rotate(157deg) brightness(94%) contrast(87%);
 `;
 
-export const PasswordField = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  /* background-color: yellow; */
-`;
-
-export const PasswordToggle = styled.button`
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${props => props.theme.colors.icons};
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export const ButtonContainer = styled.div`
   display: flex;

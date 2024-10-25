@@ -17,8 +17,6 @@ import {
   ButtonContainer,
   Button,
   PhotoUploadButton,
-  PasswordToggle,
-  PasswordField, 
   PopupOverlay,
   PopupContent,
   PopupMessage,
@@ -29,8 +27,10 @@ import {
 
 const EditProfile = ({ onCancel }) => {
   const { user, updateUserProfile, updateProfilePicture } = useContext(UserContext);
-  const [editedUser, setEditedUser] = useState({ ...user });
-  const [showPassword, setShowPassword] = useState(false);
+  const [editedUser, setEditedUser] = useState({
+    ...user,
+    DateOfBirth: user?.DateOfBirth ? new Date(user.DateOfBirth).toISOString().split('T')[0] : ''
+  });
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(true);
@@ -65,51 +65,50 @@ const EditProfile = ({ onCancel }) => {
     navigate('/selfie-check', { state: { isProfilePhotoUpdate: true } });
   };
 
-  const handlePhotoChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        await updateProfilePicture(file);
-        setPopupMessage('Profile picture updated successfully. Redirecting to verification...');
-        setIsSuccess(true);
-        setShowPopup(true);
-        setTimeout(() => {
-          navigate('/selfie-check');
-        }, 2000);
-      } catch (error) {
-        console.error("Failed to update profile picture:", error);
-        setPopupMessage('Failed to update profile picture. Please try again.');
-        setIsSuccess(false);
-        setShowPopup(true);
-      }
-    }
-  };
+  // const handlePhotoChange = async (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     try {
+  //       await updateProfilePicture(file);
+  //       setPopupMessage('Profile picture updated successfully. Redirecting to verification...');
+  //       setIsSuccess(true);
+  //       setShowPopup(true);
+  //       setTimeout(() => {
+  //         navigate('/selfie-check');
+  //       }, 2000);
+  //     } catch (error) {
+  //       console.error("Failed to update profile picture:", error);
+  //       setPopupMessage('Failed to update profile picture. Please try again.');
+  //       setIsSuccess(false);
+  //       setShowPopup(true);
+  //     }
+  //   }
+  // };
 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedUser({ ...editedUser, [name]: value });
+    setEditedUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleDateChange = (e) => {
-    const { value } = e.target;
-    setEditedUser({ ...editedUser, DateOfBirth: value });
-  };
+  // const handleDateChange = (e) => {
+  //   const { value } = e.target;
+  //   setEditedUser({ ...editedUser, DateOfBirth: value });
+  // };
 
-  const getGenderIcon = (gender) => {
-    switch (gender.toLowerCase()) {
-      case 'female':
-        return <GenderIcon src={Female} alt="Female" />;
-      case 'male':
-        return <GenderIcon src={Male} alt="Male" />;
-      default:
-        return <GenderIcon src={Neutral} alt="Neutral" />;
-    }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  // const getGenderIcon = (gender) => {
+  //   switch (gender.toLowerCase()) {
+  //     case 'female':
+  //       return <GenderIcon src={Female} alt="Female" />;
+  //     case 'male':
+  //       return <GenderIcon src={Male} alt="Male" />;
+  //     default:
+  //       return <GenderIcon src={Neutral} alt="Neutral" />;
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,6 +152,17 @@ const EditProfile = ({ onCancel }) => {
     }
   };
 
+  const getGenderIcon = (gender) => {
+    switch (gender?.toLowerCase()) {
+      case 'female':
+        return <GenderIcon src={Female} alt="Female" />;
+      case 'male':
+        return <GenderIcon src={Male} alt="Male" />;
+      default:
+        return <GenderIcon src={Neutral} alt="Neutral" />;
+    }
+  };
+
   return (
     <PageContainer>
       <BackBtn/>
@@ -170,7 +180,7 @@ const EditProfile = ({ onCancel }) => {
             <FieldIcon><User size="1.5em" /></FieldIcon>
             <EditField 
               name="firstName"
-              value={editedUser.firstName}
+              value={editedUser.firstName || ''}
               onChange={handleChange}
               placeholder="First Name"
             />
@@ -179,54 +189,43 @@ const EditProfile = ({ onCancel }) => {
             <FieldIcon><UserPlus size="1.5em" /></FieldIcon>
             <EditField 
               name="lastName"
-              value={editedUser.lastName}
+              value={editedUser.lastName || ''}
               onChange={handleChange}
               placeholder="Last Name"
             />
           </Field>
           <Field>
-            <FieldIcon>{getGenderIcon(user.gender)}</FieldIcon>
+            <FieldIcon>{getGenderIcon(editedUser.gender)}</FieldIcon>
             <EditField 
               name="gender"
-              value={editedUser.gender}
+              value={editedUser.gender || ''}
               onChange={handleChange}
               placeholder="Gender"
             />
           </Field>
           <Field>
             <FieldIcon><Calendar size="1.5em" /></FieldIcon>
+            <div style={{ position: 'relative', width: '100%' }} onClick={e => e.stopPropagation()}>
               <EditField 
                 type="date"
                 name="DateOfBirth"
                 value={editedUser.DateOfBirth || ''}
-                onChange={handleDateChange}
+                onChange={handleChange}
                 placeholder="Date of Birth"
+                onClick={e => e.stopPropagation()}
               />
+            </div>
           </Field>
           <Field>
             <FieldIcon><Contact size="1.5em" /></FieldIcon>
             <EditField 
               name="phoneOrEmail"
-              value={editedUser.phoneOrEmail}
+              value={editedUser.phoneOrEmail || ''}
               onChange={handleChange}
               placeholder="Phone or Email"
             />
           </Field>
-          <Field>
-            <FieldIcon><Lock size="1.5em" /></FieldIcon>
-            <PasswordField>
-            <EditField 
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={editedUser.password}
-              onChange={handleChange}
-              placeholder="New Password"
-            />
-            <PasswordToggle type="button" onClick={togglePasswordVisibility}>
-              {showPassword ? <Eye size="1.5em" /> : <EyeOff size="1.5em" />}
-            </PasswordToggle>
-            </PasswordField>
-          </Field>
+         
         </FieldsContainer>
         <ButtonContainer>
           <Button type="submit">Save Changes</Button>

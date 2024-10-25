@@ -13,7 +13,15 @@ import {
   FileName,
   FileSize,
   RemoveButton,
-  ProgressBar
+  ProgressBar,
+  PopupOverlay,
+  PopupContent,
+  PopupMessage,
+  PopupButtons,
+  PopupButton,
+  SuccessPopupContent,
+  SuccessMessage,
+  SuccessButton
 } from './MedDocsUploader.style';
 
 const DocsUploader = () => {
@@ -24,6 +32,10 @@ const DocsUploader = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [userDocuments, setUserDocuments] = useState([]);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [docToDelete, setDocToDelete] = useState(null);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [deletedFileName, setDeletedFileName] = useState('');
   const fileInputRef = useRef(null);
   const { uploadDocument, getUserDocuments, deleteDocument } = useUserContext();
 
@@ -102,6 +114,30 @@ const DocsUploader = () => {
     }
   }, [files])
 
+  const handleDeleteClick = (docId) => {
+    setDocToDelete(docId);
+    setShowDeletePopup(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const docToBeDeleted = userDocuments.find(doc => doc.docId === docToDelete);
+      await deleteDocument(docToDelete);
+      await loadUserDocuments();
+      setShowDeletePopup(false);
+      setDocToDelete(null);
+      setDeletedFileName(docToBeDeleted.docName);
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeletePopup(false);
+    setDocToDelete(null);
+  };
+
   const handleDelete = async (docId) => {
     try {
       await deleteDocument(docId);
@@ -110,6 +146,12 @@ const DocsUploader = () => {
       console.error('Failed to delete document:', error);
     }
   };
+
+  const handleSuccessClose = () => {
+    setShowSuccessPopup(false);
+    setDeletedFileName('');
+  };
+
 
   return (
     <UploaderContainer>
@@ -150,12 +192,44 @@ const DocsUploader = () => {
             <FileName>{doc.docName}</FileName>
             <FileSize>{(doc.docSize / 1024).toFixed(2)} KB</FileSize>
             <FileSize>{(new Date(doc.createdAt)).toLocaleString("de-DE")}</FileSize>
-            <RemoveButton onClick={() => handleDelete(doc.docId)}>
+            <RemoveButton onClick={() => handleDeleteClick(doc.docId)}>
               <X size={16} />
             </RemoveButton>
           </FileItem>
         ))}
       </FileList>
+
+      {showDeletePopup && (
+        <PopupOverlay>
+          <PopupContent>
+            <PopupMessage>
+              Are you sure you want to delete this document?
+            </PopupMessage>
+            <PopupButtons>
+              <PopupButton onClick={cancelDelete}>
+                Cancel
+              </PopupButton>
+              <PopupButton $delete onClick={confirmDelete}>
+                Delete
+              </PopupButton>
+            </PopupButtons>
+          </PopupContent>
+        </PopupOverlay>
+      )}
+
+      {showSuccessPopup && (
+        <PopupOverlay>
+          <SuccessPopupContent>
+            <SuccessMessage>
+              File "{deletedFileName}" was successfully deleted
+            </SuccessMessage>
+            <SuccessButton onClick={handleSuccessClose}>
+              OK
+            </SuccessButton>
+          </SuccessPopupContent>
+        </PopupOverlay>
+      )}
+
     </UploaderContainer>
   );
 };

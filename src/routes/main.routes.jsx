@@ -31,7 +31,7 @@ import PrivacyAndSecurity from "../pages/Settings/Privacy&Security";
 import HelpAndSupport from "../pages/Settings/SupportSettings";
 import EditProfile from "../pages/EditProfile/EditProfile";
 import { ConnectionProvider } from "../contexts/connection.context";
-import DigitalSignature from "../pages/DigitalSignature/DigitalSignature";
+// import DigitalSignature from "../pages/DigitalSignature/DigitalSignature";
 import { RegisterInterceptors } from "../services/api";
 
 
@@ -44,7 +44,7 @@ export const router = createBrowserRouter(
                             <Route path="/profile" element={<Private><Profile /></Private>}/>
                             <Route path="/docs/med" element={<Private><MedDocsUploader/></Private>}/>
                             <Route path="/docs" element={<Private><Docs/></Private>}/>
-                            <Route path="/digital-signature" element={<Private><DigitalSignature /></Private>}/>
+                            {/* <Route path="/digital-signature" element={<Private><DigitalSignature /></Private>}/> */}
                             <Route path="/connections" element={<Private><Connections/></Private>}/>
                             <Route path="/contact/:id" element={<Private><Contact/></Private>}/>
                             <Route path="/settings" element={<Private><Settings/></Private>}/>

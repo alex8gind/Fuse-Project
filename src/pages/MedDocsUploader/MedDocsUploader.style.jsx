@@ -147,3 +147,69 @@ export const ProgressBar = styled.div`
     width: 150px;
   }
 `;
+
+export const PopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const PopupContent = styled.div`
+  background-color: ${props => props.theme.colors.navigation_bg};
+  padding: 2em;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  width: 300px;
+`;
+
+export const PopupMessage = styled.p`
+  text-align: center;
+  margin-bottom: 1.5em;
+  color: ${props => props.theme.colors.text};
+`;
+
+export const PopupButtons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+`;
+
+export const PopupButton = styled.button`
+  padding: 0.5em 1.5em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: ${props => props.$delete ? props.theme.colors.error : props.theme.colors.primaryOrange};
+  color: white;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const SuccessPopupContent = styled(PopupContent)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5em;
+`;
+
+export const SuccessMessage = styled(PopupMessage)`
+  color: ${props => props.theme.colors.primaryOrange};
+  font-weight: 500;
+`;
+
+export const SuccessButton = styled(PopupButton)`
+  background-color: ${props => props.theme.colors.primaryOrange};
+  min-width: 100px;
+`;

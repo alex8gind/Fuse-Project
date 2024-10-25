@@ -240,10 +240,11 @@ const verifyEmail = async (token) => {
 
 const logout = async () => {
         try {
-          await api.post('/logout');
-          setUser(null);
           localStorage.removeItem('userId');
           localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          setUser(null);
+          await api.post('/logout');
           navigate('/login');
         } catch (err) {
           setError('Logout failed');
@@ -304,9 +305,9 @@ const reactivateAccount = async () => {
 
 const deleteAccount = async () => {
       try {
-        await api.delete(`/${user.userId}`);
+        const response = await api.delete(`/profile`);
         setUser(null);
-        localStorage.removeItem('accessToken');
+        logout();
         return response.data;
       } catch (err) {
         setError('Failed to delete account');
