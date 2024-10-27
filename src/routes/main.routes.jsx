@@ -11,7 +11,8 @@ import Registration from "../pages/Registration/Registration";
 import PageNotFound from "../pages/PageNotFound/PageNotFound";
 import ContextProvider from "../contexts/context.provider";
 import UserProvider from "../contexts/user.context";
-import ForgotPass from "../pages/ForgotPass/ForgotPass";
+import ForgotPassword from "../pages/ResetPassword/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import IdVerification from "../pages/IdentityVarification/1.IdVerification/IdVerification";
 import IdDocsFotoOptions from "../pages/IdentityVarification/2.IdDocsFotoOptions/IdDocsFotoOptions";
 import CaptureInstructions from "../pages/IdentityVarification/3.CaptureInstructions/CaptureInstructions";
@@ -60,7 +61,8 @@ export const router = createBrowserRouter(
                         <Route path="/verify" element={<VerificationEmailOrPhone/>}/>                        
                         
                         <Route path="/verify/:token" element={<VerificationResult/>}/>
-                        <Route path="/forgot-password" element={<ForgotPass/>}/>
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route path="/id-verification" element={<IdVerification />} />
                         <Route path="/choose-id-option" element={<IdDocsFotoOptions />} />
                         <Route path="/capture-instructions" element={<CaptureInstructions />} />

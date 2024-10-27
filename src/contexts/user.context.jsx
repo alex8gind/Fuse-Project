@@ -374,24 +374,113 @@ const changePassword = async (passwordData) => {
         }
 };
     
-const forgotPassword = async (email) => {
-        try {
-          const response = await api.post('/forgot-password', { email });
-          return response.data;
-        } catch (err) {
-          setError('Failed to process forgot password request');
-          throw err;
-        }
+const forgotPassword = async (phoneOrEmail) => {
+  try {
+      // Validate input
+      if (!phoneOrEmail) {
+          throw new Error('Phone number or email is required');
+      }
+
+      const response = await api.post('/forgot-password', { 
+          phoneOrEmail 
+      });
+
+      // Check if response contains expected data
+      if (!response.data || !response.data.message) {
+          throw new Error('Invalid server response');
+      }
+
+      return {
+          success: true,
+          message: response.data.message
+      };
+  } catch (err) {
+      // Handle specific error cases
+      if (err.response) {
+          switch (err.response.status) {
+              case 404:
+                  throw new Error('No account found with this phone number or email');
+              case 429:
+                  throw new Error('Too many reset attempts. Please try again later');
+              case 400:
+                  throw new Error(err.response.data.error || 'Invalid phone number or email format');
+              default:
+                  throw new Error('Failed to process password reset request');
+          }
+      }
+      
+      // Handle network or other errors
+      throw new Error('Network error. Please check your connection');
+  }
+};
+
+const validateResetToken = async (token) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
+  try {
+    const response = await api.post('/validate-reset-token', { token });
+    
+    if (!response.data || typeof response.data.valid !== 'boolean') {
+      throw new Error('Invalid server response');
+    }
+
+    return response.data.valid;
+  } catch (err) {
+    // Handle specific error cases
+    if (err.response) {
+      switch (err.response.status) {
+        case 404:
+          throw new Error('Reset token not found');
+        case 401:
+          throw new Error('Reset token has expired');
+        case 400:
+          throw new Error('Invalid token format');
+        default:
+          throw new Error('Invalid reset token');
+      }
+    }
+    throw new Error('Failed to validate token. Please check your connection');
+  }
 };
     
 const resetPassword = async (token, newPassword) => {
-        try {
-          return response.data;
-        } catch (err) {
-          setError('Failed to reset password');
-          throw err;
-        }
+  if (!token || !newPassword) {
+    throw new Error('Token and new password are required');
+  }
+  
+  try {
+    const response = await api.post('/reset-password', { 
+      token, 
+      newPassword 
+    });
+
+    if (!response.data || !response.data.message) {
+      throw new Error('Invalid server response');
+    }
+
+    return {
+      success: true,
+      message: response.data.message
+    };
+  } catch (err) {
+    if (err.response) {
+      switch (err.response.status) {
+        case 404:
+          throw new Error('Reset token not found');
+        case 401:
+          throw new Error('Reset token has expired');
+        case 400:
+          throw new Error(err.response.data.error || 'Invalid password format');
+        default:
+          throw new Error('Failed to reset password');
+      }
+    }
+    throw new Error('Network error. Please check your connection');
+  }
 };
+
 
 const uploadDocument = async (file, documentType) => {
   try {
@@ -463,6 +552,7 @@ const deleteDocument = async (docId) => {
           changePassword,
           forgotPassword,
           resetPassword,
+          validateResetToken,
           sendVerificationEmail,
           verifyEmail,
           uploadDocument,
