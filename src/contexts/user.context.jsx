@@ -239,18 +239,37 @@ const verifyEmail = async (token) => {
 };
 
 const logout = async () => {
-        try {
-          localStorage.removeItem('userId');
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          setUser(null);
-          await api.post('/logout');
-          navigate('/login');
-        } catch (err) {
-          setError('Logout failed');
-          throw err; 
-        }
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      try {
+        await api.post('/logout', { refreshToken });
+      } catch (err) {
+        console.warn('Error during logout API call:', err);
+        // Continue with cleanup even if API call fails
+      }
+    }
+
+     // Clear all auth tokens first
+     localStorage.removeItem('accessToken');
+     localStorage.removeItem('refreshToken');
+     localStorage.removeItem('userId');
+     
+     // Then clear user state
+     setUser(null);
+
+    // Finally navigate
+    navigate('/login');
+
+  } catch (err) {
+    console.error('Logout error:', err);
+    // Still clear everything even if there's an error
+    localStorage.clear();
+    setUser(null);
+    navigate('/login');
+  }
 };
+
 
 const updateUserProfile = async (userData) => {
         try {

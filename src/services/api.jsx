@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 export function useInterceptors(){
-  const {refreshToken, logout} = useUserContext();
+  const {refreshToken} = useUserContext();
   console.log("USING INTERCEPRTORS");
   api.interceptors.request.use(
   (config) => {
@@ -32,6 +32,12 @@ export function useInterceptors(){
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+     // Don't retry if it's a logout request
+     if (originalRequest.url === '/logout') {
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
@@ -40,14 +46,14 @@ export function useInterceptors(){
       } catch (refreshError) {
         console.log("DEBUG: refresh error", refreshError);
         store.dispatch(handleAuthError(refreshError.response.data));
-        logout();
+        // Don't call logout here to avoid potential loops
         return Promise.reject(refreshError);
       }
     }
     store.dispatch(handleApiError(error));
     return Promise.reject(error);
   }
-  );
+);
 }
 
 export function RegisterInterceptors ({children}) {
