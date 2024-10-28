@@ -34,10 +34,10 @@ import {
     });
   
     const initiateVerification = async () => {
-      if (!localStorage.getItem('accessToken')) {
-        navigate('/login');
-        return;
-      }
+      // if (!localStorage.getItem('accessToken')) {
+      //   navigate('/login');
+      //   return;
+      // }
       try {
         await sendVerificationEmail();
         setVerificationState({

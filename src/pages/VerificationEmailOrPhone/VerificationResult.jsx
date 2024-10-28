@@ -15,7 +15,7 @@ import {
 const VerificationResult = () => {
 const { token } = useParams();
 const navigate = useNavigate();
-const { verifyEmail } = useUserContext();
+const { verifyEmail, setTokens } = useUserContext();
 const [verificationState, setVerificationState] = useState({
   status: 'pending',
   message: ''
@@ -24,40 +24,59 @@ const [verificationState, setVerificationState] = useState({
 useEffect(() => {
   const verifyToken = async () => {
     if (!token) {
-      setVerificationState({ status: 'failed', message: 'No verification token provided.' });
+      setVerificationState({ 
+        status: 'failed', 
+        message: 'No verification token provided.' });
       return;
     }
 
     try {
       const result = await verifyEmail(token);
-      if (result.message === 'Email already verified') {
-        setVerificationState({ status: 'already-verified', message: 'Your email was already verified.' });
-      } else {
-        setVerificationState({ status: 'success', message: 'Your email has been successfully verified.' });
-      }
+
+       // Clear any old verification token
+       localStorage.removeItem('verificationToken');
+
+        // Set the new tokens if they exist
+        if (result.accessToken && result.refreshToken) {
+          setTokens(result.accessToken, result.refreshToken);
+        }
+
+        setVerificationState({ 
+          status: result.message === 'Email already verified' ? 'already-verified' : 'success',
+          message: result.message
+        });
+
+
+        setTimeout(() => {
+          // If we got new tokens, redirect to home, otherwise to login
+          if (result.accessToken && result.refreshToken) {
+            navigate('/');
+          } else {
+            navigate('/login');
+          }
+        }, 3000);
+
     } catch (error) {
       console.error('Verification failed:', error);
-      setVerificationState({ status: 'failed', message: 'We couldn\'t verify your email. Please try again.' });
+      setVerificationState({ 
+        status: 'failed', 
+        message: error.message || 'We couldn\'t verify your email. Please try again.'  });
     }
   };
 
   verifyToken();
-}, [token, verifyEmail]);
+}, [token, verifyEmail, setTokens, navigate]);
 
-
-// useEffect(() => {
-//   if (verificationState.status === 'success' || verificationState.status === 'already-verified') {
-//     const timer = setTimeout(() => {
-//       navigate('/login');
-//     }, 2000);
-
-//     return () => clearTimeout(timer);
-//   }
-// }, [verificationState.status, navigate]);
 
 const onClose = () => {
-  navigate(verificationState.status === 'success' || verificationState.status === 'already-verified' ? '/login' : '/register');
+  // If verification was successful and we have tokens, go to home, otherwise to login/register
+  if (verificationState.status === 'success' || verificationState.status === 'already-verified') {
+    navigate('/');
+  } else {
+    navigate('/register');
+  }
 };
+
 
 if (verificationState.status === 'pending') {
   return (

@@ -226,14 +226,26 @@ const sendVerificationEmail = async () => {
   }
 };
 
+const setTokens = (accessToken, refreshToken) => {
+  if (accessToken) localStorage.setItem('accessToken', accessToken);
+  if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+};
+
 const verifyEmail = async (token) => {
   try {
     const response = await api.post(`/verify-email/${token}`);
-    console.log("Email verification response:", response.data);
+    
+    if (response.data.accessToken && response.data.refreshToken) {
+      setTokens(response.data.accessToken, response.data.refreshToken);
+    }
+
     return response.data;
   } catch (err) {
     console.error('Email verification error:', err);
-    setError(err.response?.data?.error || 'Email verification failed');
+    // Transform error to be more frontend-friendly
+    if (err.response?.data?.error) {
+      throw new Error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -555,6 +567,7 @@ const deleteDocument = async (docId) => {
           validateResetToken,
           sendVerificationEmail,
           verifyEmail,
+          setTokens,
           uploadDocument,
           getUserDocuments,
           deleteDocument,
