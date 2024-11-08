@@ -133,6 +133,56 @@ export const ConnectionsList = styled.div`
   }
 `;
 
+export const FilterContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+export const FilterButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const FilterButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  ${props => {
+    if (props.isActive) {
+      switch(props.filterType) {
+        case 'accepted':
+          return 'background-color: #10B981; color: white;';
+        case 'pending':
+          return 'background-color: #cf4018; color: white;';
+        default:
+          return 'background-color: #3B82F6; color: white;';
+      }
+    }
+    return 'background-color: #E5E7EB; color: #374151;';
+  }}
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const ConnectionsHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const Title = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+`;
+
 export const PopupOverlay = styled.div`
   position: fixed;
   top: 0;

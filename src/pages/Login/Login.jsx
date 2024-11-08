@@ -9,8 +9,11 @@ import Spinner from '../../components/Spinner';
 import GoogleSvg from "../../assets/icons/google.svg";
 import { setError } from '../../store/userSlice';
 import ErrorNotification from '../../components/ErrorNotification';
+import Logo from '../../components/Logo.jsx';
 import { 
   StyledForm, 
+  LogoContainer,
+  Title,
   FieldWrapper,
   StyledField, 
   StyledError, 
@@ -101,6 +104,8 @@ const Login = () => {
       >
         {({ errors, touched, isSubmitting, resetForm }) => (
           <StyledForm>
+            <LogoContainer><Logo /></LogoContainer>
+            <Title>Safe is a new Sexy :)</Title>
             <FieldWrapper>
               <StyledField 
                 name="phoneOrEmail" 

@@ -2,7 +2,6 @@ import axios from 'axios';
 import {store} from '../store/store';
 import {handleApiError, handleAuthError } from '../store/userActions';
 import { useUserContext } from '../contexts/user.context';
-import { CloudCog } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 
 

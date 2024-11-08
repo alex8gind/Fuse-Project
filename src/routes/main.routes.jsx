@@ -58,8 +58,7 @@ export const router = createBrowserRouter(
                         </Route>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Registration/>}/>
-                        <Route path="/verify" element={<VerificationEmailOrPhone/>}/>                        
-                        
+                        <Route path="/verify" element={<VerificationEmailOrPhone/>}/>                                                
                         <Route path="/verify/:token" element={<VerificationResult/>}/>
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password/:token" element={<ResetPassword />} />

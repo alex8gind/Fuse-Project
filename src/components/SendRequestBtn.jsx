@@ -1,9 +1,9 @@
-import styled from 'styled-components';
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionRequestPopup from './ConnectionRequestPopup';
+import styled from 'styled-components';
 import { X } from 'lucide-react';
 import { ConnectionContext } from '../contexts/connection.context';
+import ConnectionRequestPopup from './ConnectionRequestPopup';
 
 const ButtonContainer = styled.div`
   position: relative;
@@ -20,12 +20,13 @@ const StyledButton = styled.button`
   border-radius: 1.1vh;
   font-size: 1rem;
   font-family: ${props => props.theme.fonts.main};
-  cursor: pointer;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.$disabled ? '0.5' : '1'};
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${props => props.$requestSent ? props.theme.colors.primaryOrange : props.theme.colors.background};
-    color: ${props => props.$requestSent ? props.theme.colors.background : props.theme.colors.primaryOrange};
+    background-color: ${props => !props.$disabled && (props.$requestSent ? props.theme.colors.primaryOrange : props.theme.colors.background)};
+    color: ${props => !props.$disabled && (props.$requestSent ? props.theme.colors.background : props.theme.colors.primaryOrange)};
   }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
@@ -80,7 +81,17 @@ const CloseButton = styled.button`
   justify-content: center;
 `;
 
-const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, selectedUser, userId, isRequestSent }) => {
+const SendRequestBtn = ({ 
+  isHomePage, 
+  isContactsPage, 
+  contactName, 
+  onClick, 
+  selectedUser, 
+  userId, 
+  isRequestSent,
+  disabled,
+  $disabled 
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const buttonRef = useRef(null);
@@ -100,7 +111,12 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
     };
   }, []);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
+
     if (isHomePage) {
       setShowPopup(true);
     } else if (selectedUser || isContactsPage) {
@@ -112,6 +128,8 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
   };
 
   const handleSendRequest = async () => {
+    if (disabled) return;
+    
     if (userId) {
       try {
         if (isRequestSent) {
@@ -135,10 +153,15 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
   
   return (
     <ButtonContainer ref={buttonRef}>
-      <StyledButton onClick={handleClick} $requestSent={isRequestSent}>
+      <StyledButton 
+        onClick={handleClick} 
+        $requestSent={isRequestSent}
+        disabled={disabled}
+        $disabled={$disabled}
+      >
         {isRequestSent ? 'Cancel Request' : 'Send Connection Request'}
       </StyledButton>
-      {showWarning && (
+      {showWarning && !disabled && (
         <WarningCloud>
           Please choose a contact first.
           <CloseButton onClick={() => setShowWarning(false)}>
@@ -146,7 +169,7 @@ const SendRequestBtn = ({ isHomePage, isContactsPage, contactName, onClick, sele
           </CloseButton>
         </WarningCloud>
       )}
-      {showPopup && (
+      {showPopup && !disabled && (
         <ConnectionRequestPopup
           onClose={() => setShowPopup(false)}
           onSendRequest={handleSendRequest}

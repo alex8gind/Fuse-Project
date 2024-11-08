@@ -43,6 +43,27 @@ export const LastInteraction = styled.p`
   color: ${props => props.theme.colors.textSecondary};
 `;
 
+export const StatusContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+`;
+
+export const ConnectionStatus = styled.span`
+  font-size: 0.875rem;
+  ${props => {
+    switch(props.status) {
+      case 'accepted':
+        return 'color: #10B981;'; // green
+      case 'pending':
+        return 'color: #F59E0B;'; // yellow
+      default:
+        return 'color: #6B7280;'; // gray
+    }
+  }}
+`;
+
 export const Status = styled.span`
   font-size: 0.8rem;
   color: ${props => props.theme.colors.primary};

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, X, Loader, AlertTriangle} from 'lucide-react';
 import { useUserContext } from '../../contexts/user.context';
 import {
@@ -25,6 +25,7 @@ import {
     */
    const VerificationEmailOrPhone = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { sendVerificationEmail, user } = useUserContext();
     const [isResending, setIsResending] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -32,6 +33,22 @@ import {
       status: 'loading',
       message: ''
     });
+
+  //     // Check if user just registered
+  // const justRegistered = location.state?.justRegistered;
+  // const userEmail = location.state?.email;
+
+  // useEffect(() => {
+  //   // Only automatically send verification email if user just registered
+  //   if (justRegistered && userEmail) {
+  //     initiateVerification();
+  //   } else {
+  //     setVerificationState({
+  //       status: 'ready',
+  //       message: 'Please verify your email to continue'
+  //     });
+  //   }
+  // }, [justRegistered, userEmail]);
   
     const initiateVerification = async () => {
       // if (!localStorage.getItem('accessToken')) {
@@ -48,7 +65,7 @@ import {
         console.error(error);
         setVerificationState({
           status: 'error',
-          message: error.message
+          message: error.message || 'Failed to send verification email'
         });
       }
     };
@@ -61,6 +78,7 @@ import {
       console.log("HANDLE RESEND EMAIL");
       if (isResending) return;
       setIsResending(true);
+
       try {
         await sendVerificationEmail();
         setMessage({ 
@@ -70,7 +88,7 @@ import {
       } catch (error) {
         setMessage({ 
           type: 'error', 
-          text: error.message
+          text: error.message || 'Failed to resend verification email'
         });
       } finally {
         setIsResending(false);

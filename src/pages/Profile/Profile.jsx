@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { CreditCard,User, Calendar, Contact, Lock, Pencil, Eye, EyeOff } from 'lucide-react';
+import React, { useContext, useEffect } from 'react';
+import { CreditCard,User, Calendar, Contact, Pencil} from 'lucide-react';
 import Female from '../../assets/icons/female.png';
 import Male from '../../assets/icons/male.png';
 import Neutral from '../../assets/icons/neutral.png';
@@ -20,8 +20,25 @@ import {
 
 const Profile = () => {
 
-  const {user} = useContext(UserContext)
+  const { user, checkVerificationStatus, setProfilePicture } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkVerificationAndProfile = async () => {
+      try {
+        const verificationStatus = await checkVerificationStatus();
+        
+        // If user is verified but doesn't have a profile picture, set it
+        if (verificationStatus.isVerified && (!user?.profilePicture || user.profilePicture === 'default.png')) {
+          await setProfilePicture();
+        }
+      } catch (error) {
+        console.error('Failed to check verification status:', error);
+      }
+    };
+
+    checkVerificationAndProfile();
+  }, []);
 
   if(!user) return <h2>Loading...</h2>
 

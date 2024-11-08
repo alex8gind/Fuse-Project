@@ -1,13 +1,13 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { UserContext } from "./user.context";
-import { maxios } from "../utils/maxios";
+import api from "../services/api";
 
 export const ConnectionContext = createContext(null);
 
 export const ConnectionProvider = ({ children }) => {
   const [connections, setConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [sentRequests, setSentRequests] = useState([{userId: "2", status: 'pending'}]);
+  const [sentRequests, setSentRequests] = useState([]);
   const [blockedUsers, setBlockedUsers] = useState({}); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,123 +16,360 @@ export const ConnectionProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       getUserConnections();
-      getPendingRequests();
-      getSentRequests();
-      getBlockedUsers();
+      // getBlockedUsers();
     }
   }, [user]);
 
+  useEffect(() => {
+    console.log("🫥🫥🫥", sentRequests);
+  }, [sentRequests]);
 
-  const getUserConnections = async () => {
+  const sendConnectionRequest = async (receiverId) => {
     try {
       setLoading(true);
-      // In a real scenario, this would be an API call to fetch user's connections
-      const response = await maxios.get('success', { connections: [
-        {
-          userId: "2",
-          PId: 'A2B2', 
-          firstName: 'Jane',
-          lastName: 'Smith',
-          DateOfBirth: '1988-09-22',
-          gender: 'female',
-          phoneOrEmail: '+1234567890',
-          password: 'hashedPassword456',
-          isVerified: true,
-          isBlocked: false,
-          isAdmin: true,
-          isActive: true,
-          profilePicture: 'https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-          lastLogin: '2023-09-20T09:45:00Z',
-          documents: [104, 105],
-          createdAt: '2023-02-15T14:30:00Z',
-          updatedAt: '2023-03-01T11:45:00Z'
-        },
-      ] });
-      setConnections(response.data.connections);
+      const response = await api.post('/connection', { receiverId });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+
+      const newConnection = response.data.data;
+
+    const transformedConnection = {
+      connectionId: newConnection.connectionId,
+      userId: newConnection.otherUser.userId,
+      PId: newConnection.otherUser.PId,
+      name: `${newConnection.otherUser.firstName} ${newConnection.otherUser.lastName}`,
+      profilePicture: newConnection.otherUser.profilePicture,
+      isActive: newConnection.otherUser.isActive,
+      status: newConnection.status,
+      lastInteraction: newConnection.updatedAt
+    };
+
+    setSentRequests(prev => [...prev, transformedConnection]);
+
+    // Refresh all connection lists to ensure consistency
+    await getUserConnections();
+
+    return transformedConnection
+
     } catch (err) {
-      setError('Failed to fetch connections');
+      console.error('Error sending connection request:', err);
+      setError(err.message || 'Failed to send connection request');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const getPendingRequests = async () => {
+  const cancelConnectionRequest = async (connectionId) => {
     try {
-      const response = await maxios.get('success', { pendingRequests: [] });
-      setPendingRequests(response.data.pendingRequests);
-    } catch (err) {
-      setError('Failed to fetch pending requests');
-    }
-  };
+      setLoading(true);
+      const response = await api.delete(`/connection/${connectionId}`);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
 
-  const getSentRequests = async () => {
-    try {
-      const response = await maxios.get('success', { sentRequests: [] });
-      setSentRequests(response.data.sentRequests);
-    } catch (err) {
-      setError('Failed to fetch sent requests');
-    }
-  };
+      const cancelledConnection = response.data.data;
 
-  const searchUsers = async (searchTerm) => {
-    try {
-      // In a real scenario, this would be an API call to search users
-      const response = await maxios.get('success', { 
-        users: [] // Simulating an empty result for now
-      });
-      return response.data.users;
+      const transformedConnection = {
+        connectionId: cancelledConnection.connectionId,
+        userId: cancelledConnection.otherUser.userId,
+        PId: cancelledConnection.otherUser.PId,
+        name: `${cancelledConnection.otherUser.firstName} ${cancelledConnection.otherUser.lastName}`,
+        profilePicture: cancelledConnection.otherUser.profilePicture,
+        isActive: cancelledConnection.otherUser.isActive,
+        status: cancelledConnection.status,
+        lastInteraction: cancelledConnection.updatedAt
+      };
+
+       // Remove from sent requests
+      setSentRequests(prev => 
+        prev.filter(req => req.connectionId !== connectionId)
+      );
+
+       // Remove from connections if it exists there
+       setConnections(prev => 
+        prev.filter(conn => conn.connectionId !== connectionId)
+      );
+
+      await getUserConnections();
+
+      return transformedConnection
+
     } catch (err) {
-      setError('Failed to search users');
+      console.error('Error canceling connection request:', err);
+      setError(err.message || 'Failed to cancel connection request');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
+  // const getUserConnections = async () => {
+  //   try {
+  //     setLoading(true);
+  //     setError(null);
+      
+  //     const response = await api.get('/connections');
+
+  //     if (!response.data) {
+  //       throw new Error('No data received from server');
+  //     }
   
-  const sendConnectionRequest = async (userId) => {
+  //     if (!response.data?.success || !Array.isArray(response.data?.data)) {
+  //       throw new Error(response.data.message || 'Failed to fetch connections');
+  //     }
+  
+  //     if (!Array.isArray(response.data.data)) {
+  //       throw new Error('Invalid data format received from server');
+  //     }
+  //     console.log('😶‍🌫️😶‍🌫️😶‍🌫️', response.data);
+
+  //     // Transform the response data to match your frontend structure
+  //     const transformedConnections = response.data.data.map(conn => ({
+  //       connectionId: conn.connectionId,
+  //       userId: conn.otherUser.userId,
+  //       PId: conn.otherUser.PId,
+  //       firstName: conn.otherUser.firstName,  
+  //       lastName: conn.otherUser.lastName, 
+  //       profilePicture: conn.otherUser.profilePicture,
+  //       status: conn.status,
+  //       isActive: conn.otherUser.isActive, 
+  //       lastInteraction: conn.updatedAt
+  //     }));
+
+  //     setConnections(transformedConnections);
+  //     return transformedConnections;
+  //   } catch (err) {
+  //     console.error('Error fetching connections:', err);
+  //     setError(err.response?.data?.message || err.message || 'Failed to fetch connections');
+  //     return []; 
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const getUserConnections = async () => {
     try {
-      const response = await maxios.post('success', { message: 'Connection request sent successfully' });
-      setSentRequests(prev => [...prev, { userId, status: 'pending' }]);
-      return response.data;
+      setLoading(true);
+      setError(null);
+      
+      const response = await api.get('/connections');
+      console.log("Raw response data:", response.data);
+
+      if (!response.data?.success || !Array.isArray(response.data?.data)) {
+        throw new Error('Invalid response format from server');
+      }
+
+      const connectionData = response.data.data;
+      
+      // Split connections based on status
+      const activeConnections = [];
+      const pending = [];
+      const sent = [];
+
+      connectionData.forEach(connection => {
+        if (!connection.otherUser) return; 
+
+      
+      const transformedConnection = {
+        connectionId: connection.connectionId,
+        userId: connection.otherUser.userId,
+        PId: connection.otherUser.PId,
+        name: `${connection.otherUser.firstName} ${connection.otherUser.lastName}`,
+        profilePicture: connection.otherUser.profilePicture,
+        isActive: connection.otherUser.isActive,
+        status: connection.status,
+        lastInteraction: connection.updatedAt,
+        senderId: connection.senderId
+      };
+
+      console.log("Processing connection:", connection); 
+      console.log("Status:", connection.status); 
+      console.log("SenderId:", connection.senderId, "UserId:", user.userId); 
+        
+      if (connection.status === 'accepted') {
+        activeConnections.push(transformedConnection);
+      } else if (connection.status === 'pending') {
+        if (connection.senderId === user.userId) {
+          sent.push(transformedConnection);
+        } else {
+          pending.push(transformedConnection);
+        }
+      }
+    });
+
+
+      console.log("Active connections:", activeConnections); // Debug log
+      console.log("Pending requests:", pending); // Debug log
+      console.log("Sent requests:", sent); // Debug log
+
+      setConnections(activeConnections);  // Now this will contain the sent requests
+      setPendingRequests(pending);
+      setSentRequests(sent);
+      
+      return activeConnections;
+
     } catch (err) {
-      setError('Failed to send connection request');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch connections';
+      setError(errorMessage);
+      console.error('Error fetching connections:', err);
+      return [];
+    } finally {
+      setLoading(false);
     }
   };
 
-  const cancelSentRequest = async (userId) => {
+  const getConnection = async (connectionId) => {
     try {
-      const response = await maxios.post('success', { message: 'Connection request cancelled successfully' });
-      setSentRequests(prev => prev.filter(request => request.userId !== userId));
-      return response.data;
+      setLoading(true);
+      const response = await api.get(`/connection/${connectionId}`);
+
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+
+      const connection = response.data.data;
+      return {
+        connectionId: connection.connectionId,
+        userId: connection.otherUser.userId,
+        PId: connection.otherUser.PId,
+        name: `${connection.otherUser.firstName} ${connection.otherUser.lastName}`,
+        profilePicture: connection.otherUser.profilePicture,
+        isActive: connection.otherUser.isActive,
+        status: connection.status,
+        lastInteraction: connection.updatedAt,
+        senderId: connection.senderId
+      };
     } catch (err) {
-      setError('Failed to cancel connection request');
+      console.error('Error fetching connection:', err);
+      setError(err.message || 'Failed to fetch connection');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const acceptRequest = async (userId) => {
+  const acceptConnectionRequest = async (connectionId) => {
     try {
-      const response = await maxios.post('success', { message: 'Connection request accepted successfully' });
-      setPendingRequests(prev => prev.filter(request => request.userId !== userId));
-      setConnections(prev => [...prev, { userId, status: 'connected' }]);
-      return response.data;
+      setLoading(true);
+      const response = await api.patch(`/connection/${connectionId}/accept`);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+
+      const updatedConnection = response.data.data;
+
+      // Remove from pending requests
+      setPendingRequests(prev => 
+        prev.filter(req => req.connectionId !== connectionId)
+      );
+
+      // Update connections list
+      await getUserConnections();
+
+      return updatedConnection;
     } catch (err) {
-      setError('Failed to accept connection request');
+      console.error('Error accepting connection request:', err);
+      setError(err.message || 'Failed to accept connection request');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const declineRequest = async (userId) => {
-    try {
-      const response = await maxios.post('success', { message: 'Connection request declined successfully' });
-      setPendingRequests(prev => prev.filter(request => request.userId !== userId));
-      return response.data;
-    } catch (err) {
-      setError('Failed to decline connection request');
-      throw err;
+  const declineConnectionRequest = async (connectionId) => {
+  try {
+    setLoading(true);
+    const response = await api.patch(`/connection/${connectionId}/decline`);
+    
+    if (!response.data.success) {
+      throw new Error(response.data.message);
     }
+
+    // Remove from pending requests
+    setPendingRequests(prev => 
+      prev.filter(req => req.connectionId !== connectionId)
+    );
+
+    // Also remove from connections if it exists there
+    setConnections(prev => 
+      prev.filter(conn => conn.connectionId !== connectionId)
+    );
+
+  } catch (err) {
+    console.error('Error declining connection request:', err);
+    setError(err.message || 'Failed to decline connection request');
+    throw err;
+  } finally {
+    setLoading(false);
+  }
   };
 
+  const searchUserByPId = async (pid) => {
+  try {
+      setLoading(true);
+      
+      const response = await api.get(`/search/pid/${pid}`);
+
+      if (!response.data.success) {
+          throw new Error(response.data.message);
+      }
+
+      const foundUser = response.data.data;
+
+      // Return empty array if no user found or if it's the current user
+      if (!foundUser || foundUser.userId === user.userId) 
+
+      // Check if user is  blocked
+      if (blockedUsers[foundUser.userId]) {
+        return [];
+      }
+
+      // Check if there's an existing connection
+      const existingConnection = connections.find(conn => 
+        conn.userId === foundUser.userId
+      );
+      if (existingConnection) {
+        // If connection exists, return it but with updated timestamp
+        return [{
+            ...existingConnection,
+            updatedAt: new Date().toISOString(), // Update timestamp
+            otherUser: {
+                ...existingConnection.otherUser,
+                isActive: foundUser.isActive // Update active status
+            }
+        }];
+      }
+
+      // If no existing connection, return array with single result in otherUser format
+      return [{
+          connectionId: null,
+          otherUser: {
+              userId: foundUser.userId,
+              PId: foundUser.PId,
+              firstName: foundUser.firstName,
+              lastName: foundUser.lastName,
+              profilePicture: foundUser.profilePicture,
+              isActive: foundUser.isActive
+          },
+          status: 'none',
+          updatedAt: new Date().toISOString()
+      }];
+
+  } catch (err) {
+      if (err.response?.status === 404) {
+          return []; // Return empty array if user not found
+      }
+      console.error('Error searching user by PID:', err);
+      setError(err.message || 'Failed to search user');
+      return [];
+  } finally {
+      setLoading(false);
+  }
+  };
 
   const blockUser = async (userId) => {
     try {
@@ -184,8 +421,19 @@ export const ConnectionProvider = ({ children }) => {
     }
   };
 
+  const getReportedUsers = async () => {
+    try {
+      const response = await maxios.get('success', { reportedUsers: [] });
+      setReportedUsers(response.data.reportedUsers);
+    } catch (err) {
+      setError('Failed to fetch reported users');
+    }
+  };
+
   const checkRequest = useCallback((userId) => {
-    return sentRequests.some(request => request.userId === userId);
+    return sentRequests.some(request => 
+      request.otherUser && request.otherUser.userId === userId
+    );
   }, [sentRequests]);
 
 
@@ -199,19 +447,21 @@ export const ConnectionProvider = ({ children }) => {
       setBlockedUsers,
       loading,
       error,
+
+      getConnection,
       getUserConnections,
-      getPendingRequests,
-      getSentRequests,
       sendConnectionRequest,
-      cancelSentRequest,
-      acceptRequest,
-      declineRequest,
+      cancelConnectionRequest,
+      acceptConnectionRequest,
+      declineConnectionRequest,
+      searchUserByPId,
       blockUser,
       unblockUser,
+      getBlockedUsers, 
       reportUser,
-      searchUsers,
+      getReportedUsers,
       checkRequest
-       }}>
+    }}>
       {children}
     </ConnectionContext.Provider>
   );

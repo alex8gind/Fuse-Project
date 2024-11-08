@@ -1,11 +1,10 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
 import ConnectionCard from '../../components/ConnectionCard/ConnectionCard';
-import BackBtn from "../../components/BackBtn"
+import BackBtn from "../../components/BackBtn";
 import { ConnectionContext } from '../../contexts/connection.context';
 import { UserContext } from '../../contexts/user.context';
-import { Search, X } from 'lucide-react';
-
 import {
   PageContainer, 
   SearchContainer,
@@ -17,6 +16,11 @@ import {
   SearchResultItem,
   NoResultsMessage,
   ConnectionsList,
+  FilterContainer,
+  FilterButtons,
+  FilterButton,
+  ConnectionsHeader,
+  Title,
   PopupOverlay,
   PopupContent,
   PopupTitle,
@@ -25,121 +29,137 @@ import {
   ConfirmButton,
   CancelButton,
   CloseButton
-} from "./Connections.style"
+} from "./Connections.style";
+
 
 const Connections = () => {
-  const { connections, setConnections, sendConnectionRequest, blockedUsers } = useContext(ConnectionContext);
-  const { user, mockUsers } = useContext(UserContext);
+  const { 
+    connections, 
+    setConnections,
+    getUserConnections,
+    sentRequests,
+    pendingRequests,
+    searchUserByPId,
+    sendConnectionRequest, 
+    cancelConnectionRequest,
+    blockedUsers 
+  } = useContext(ConnectionContext);
+
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [message, setMessage] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const navigate = useNavigate();
+  const [filterStatus, setFilterStatus] = useState('all');
+
 
   useEffect(() => {
     console.log("Connections component: user", user);
-    console.log("Connections component: mockUsers", mockUsers);
     console.log("Connections component: connections", connections);
     console.log("Connections component: blockedUsers", blockedUsers);
-  }, [user, mockUsers, connections, blockedUsers]);
+  }, [user, connections, blockedUsers]);
 
 
-  const performSearch = () => {
-    setHasSearched(true);
-    if (searchTerm.length > 0 && Array.isArray(mockUsers)) {
-      console.log("Searching for:", searchTerm);
-      console.log("Available mock users:", mockUsers);
-      // Search only by exact PId match and exclude blocked users
-      const results = mockUsers.filter(mockUser => {
-        if (!mockUser || typeof mockUser !== 'object') {
-          console.warn('Invalid mockUser:', mockUser);
-          return false;
-        }
-        return (
-          mockUser.PId &&
-          mockUser.PId.toLowerCase() === searchTerm.toLowerCase() &&
-          mockUser.userId !== user?.userId &&
-          !connections.some(conn => conn.userId === mockUser.userId) &&
-          !(blockedUsers && blockedUsers[mockUser.userId])
-        );
-      });
-      setSearchResults(results);
-      console.log('Search results:', results);
-    } else {
-      console.log("Search term empty or mockUsers not available");
-      setSearchResults([]);
+  const handleSearch = async () => {
+    if (!searchTerm) {
+      setMessage('Please enter a PID');
+      return;
+    }
+    
+    try {
+      const results = await searchUserByPId(searchTerm);
+      if (results.length === 0) {
+        setMessage('No user found with this PID');
+        setHasSearched(true); 
+        return;
+      }
+      const searchResult = results[0];
+      if (searchResult.connectionId) {
+      // Existing connection found - move to top of list
+        setConnections(prevConnections => {
+          const filteredConnections = prevConnections.filter(
+            conn => conn.connectionId !== searchResult.connectionId
+          );
+          return [searchResult, ...filteredConnections];
+        });
+        setMessage('Existing connection found');
+      } else {
+        // If it's a new potential connection, add to search results
+        setSearchResults([searchResult]);
+      }
+      setHasSearched(true);
+    } catch (error) {
+      setMessage('Failed to search user');
+      setHasSearched(true);
     }
   };
 
-  const handleInputChange = (e) => {
-    setSearchTerm(e.target.value);
-    setHasSearched(false);
-    setSearchResults([]);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      performSearch();
-    }
-  };
-
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
+  const handleSelectUser = (result) => {
+    setSelectedUser(result);
     setShowConfirmPopup(true);
   };
 
-  const handleConfirmRequest = () => {
-    if (selectedUser) {
-      sendConnectionRequest(selectedUser.userId);
-      const newConnection = {
-        userId: selectedUser.userId,
-        PId: selectedUser.PId,
-        name: `${selectedUser.firstName} ${selectedUser.lastName}`,
-        profilePicture: selectedUser.profilePicture,
-        lastInteraction: new Date().toISOString(),
-        isActive: selectedUser.isActive,
-        isBlocked: false
-      };
-      setConnections([...connections, newConnection]);
-      setShowConfirmPopup(false);
-      setShowSuccessPopup(true);
-      setSelectedUser(null);
-      setSearchTerm('');
-      setSearchResults([]);
-      setHasSearched(false);
+  const handleConfirmRequest = async () => {
+    if (!selectedUser?.otherUser?.userId) return;
+
+      try {
+        await sendConnectionRequest(selectedUser.otherUser.userId);
+        setShowConfirmPopup(false);
+        setShowSuccessPopup(true);
+        setSearchResults([]);
+        setSearchTerm('');
+      } catch (error) {
+        setMessage('Failed to send connection request');
+      }
+  };
+
+  const filteredConnections = useMemo(() => {
+    switch(filterStatus) {
+      case 'accepted':
+        return connections;
+      case 'sent':
+        return sentRequests; 
+      case 'pending':
+        return pendingRequests; 
+      case 'all':
+      default:
+        return [...connections, ...sentRequests, ...pendingRequests];
+    }
+  }, [connections, sentRequests, pendingRequests, filterStatus]);
+
+  const handleCancelRequest = async () => {
+    try {
+      await cancelConnectionRequest(selectedUser.otherUser.userId);
+      setMessage('Connection request cancelled');
+      // Refresh connections list
+      await getUserConnections();
+    } catch (error) {
+      setMessage('Failed to cancel connection request');
     }
   };
 
-  const handleCancelRequest = () => {
-    setShowConfirmPopup(false);
-    setSelectedUser(null);
+
+  const handleCardClick = (connection) => {
+    navigate(`/contact/${connection.connectionId}`);
   };
 
-  const handleCloseSuccessPopup = () => {
+  if (!user) return <PageContainer>Please log in to view connections.</PageContainer>;
+
+const handleCloseSuccessPopup = () => {
     setShowSuccessPopup(false);
-  };
-
-
-
-  const handleCardClick = (id) => {
-    navigate(`/contact/${id}`);
-  };
-
-  if (!user) {
-    return <PageContainer>Please log in to view connections.</PageContainer>;
-  }
-
-  if (!Array.isArray(mockUsers)) {
-    return <PageContainer>Error: Unable to load user data. Please try again later.</PageContainer>;
-  }
-
+};
 
   return (
     <PageContainer>
       <BackBtn/>
-      <h2>Connections</h2>
+      <ConnectionsHeader> 
+        <Title>Connections</Title>
+      </ConnectionsHeader>
       
     <SearchContainer>
       <SearchInputWrapper>
@@ -151,19 +171,21 @@ const Connections = () => {
           type="text"
           placeholder="Enter a PID to connect..."
           value={searchTerm}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
         />
-
-        <SearchButton onClick={performSearch}>Search</SearchButton>
+        <SearchButton onClick={handleSearch}>Search</SearchButton>
       </SearchInputWrapper>
 
         {(searchResults.length > 0 || (hasSearched && searchTerm)) && (          
           <SearchResults>
               {searchResults.length > 0 ? (
                 searchResults.map(result => (
-                  <SearchResultItem key={result.userId} onClick={() => handleSelectUser(result)}>
-                    {result.PId} - {result.firstName} {result.lastName}
+                  <SearchResultItem 
+                  key={result.otherUser.userId} 
+                  onClick={() => handleSelectUser(result)}
+                  >
+                    {result.otherUser.PId} - {result.otherUser.firstName} {result.otherUser.lastName}
                   </SearchResultItem>
                 ))
               ) : (
@@ -173,14 +195,60 @@ const Connections = () => {
         )}     
     </SearchContainer>
       
-      <h3>My Connections</h3>
+    <FilterContainer>
+        <Title>My Connections ({filteredConnections.length})</Title>
+        <FilterButtons>
+          <FilterButton 
+            isActive={filterStatus === 'all'}
+            filterType="all"
+            onClick={() => setFilterStatus('all')}
+          >
+            All ({connections.length + sentRequests.length + pendingRequests.length})
+          </FilterButton>
+          <FilterButton 
+            isActive={filterStatus === 'accepted'}
+            filterType="accepted"
+            onClick={() => setFilterStatus('accepted')}
+          >
+            Accepted ({connections.length})
+          </FilterButton>
+          <FilterButton 
+            isActive={filterStatus === 'sent'}
+            filterType="sent"
+            onClick={() => setFilterStatus('sent')}
+          >
+            Sent ({sentRequests.length})
+          </FilterButton>
+          <FilterButton 
+            isActive={filterStatus === 'pending'}
+            filterType="pending"
+            onClick={() => setFilterStatus('pending')}
+          >
+            New Requests ({pendingRequests.length})
+          </FilterButton>
+        </FilterButtons>
+      </FilterContainer>
 
-      {showConfirmPopup && (
+      {filteredConnections.length === 0 ? (
+        <div>No connections found. Use the search above to find and add connections.</div>
+      ) : (
+        <ConnectionsList>
+          {filteredConnections.map(connection => (
+            <ConnectionCard
+              key={connection.connectionId}
+              connection={connection}
+              onClick={() => handleCardClick(connection)} 
+            />
+          ))}
+        </ConnectionsList>
+      )}
+
+      {showConfirmPopup && selectedUser && (
         <PopupOverlay>
           <PopupContent>
             <PopupTitle>Confirm Connection Request</PopupTitle>
             <PopupText>
-              Please confirm you want to send a request to {selectedUser.firstName} {selectedUser.lastName} ({selectedUser.PId})?
+              Send request to {selectedUser.otherUser.firstName} {selectedUser.otherUser.lastName} ({selectedUser.otherUser.PId})?
             </PopupText>
             <PopupButtons>
               <CancelButton onClick={handleCancelRequest}>Cancel</CancelButton>
@@ -195,7 +263,7 @@ const Connections = () => {
         <PopupOverlay>
           <PopupContent>
             <PopupTitle>Success</PopupTitle>
-            <PopupText>Request sent successfully!</PopupText>
+            <PopupText>Connection request sent successfully!</PopupText>
             <PopupButtons>
               <ConfirmButton onClick={handleCloseSuccessPopup}>OK</ConfirmButton>
             </PopupButtons>
@@ -204,24 +272,6 @@ const Connections = () => {
         </PopupOverlay>
       )}
 
-      {connections.length === 0 ? (
-        <div>You haven't connected with anyone yet. Use the search above to find and add connections.</div>
-      ) : (
-        <ConnectionsList>
-          {connections.map(connection => (
-            <ConnectionCard
-              key={connection.userId}
-              PId={connection.PId}
-              photo={connection.profilePicture}
-              name={connection.name}
-              lastInteraction={connection.lastInteraction}
-              status={connection.isActive ? "Active" : "Inactive"}
-              isBlocked={blockedUsers[connection.userId]}
-              onClick={() => handleCardClick(connection.userId)}
-            />
-          ))}
-        </ConnectionsList>
-      )}
 
     </PageContainer>
   );

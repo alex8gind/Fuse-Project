@@ -1,37 +1,74 @@
-import React from 'react';
+import React  from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, X, CreditCard } from 'lucide-react';
+import { ChevronLeft, X, Mail } from 'lucide-react';
 import {
   Container,
   Header,
-  BackButton,
-  CloseButton,
+  IconButton,
+  Content,
+  MessageContainer,
+  Heading,
+  Description,
+  NotificationBox,
+  NotificationText,
   Title,
-  IconWrapper,
-  Message,
-  ProgressBar,
-  ProgressText
+  IconWrapper
 } from './IdentityChecking.style';
 
-const IdentityChecking = () => {
+const IdentityVerification = ({ onBack, onClose }) => {
   const navigate = useNavigate();
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate('/'); // Navigate to home page as default behavior
+    }
+  };
 
   return (
     <Container>
       <Header>
-        <BackButton onClick={() => navigate(-1)}><ChevronLeft /></BackButton>
-        <Title>ID Information</Title>
-        <CloseButton onClick={() => navigate('/')}><X /></CloseButton>
+        <IconButton onClick={handleBack}>
+          <ChevronLeft size={18} />
+        </IconButton>
+        <Title>ID Verification</Title>
+        <IconButton onClick={handleClose}>
+          <X size={18} />
+        </IconButton>
       </Header>
-      <IconWrapper>
-        <CreditCard size={64} color="#6366f1" />
-      </IconWrapper>
-      <Message>Checking your identity</Message>
-      <Message $small>Please keep this page open</Message>
-      <ProgressBar />
-      <ProgressText>Uploading ID</ProgressText>
+
+      <Content>
+        <IconWrapper>
+          <Mail size={28} />
+        </IconWrapper>
+
+        <MessageContainer>
+          <Heading>Verification In Progress</Heading>
+          <Description>
+            We are currently processing your identity verification request.
+          </Description>
+        </MessageContainer>
+
+        <NotificationBox>
+          <NotificationText>
+            You will receive a confirmation email once your identity verification is complete. 
+            This process typically takes 24-48 hours.
+          </NotificationText>
+          <NotificationText>
+            You can safely close this window.
+          </NotificationText>
+        </NotificationBox>
+      </Content>
     </Container>
   );
 };
 
-export default IdentityChecking;
+export default IdentityVerification;

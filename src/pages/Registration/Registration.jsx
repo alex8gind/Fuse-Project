@@ -6,9 +6,15 @@ import * as Yup from 'yup';
 import { Eye, EyeOff } from 'lucide-react';
 import Spinner from '../../components/Spinner';
 import { setError } from '../../store/userSlice';
+import ErrorNotification from '../../components/ErrorNotification';
+import Logo from '../../components/Logo.jsx';
 import { 
   StyledForm, 
+  LogoContainer,
+  Title,
   StyledField, 
+  StyledSelect,
+  SelectWrapper,
   StyledButton, 
   StyledLink,
   StyledError,
@@ -87,18 +93,28 @@ const Registration = () => {
     try {
       console.log('Submitting values:', values);
       const user = await register(values);
+
       if(user){
       setMessage({ 
         type: 'success', 
         text: 'Registration successful! You will be redirected to the verification page...' 
       });
         resetForm();
-        setTimeout(() => navigate('/verify'), { state: { email: values.phoneOrEmail } }), 2000;
+
+        setTimeout(() => navigate('/verify'), {
+           state: {
+             email: values.phoneOrEmail,
+             justRegistered: true  
+            } }), 2000;
       } else {
         throw new Error(resultAction.error.message || 'Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Registration failed. Please try again.' 
+      });
     } finally {
       setSubmitting(false);
     }
@@ -120,7 +136,8 @@ const Registration = () => {
       >
         {({ errors, touched, isSubmitting, handleSubmit }) => (
           <StyledForm onSubmit={handleSubmit}>
-            <h1>Create an Account</h1>
+           <LogoContainer><Logo /></LogoContainer> 
+            <Title>When Safety brings Freedom</Title>
             
             <FieldWrapper>
               <StyledField 
@@ -129,7 +146,8 @@ const Registration = () => {
                 $error={errors.firstName}
                 $touched={touched.firstName}
               />
-              {errors.firstName && touched.firstName && <StyledError>{errors.firstName}</StyledError>}
+              {errors.firstName && touched.firstName && 
+                <StyledError>{errors.firstName}</StyledError>}
             </FieldWrapper>
 
             <FieldWrapper>
@@ -180,22 +198,26 @@ const Registration = () => {
             </FieldWrapper>
 
             <FieldWrapper>
-              <Field as="select" 
-                name="gender"
-                $error={errors.gender}
-                $touched={touched.gender}
-              >              
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </Field>
+              <SelectWrapper>
+                <StyledSelect
+                  as="select" 
+                  name="gender"
+                  $error={errors.gender}
+                  $touched={touched.gender}
+                >              
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </StyledSelect>
+              </SelectWrapper>
               {errors.gender && touched.gender && <StyledError>{errors.gender}</StyledError>}
             </FieldWrapper>
 
             <StyledButton type="submit" disabled={isSubmitting || loading}>
               {isSubmitting || loading ? <><Spinner />Submitting...</> : 'Sign Up'}
             </StyledButton>
+            <StyledLink as={Link} to="/login">Already have an account?</StyledLink>
 
             <MessageContainer $visible={!!message.text}>
                 {message.type === 'success' && (
@@ -205,11 +227,9 @@ const Registration = () => {
                   <ErrorMessage>{message.text}</ErrorMessage>
                 )}
             </MessageContainer>
-            
           </StyledForm>
         )}
       </Formik>
-      <StyledLink as={Link} to="/login">Already have an account?</StyledLink>
     </>
   );
 };

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Ban } from 'lucide-react';
+import { ConnectionContext } from '../../contexts/connection.context';
 import {
     Card, 
     UserPhoto, 
@@ -7,24 +8,57 @@ import {
     PersonalId,
     UserName, 
     LastInteraction, 
+    StatusContainer,
+    ConnectionStatus,
     Status,
     BlockedIcon
 } from "./ConnectionCard.style" 
 
-const ConnectionCard = ({ PId, photo, name, lastInteraction, status, isBlocked, onClick }) => {
+const ConnectionCard = ({ connection, onClick }) => {
+  console.log("Connection in card:", connection); 
+  const { blockedUsers } = useContext(ConnectionContext);
+
+  if (!connection) return null
+
+  const {
+    connectionId,
+    userId,  
+    PId,    
+    name,    
+    profilePicture,
+    isActive,
+    status,
+    lastInteraction
+  } = connection;
+
+
+useEffect(() => {
+  console.log(connection);
+}, [connection]);
+
   return (
     <Card onClick={onClick}>
-      <UserPhoto src={photo} alt={name} />
+      <UserPhoto 
+        src={profilePicture} 
+        alt={name} 
+      />
       <UserInfo>
         <UserName>{name}</UserName>
         <PersonalId>PID: {PId}</PersonalId>
-        <LastInteraction>{lastInteraction}</LastInteraction>
+        <LastInteraction>{new Date(lastInteraction).toLocaleString()}</LastInteraction>
       </UserInfo>
-      {isBlocked ? (
+      <StatusContainer>
+      {blockedUsers[userId] ? (
         <BlockedIcon><Ban size={20} color="red" /></BlockedIcon>
       ) : (
-      <Status>{status}</Status>
+        <>
+          <Status>{isActive ? 'Active' : 'Inactive'}</Status>
+          <ConnectionStatus status={status}>
+            {status === 'pending' ? 'Pending' : 'Connected'}
+          </ConnectionStatus>
+      </>
       )}
+      </StatusContainer>
     </Card>
   );
 };

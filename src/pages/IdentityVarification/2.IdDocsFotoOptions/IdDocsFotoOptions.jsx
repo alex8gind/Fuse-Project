@@ -17,11 +17,11 @@ import {
 const IdDocsFotoOptions = () => {
   const navigate = useNavigate();
 
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = (documentType, option) => {
     // Handle the selected option
     console.log(`Selected option: ${option}`);
     // Navigate to the CaptureInstructions page
-    navigate('/capture-instructions', { state: { documentType: 'document', idType: option } });
+    navigate('/capture-instructions', { state: { documentType, idType: option } });
   };
 
   return (
@@ -36,15 +36,15 @@ const IdDocsFotoOptions = () => {
       <Title>We need a photo of your ID</Title>
       <Subtitle>For the United States, please select one of the following identity document types:</Subtitle>
       <OptionList>
-        <OptionButton onClick={() => handleOptionSelect("Driver's License")}>
+        <OptionButton onClick={() => handleOptionSelect("driving_license", "Driver's License")}>
           <OptionIcon><CreditCard size={24} /></OptionIcon>
           Driver's License
         </OptionButton>
-        <OptionButton onClick={() => handleOptionSelect("ID Card")}>
+        <OptionButton onClick={() => handleOptionSelect("id", "ID Card")}>
           <OptionIcon><FileText size={24} /></OptionIcon>
           ID Card
         </OptionButton>
-        <OptionButton onClick={() => handleOptionSelect("Passport")}>
+        <OptionButton onClick={() => handleOptionSelect("passport", "Passport")}>
           <OptionIcon><BookOpen size={24} /></OptionIcon>
           Passport
         </OptionButton>

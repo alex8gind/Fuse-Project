@@ -61,11 +61,13 @@ export const StepItem = styled.li`
   border-radius: 8px;
   margin-bottom: 1rem;
   cursor: ${props => props.$clickable ? 'pointer' : 'not-allowed'};
-  opacity: ${props => props.$clickable ? 1 : 0.5};
+  opacity: 1;
   transition: all 0.2s;
+  background-color: ${props => props.$completed ? '#f8f9fa' : 'transparent'};
+  pointer-events: ${props => props.$clickable ? 'auto' : 'none'};
 
   &:hover {
-    background-color: ${props => props.$clickable ? '#f0f0f0' : 'transparent'};
+    background-color: ${props => props.$clickable ? '#f0f0f0' : props.$completed ? '#f8f9fa' : 'transparent'};
   }
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
@@ -89,12 +91,13 @@ export const StepAction = styled.div`
 export const NextButton = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: #1877f2;
+  background-color: ${props => props.disabled ? '#7f7f7f' : '#1877f2'};
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
   transition: background-color 0.2s;
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
@@ -102,12 +105,7 @@ export const NextButton = styled.button`
   }
 
   &:hover {
-    background-color: #166fe5;
-  }
-
-  &:disabled {
-    background-color: #7f7f7f;
-    cursor: not-allowed;
+    background-color: ${props => props.disabled ? '#7f7f7f' : '#166fe5'};
   }
 `;
 

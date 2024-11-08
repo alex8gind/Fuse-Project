@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useContext, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
+import { useNavigate, useParams} from 'react-router-dom';
 import BackBtn from "../../components/BackBtn";
 import PopUp from "../../components/ReportPopUp";
 import SendRequestBtn from "../../components/SendRequestBtn";
 import { ConnectionContext } from '../../contexts/connection.context';
-import { UserContext } from '../../contexts/user.context';
 import {
   PageContainer, 
   Header, 
@@ -14,8 +13,7 @@ import {
   UserStatus, 
   ReportBtn, 
   BlockedBadge, 
-  InteractionsList, 
-  InteractionItem,
+  RequestMessage,
   ActionButtonsContainer,
   ActionButton
 } from "./Contact.style"
@@ -23,70 +21,78 @@ import {
 const Contact = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user } = useContext(UserContext);
-    const { 
-      connections, 
-      blockUser, 
-      blockedUsers, 
-      unblockUser, 
-      getUserConnections,
-      reportUser,
-      loading: contextLoading,
-      error: contextError,
-      sendConnectionRequest,
-      cancelSentRequest,
-      checkRequest,
-      sentRequests
+
+  const { 
+    getConnection, 
+    getUserConnections,
+    sendConnectionRequest, 
+    cancelConnectionRequest,
+    sentRequests,
+    pendingRequests,
+    blockUser, 
+    unblockUser, 
+    blockedUsers, 
+    reportUser,
+    loading: contextLoading,
+    error: contextError,
+    checkRequest
     } = useContext(ConnectionContext);
+
     const [connectionData, setConnectionData] = useState(null);
     const [showPopUp, setShowPopUp] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [reportLoading, setReportLoading] = useState(false);
     const [reportError, setReportError] = useState(null);
-    const isRequestSent = useMemo(() => checkRequest(id), [checkRequest, id, sentRequests]);
+    const [message, setMessage] = useState('');
+
+    const isRequestSent = useMemo(() => {
+      if (!connectionData?.userId) return false;
+      return sentRequests.some(request => request.userId === connectionData.userId);
+    }, [sentRequests, connectionData]);
+
+    const isPendingRequest = useMemo(() => {
+      if (!connectionData?.userId) return false;
+      return pendingRequests.some(request => request.userId === connectionData.userId);
+    }, [pendingRequests, connectionData]);
 
     useEffect(() => {
-      console.log("DEBUGGING: loading:", loading, contextLoading);  
-    }, [loading, contextLoading])
+      console.log("🤷‍♂️🤷‍♂️🤷‍♂️", connectionData);  
+    }, [connectionData])
 
-    const fetchData = useCallback(async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const connection = connections.find(conn => String(conn.userId) === String(id));
-        if (connection) {
-          setConnectionData({
-            ...connection,
-            interactions: [
-              { id: 1, type: 'message', content: 'Hello!', timestamp: '2023-09-15T14:30:00Z' },
-              { id: 2, type: 'call', content: 'Voice call, duration: 5 minutes', timestamp: '2023-09-14T10:00:00Z' },
-              { id: 3, type: 'message', content: 'Are we meeting tomorrow?', timestamp: '2023-09-13T18:45:00Z' },
-            ]
-          });
-        } else {
-          setError('Connection not found');
-        }
-      } catch (err) {
-        console.error('Error fetching connection data:', err);
-        setError('Failed to fetch connection data');
-      } finally {
-        setLoading(false);
+   
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const connection = await getConnection(id);
+      if (connection) {
+        setConnectionData(connection);
+      } else {
+        setError('Connection not found');
       }
-    }, [id, connections, getUserConnections, checkRequest]);
+    } catch (err) {
+      console.error('Error fetching connection data:', err);
+      setError('Failed to fetch connection data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-      fetchData();
-    }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [id]);
 
     const handleBlockToggle = async () => {
+      if (!connectionData?.userId) return;
+
       setLoading(true);
       try {
-        const isBlocked = blockedUsers[id];
+        const isBlocked = blockedUsers[connectionData.userId];
         if (isBlocked) {
-          await unblockUser(id);
+          await unblockUser(connectionData.userId);
         } else {
-          await blockUser(id);
+          await blockUser(connectionData.userId);
         }
         await fetchData();
       } catch (err) {
@@ -97,11 +103,13 @@ const Contact = () => {
     };
 
     const handleReportAndBlock = async (reason) => {
+      if (!connectionData?.userId) return false;
+
       setReportLoading(true);
       setReportError(null);
       try {
-        await reportUser(id, reason);
-        await blockUser(id);
+        await reportUser(connectionData.userId, reason);
+        await blockUser(connectionData.userId);
         setShowPopUp(false);
         await fetchData();
         return true;
@@ -113,45 +121,56 @@ const Contact = () => {
         setReportLoading(false);
       }
     };
-
     const handleSendRequest = async () => {
-      try {
-        await sendConnectionRequest(id);
-        console.log(`Request sent to ${connectionData.name}`);
-      } catch (error) {
-        console.error('Failed to send connection request:', error);
-        setError('Failed to send connection request');
-      }
+      if (!connectionData?.userId) return;
+  
+        try {
+          await sendConnectionRequest(connectionData.userId);
+          setShowConfirmPopup(false);
+          setShowSuccessPopup(true);
+          setMessage('Connection request sent successfully');
+          await fetchData(); 
+        } catch (error) {
+          setMessage('Failed to send connection request');
+        }
     };
-
+  
     const handleCancelRequest = async () => {
+      if (!connectionData?.connectionId) return;
+
       try {
-        await cancelSentRequest(id);
-        console.log(`Request cancelled for ${connectionData.name}`);
+        await cancelConnectionRequest(connectionData.connectionId);
+        setMessage('Connection request cancelled');
+        await fetchData(); 
       } catch (error) {
-        console.error('Failed to cancel connection request:', error);
-        setError('Failed to cancel connection request');
+        setMessage('Failed to cancel connection request');
       }
     };
+  
   
     if (loading || contextLoading) return <PageContainer>Loading...</PageContainer>;
     if (error || contextError) return <PageContainer>Error: {error || contextError}</PageContainer>;
     if (!connectionData) return <PageContainer>No connection data available</PageContainer>;
+  
 
-    const isBlocked = blockedUsers[id];
-    
-
+    const isBlocked = blockedUsers[connectionData?.userId]
+ 
     return (
       <PageContainer>
         <BackBtn/>
         <Header>
-          <UserPhoto src={connectionData.profilePicture} alt={connectionData.name} />
+          <UserPhoto 
+          src={connectionData.profilePicture} 
+          alt={connectionData.name} 
+          />
           <UserInfo>
             <UserName>
               {connectionData.name}
               {isBlocked && <BlockedBadge>Blocked</BlockedBadge>}
             </UserName>           
-            <UserStatus>{connectionData.isActive ? 'Online' : 'Offline'}</UserStatus>          
+            <UserStatus>
+              {connectionData.isActive ? 'Active' : 'Inactive'}
+            </UserStatus>          
           </UserInfo>
         </Header>
         
@@ -159,20 +178,21 @@ const Contact = () => {
           <SendRequestBtn 
             isContactsPage={true} 
             contactName={connectionData.name}
+            connectionId={connectionData.connectionId}
             userId={connectionData.userId}
             onClick={isRequestSent ? handleCancelRequest : handleSendRequest}
             isRequestSent={isRequestSent}
           />
         )}
         
-        <InteractionsList>
+        {/* <InteractionsList>
           {connectionData.interactions.map(interaction => (
             <InteractionItem key={interaction.id}>
               <p>{interaction.content}</p>
               <small>{new Date(interaction.timestamp).toLocaleString()}</small>
             </InteractionItem>
           ))}
-        </InteractionsList>
+        </InteractionsList> */}
             
         <ActionButtonsContainer>
           {!isBlocked && (
@@ -191,6 +211,12 @@ const Contact = () => {
             error={reportError}
           />
         )}
+
+      {message && (
+        <div style={{ textAlign: 'center', marginTop: '1rem', color: message.includes('error') ? 'red' : 'green' }}>
+          {message}
+        </div>
+      )}
       </PageContainer>
     );
 };

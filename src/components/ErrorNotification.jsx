@@ -9,7 +9,7 @@ const fadeIn = keyframes`
 
 const NotificationContainer = styled.div`
   position: fixed;
-  top: 8%;
+  top: 5%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: fit-content;
@@ -17,7 +17,7 @@ const NotificationContainer = styled.div`
   padding: 15px 20px;
   border-radius: 5px;
   background-color: ${props => props.theme.colors.error};
-  color: ${props => props.theme.colors.background};
+  color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   justify-content: center;

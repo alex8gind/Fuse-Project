@@ -37,20 +37,11 @@ const DocsUploader = () => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [deletedFileName, setDeletedFileName] = useState('');
   const fileInputRef = useRef(null);
-  const { uploadDocument, getUserDocuments, deleteDocument } = useUserContext();
+  const { uploadDocument, deleteDocument, getMedDocuments, medDocuments } = useUserContext();
 
   useEffect(() => {
-    loadUserDocuments();
+    getMedDocuments();
   }, []);
-
-  const loadUserDocuments = async () => {
-    try {
-      const documents = await getUserDocuments();
-      setUserDocuments(documents);
-    } catch (error) {
-      console.error('Failed to load user documents:', error);
-    }
-  };
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -105,7 +96,7 @@ const DocsUploader = () => {
     setUploading(false);
     setFiles([]);
     setUploadProgress({});
-    loadUserDocuments();
+    getMedDocuments();
   };
 
   useEffect(() => {
@@ -121,9 +112,9 @@ const DocsUploader = () => {
 
   const confirmDelete = async () => {
     try {
-      const docToBeDeleted = userDocuments.find(doc => doc.docId === docToDelete);
+      const docToBeDeleted = medDocuments.find(doc => doc.docId === docToDelete);
       await deleteDocument(docToDelete);
-      await loadUserDocuments();
+      await getMedDocuments();
       setShowDeletePopup(false);
       setDocToDelete(null);
       setDeletedFileName(docToBeDeleted.docName);
@@ -141,7 +132,7 @@ const DocsUploader = () => {
   const handleDelete = async (docId) => {
     try {
       await deleteDocument(docId);
-      loadUserDocuments();
+      getMedDocuments();
     } catch (error) {
       console.error('Failed to delete document:', error);
     }
@@ -187,7 +178,7 @@ const DocsUploader = () => {
         ))}
       </FileList>
       <FileList>
-        {userDocuments.map((doc) => (
+        {medDocuments.map((doc) => (
           <FileItem key={doc.docId}>
             <FileName>{doc.docName}</FileName>
             <FileSize>{(doc.docSize / 1024).toFixed(2)} KB</FileSize>

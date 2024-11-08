@@ -11,7 +11,7 @@ import { router } from './routes/main.routes.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>  
-    <Provider store={store}> {/* Add this wrapper */}
+    <Provider store={store}> 
       <HelmetProvider>
         <ThemeProvider theme={theme}>
           <GlobalStyle />

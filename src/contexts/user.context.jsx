@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { nav } from "framer-motion/client";
+
 
 
 export const UserContext = createContext(null)
@@ -108,6 +108,8 @@ function UserProvider({children}) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [medDocuments, setMedDocuments] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -250,6 +252,64 @@ const verifyEmail = async (token) => {
   }
 };
 
+const uploadVerificationDocument = async (file, documentType) => {
+  try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', documentType);
+
+      const response = await api.post('/verification-documents', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+              );
+              return percentCompleted;
+          }
+      });
+
+      return response.data.document;
+  } catch (err) {
+    console.error(err);
+      setError('Failed to upload verification document');
+      throw err;
+  }
+};
+
+const getVerificationDocuments = async () => {
+  try {
+      const response = await api.get('/verification-documents', {
+          headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+      });
+      return response.data.documents;
+  } catch (error) {
+      console.error('Failed to fetch verification documents:', error);
+      throw error;
+  }
+};
+
+const deleteVerificationDocument = async (docId) => {
+  try {
+      await api.delete(`/verification-documents/${docId}`);
+  } catch (err) {
+    console.error(err);
+      setError('Failed to delete verification document');
+      throw err;
+  }
+};
+
+const getMedDocuments = async () => {
+  try {
+    const response = await api.get('/med');
+    setMedDocuments(response.data.documents); 
+  } catch (err) {
+    setError('Failed to fetch med documents');
+    throw err;
+  }
+}; 
+
 const logout = async () => {
   try {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -282,6 +342,64 @@ const logout = async () => {
   }
 };
 
+const checkVerificationStatus = async () => {
+  try {
+    const response = await api.get('/verification-status');
+    
+    // Update user state with latest verification status
+    setUser(prev => ({
+      ...prev,
+      isPhoneOrEmailVerified: response.data.isPhoneOrEmailVerified,
+      isVerified: response.data.isVerified
+    }));
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to check verification status:', error);
+    throw error;
+  }
+};
+
+const setProfilePicture = async () => {
+  console.log("SETTING PROFILE PICTURE:",);
+  try {
+    const verificationStatus = await checkVerificationStatus();
+    
+    if (!verificationStatus.isVerified) {  
+      throw new Error('User must be verified to set profile picture');
+    }
+
+    // Get verification documents to find the selfie
+    const verificationDocs = await getVerificationDocuments();
+    const selfie = verificationDocs.find(doc => doc.documentType === 'photo');
+    
+    if (!selfie) {
+      throw new Error('No verification selfie found');
+    }
+     
+     // Send request to update profile picture
+     const response = await api.put('/profile', {profilePicture: selfie.url});
+
+       // Response validation
+      if (!response.data) {
+      throw new Error('No data received from server');
+    }
+
+ 
+     // Update user state with new profile picture
+     setUser(prev => ({
+       ...prev,
+       profilePicture: response.data.profilePicture || selfie.url
+     }));
+ 
+     return response.data;
+   } catch (error) {
+     console.error('Failed to set profile picture:', error);
+     setError('Failed to set profile picture');
+     throw error;
+   }
+ };
+
 
 const updateUserProfile = async (userData) => {
         try {
@@ -295,20 +413,6 @@ const updateUserProfile = async (userData) => {
         }
 };
 
-const updateProfilePicture = async (photoFile) => {
-  try {
-      const formData = new FormData();
-            formData.append('profilePicture', photoFile);
-            const response = await api.put('/users/profile-picture', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-      setUser(response.data.user);
-      return response.data.user;
-  } catch (err) {
-      setError('Failed to update profile picture');
-      throw err;
-  }
-};
 
 const deactivateAccount = async () => {
         try {
@@ -501,7 +605,13 @@ const uploadDocument = async (file, documentType) => {
     formData.append('documentType', documentType);
 
     const response = await api.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+        );
+        return percentCompleted;
+    }
     });
 
     // Update the user's documents in the context
@@ -517,24 +627,10 @@ const uploadDocument = async (file, documentType) => {
   }
 };
 
-const getUserDocuments = async () => {
-  try {
-    const response = await api.get('/med');
-    return response.data.documents;
-  } catch (err) {
-    setError('Failed to fetch user documents');
-    throw err;
-  }
-};
 
 const deleteDocument = async (docId) => {
   try {
     await api.delete(`/doc/${docId}`);
-    // Update the user's documents in the context
-    setUser(prevUser => ({
-      ...prevUser,
-      documents: prevUser.documents.filter(doc => doc.docId !== docId)
-    }));
   } catch (err) {
     setError('Failed to delete document');
     throw err;
@@ -553,8 +649,14 @@ const deleteDocument = async (docId) => {
           logout,
           register,
           refreshToken,
+          uploadVerificationDocument,
+          getVerificationDocuments,
+          deleteVerificationDocument,
+          getMedDocuments,
+          medDocuments,
+          checkVerificationStatus,
+          setProfilePicture,
           updateUserProfile,
-          updateProfilePicture,
           deactivateAccount,
           reactivateAccount,
           deleteAccount,
@@ -569,7 +671,6 @@ const deleteDocument = async (docId) => {
           verifyEmail,
           setTokens,
           uploadDocument,
-          getUserDocuments,
           deleteDocument,
 
         }}>

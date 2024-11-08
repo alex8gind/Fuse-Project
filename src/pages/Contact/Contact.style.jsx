@@ -88,27 +88,13 @@ export const ReportBtn = styled.button`
   }
 `;
 
-
-export const InteractionsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 95%;
-
-  @media (min-width: ${props => props.theme.breakpoints.md}) {
-    width: 65%;
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    width: 40%;
-  }
+export const RequestMessage = styled.div`
+  color: ${props => props.theme.colors.primaryOrange};
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
 `;
 
-export const InteractionItem = styled.div`
-  padding: 1em;
-  background-color: ${props => props.theme.colors.background};
-  border-radius: 5px;
-`;
 
 export const BlockedBadge = styled.span`
   background-color: ${props => props.theme.colors.error};
