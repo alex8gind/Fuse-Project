@@ -49,7 +49,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-  const {login} = useContext(UserContext);
+  const {login, loginWithGoogle} = useContext(UserContext);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
   const { loading, error } = useSelector(state => state.user);
@@ -86,6 +86,16 @@ const Login = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+        try {
+            await loginWithGoogle();
+            navigate('/'); // Navigate to home page after successful login
+        } catch (error) {
+            console.error('Google login failed:', error);
+            // Handle error (show error message to user)
+        }
   };
 
   return (
@@ -154,7 +164,7 @@ const Login = () => {
 
             <OrDivider>OR</OrDivider>
 
-            <GoogleButton type="button">
+            <GoogleButton type="button" onClick={handleGoogleLogin}>
               <GoogleIcon src={GoogleSvg} alt="Google" />
               Continue with Google
             </GoogleButton>

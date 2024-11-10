@@ -133,3 +133,16 @@ export const ActionButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
+export const MessageContainer = styled.div`
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  color: ${props => props.$type === 'error' ? 
+    props.theme.colors.error : 
+    props.theme.colors.primaryOrange};
+  background-color: ${props => props.$type === 'error' ? 
+    `${props.theme.colors.error}10` : 
+    `${props.theme.colors.primaryOrange}10`};
+`;

@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { auth, googleProvider } from '../firebase-config';
+import { signInWithPopup } from 'firebase/auth';
 
 
 
@@ -186,6 +188,33 @@ const login = async (credentials) => {
           setError(err.response?.data?.error || 'Login failed');
           throw err;
         }
+};
+
+const loginWithGoogle = async () => {
+  try {
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      // Get the Google ID token (this is what we need to verify on backend)
+      const idToken = await result.user.getIdToken();
+      
+      // Send the token to your backend
+      const response = await api.post('/login-google', {
+        idToken,
+        email: result.user.email,
+        name: result.user.displayName,
+        photoURL: result.user.photoURL
+      });
+
+      // Handle the response similar to your regular login
+      setUser(response.data.user);
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+
+      return response.data.user;
+  } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+  }
 };
 
 const refreshToken = async () => {
@@ -646,6 +675,7 @@ const deleteDocument = async (docId) => {
           loading,
           error,
           login,
+          loginWithGoogle,
           logout,
           register,
           refreshToken,

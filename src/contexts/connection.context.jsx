@@ -11,6 +11,7 @@ export const ConnectionProvider = ({ children }) => {
   const [blockedUsers, setBlockedUsers] = useState({}); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sharedDocuments, setSharedDocuments] = useState({});
   const { user } = useContext(UserContext);
 
   useEffect(() => {
@@ -371,6 +372,92 @@ export const ConnectionProvider = ({ children }) => {
   }
   };
 
+  const shareDocuments = async (connectionId, documents, recipientId) => {
+    try {
+      setLoading(true);
+    
+      const response = await api.post(`/connection/${connectionId}/share-documents`, {
+        documents,
+        recipientId 
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+
+      // Update local state to reflect shared documents
+      setSharedDocuments(prev => ({
+        ...prev,
+        [connectionId]: [...(prev[connectionId] || []), ...response.data.data]
+      }));
+
+      return response.data.data;
+    } catch (error) {
+      console.error('Error sharing documents:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSharedDocuments = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/shared-documents');
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching shared documents:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const viewDocument = async (docId) => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/documents/${docId}/view`);
+      
+      if (!response.data?.success || !response.data?.url) {
+        throw new Error(response.data?.error || 'Failed to get document URL');
+      }
+  
+      return response.data.url;
+    } catch (error) {
+      console.error('Error viewing document:', error);
+      throw new Error(error.message || 'Failed to load document');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateShareStatus = async (docId, status) => {
+    try {
+      setLoading(true);
+      const response = await api.patch(`/documents/${docId}/share-status`, { status });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error updating share status:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const revokeShare = async (docId) => {
+    try {
+      setLoading(true);
+      const response = await api.delete(`/documents/${docId}/share`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error revoking share:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const blockUser = async (userId) => {
     try {
       const response = await maxios.post('success', { message: 'User blocked successfully' });
@@ -460,7 +547,13 @@ export const ConnectionProvider = ({ children }) => {
       getBlockedUsers, 
       reportUser,
       getReportedUsers,
-      checkRequest
+      checkRequest,
+      shareDocuments,
+      sharedDocuments,
+      getSharedDocuments,
+      viewDocument,
+      updateShareStatus,
+      revokeShare
     }}>
       {children}
     </ConnectionContext.Provider>

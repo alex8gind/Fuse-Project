@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useNavigate, useParams} from 'react-router-dom';
+import { FileText, FileSignature } from 'lucide-react';
 import BackBtn from "../../components/BackBtn";
 import PopUp from "../../components/ReportPopUp";
+import ShareDocumentsPopup from '../../components/ShareDocumentsPopUp';
+import SharedDocumentsPopup from '../../components/SharedDocumentsPopup';
+import { Eye } from 'lucide-react';
 import SendRequestBtn from "../../components/SendRequestBtn";
 import { ConnectionContext } from '../../contexts/connection.context';
+import { UserContext} from '../../contexts/user.context';
 import {
   PageContainer, 
   Header, 
@@ -15,7 +20,8 @@ import {
   BlockedBadge, 
   RequestMessage,
   ActionButtonsContainer,
-  ActionButton
+  ActionButton,
+  MessageContainer
 } from "./Contact.style"
 
 const Contact = () => {
@@ -35,7 +41,8 @@ const Contact = () => {
     reportUser,
     loading: contextLoading,
     error: contextError,
-    checkRequest
+    checkRequest,
+    shareDocuments
     } = useContext(ConnectionContext);
 
     const [connectionData, setConnectionData] = useState(null);
@@ -44,7 +51,10 @@ const Contact = () => {
     const [error, setError] = useState(null);
     const [reportLoading, setReportLoading] = useState(false);
     const [reportError, setReportError] = useState(null);
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [showDocumentsPopup, setShowDocumentsPopup] = useState(false);
+    const [showSharedDocumentsPopup, setShowSharedDocumentsPopup] = useState(false);
+    const { medDocuments } = useContext(UserContext);
 
     const isRequestSent = useMemo(() => {
       if (!connectionData?.userId) return false;
@@ -82,6 +92,38 @@ const Contact = () => {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  const handleShareDocuments = () => {
+    setShowDocumentsPopup(true);
+  };
+
+  const handleSeeSharedDocuments = () => {
+    setShowSharedDocumentsPopup(true);
+  };
+
+  const handleShareSubmit = async (selectedDocuments) => {
+    try {
+      await shareDocuments(
+        connectionData.connectionId, 
+        selectedDocuments,
+        connectionData.userId 
+      );
+      setShowDocumentsPopup(false);
+      setMessage({
+        type: 'success',
+        text: 'Documents shared successfully!'
+      });
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error.message || 'Failed to share documents. Please try again.'
+      });
+    }
+  };
+
+  const handleSignAgreement = () => {
+    navigate('/digital-signature'); 
+  };
 
     const handleBlockToggle = async () => {
       if (!connectionData?.userId) return;
@@ -185,14 +227,22 @@ const Contact = () => {
           />
         )}
         
-        {/* <InteractionsList>
-          {connectionData.interactions.map(interaction => (
-            <InteractionItem key={interaction.id}>
-              <p>{interaction.content}</p>
-              <small>{new Date(interaction.timestamp).toLocaleString()}</small>
-            </InteractionItem>
-          ))}
-        </InteractionsList> */}
+        {connectionData?.status === 'accepted' && !isBlocked && (
+        <ActionButtonsContainer>
+          <ActionButton onClick={handleShareDocuments}>
+            <FileText />
+            Share Medical Documents
+          </ActionButton>
+          <ActionButton onClick={handleSeeSharedDocuments}>
+            <Eye />
+            See shared Documents
+          </ActionButton>
+          <ActionButton onClick={handleSignAgreement}>
+            <FileSignature />
+            Sign Consent Agreement
+          </ActionButton>
+        </ActionButtonsContainer>
+      )}
             
         <ActionButtonsContainer>
           {!isBlocked && (
@@ -212,10 +262,27 @@ const Contact = () => {
           />
         )}
 
-      {message && (
-        <div style={{ textAlign: 'center', marginTop: '1rem', color: message.includes('error') ? 'red' : 'green' }}>
-          {message}
-        </div>
+      {showDocumentsPopup && (
+        <ShareDocumentsPopup
+          documents={medDocuments}
+          onClose={() => setShowDocumentsPopup(false)}
+          onShare={handleShareSubmit}
+          recipientName={connectionData.name}
+        />
+      )}
+
+      {showSharedDocumentsPopup && (
+        <SharedDocumentsPopup
+          onClose={() => setShowSharedDocumentsPopup(false)}
+          connectionId={connectionData.connectionId}
+          userName={connectionData.name}
+        />
+      )}
+
+      {message.text && (
+        <MessageContainer $type={message.type}>
+          {message.text}
+        </MessageContainer>
       )}
       </PageContainer>
     );
