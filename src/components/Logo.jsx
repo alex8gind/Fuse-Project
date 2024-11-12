@@ -6,23 +6,23 @@ const LogoContainer = styled(Link)`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 140px;
-  height: 56px;
+  width: 160px;
+  height: 64px;
   text-decoration: none;
 
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    width: 140px;
-    height: 56px;
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.md}) {
-    width: 150px;
+    width: 160px;
     height: 64px;
   }
 
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: 170px;
+    height: 72px;
+  }
+
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    width: 160px;
-    height: 76px;
+    width: 180px;
+    height: 80px;
   }
 `;
 
@@ -31,20 +31,38 @@ const LogoSVG = styled.svg`
   height: 100%;
 `;
 
-const LogoText = styled.text`
+const BackgroundSquare = styled.rect`
+  width: 28px;
+  height: 31px;
+  x: 10.5px;
+  y: 3px;
+  fill: ${props => props.theme.colors.orange_primary};
+  rx: 8;  
+  ry: 8; 
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    width: 32px;
+    height: 34px;
+    x: 9px;
+    y: 2px;
+ 
+  }
+`;
+
+const FirstLetter = styled.text`
   font-family: ${props => props.theme.fonts.logo};
-  font-size: 24px;
   font-weight: 700;
-  fill: #E86C25;
+  fill: ${props => props.theme.colors.background_second}; 
   text-anchor: middle;
   dominant-baseline: central;
-
+  font-size: 32px; 
+  
   @media (min-width: ${props => props.theme.breakpoints.sm}) {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    font-size: 32px;
+    font-size: 34px;
   }
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
@@ -52,13 +70,47 @@ const LogoText = styled.text`
   }
 `;
 
+const RemainingLetters = styled.text`
+  font-family: ${props => props.theme.fonts.logo};
+  font-weight: 700;
+  fill: ${props => props.theme.colors.orange_primary};
+  text-anchor: start;
+  dominant-baseline: central;
+  font-size: 32px; 
+  letter-spacing: -1px;
+  
+  
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    font-size: 32px;
+  
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 34px;
+    
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    font-size: 36px;
+   
+  }
+`;
+
+
 const Logo = () => {
   return (
     <LogoContainer to="/">
-      <LogoSVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40">
-        <LogoText x="50" y="20">
-          FUSE
-        </LogoText>
+      <LogoSVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40">
+
+        <BackgroundSquare/>
+
+        <FirstLetter x="25" y="20" fontSize="24">
+          F
+        </FirstLetter>
+    
+        <RemainingLetters x="40" y="20" fontSize="24">
+          USE
+        </RemainingLetters>
       </LogoSVG>
     </LogoContainer>
   );

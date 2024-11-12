@@ -4,8 +4,8 @@ import { Search } from 'lucide-react';
 export const HeaderWrapper = styled.header`
   background-color: ${props => props.theme.colors.header};
   color: ${props => props.theme.colors.text};
+  padding: 0 0.5em;
   display: flex;
-  padding: .1em 0.5em;
   position: fixed;
   top: 0;
   left: 0;
@@ -23,32 +23,59 @@ export const Container = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   padding: .2rem 0;
+  gap: 1rem;
   /* background-color: green; */
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    padding: 0.1em 1em;
+    padding: 0.5em 1em;
+    justify-content: space-evenly;
   }
 `;
 
 export const LogoWrapper = styled.div`
   display: flex;
   flex: 0 1 auto; // Don't grow, can shrink, auto basis
-  width: fit-content;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.2rem;
+  height: 75px; 
+  justify-content: center;
   /* background-color: red; */
+
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    height: 75px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    height: 78px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.lg}) {
+    height: 85px;
+    width: fit-content;
+    justify-content: flex-start;
+  }
+
+  /* Ensure the logo link takes full height */
+  a {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 `;
 
 export const DesktopNav = styled.nav`
   display: none;
   padding: 0.5rem;
+  /* background-color: blue; */
 
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
     display: flex;
-    /* background-color: purple; */
+    justify-content: flex-start;
     flex: 1 1 auto; // Can grow and shrink, auto basis
   }
 `;
