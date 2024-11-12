@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import QRConnection from './QRConnection/QRConnection'; 
+import { ConnectionContext } from '../contexts/connection.context';
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -121,6 +122,7 @@ const ConnectionRequestPopup = ({
   const [username, setUsername] = useState('');
   const popupRef = useRef(null);
   const [showQRModal, setShowQRModal] = useState(false);
+  const { sendConnectionRequest } = useContext(ConnectionContext);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -146,7 +148,7 @@ const ConnectionRequestPopup = ({
 
   const handleQRScan = async (qrData) => {
     try {
-      await onSendRequest(qrData.userId);
+      await sendConnectionRequest(qrData.userId);
       setShowQRModal(false);
       onClose();
     } catch (error) {
@@ -198,10 +200,8 @@ const ConnectionRequestPopup = ({
     <QRConnection
         isOpen={showQRModal}
         onClose={() => setShowQRModal(false)}
-        mode="generate"
         userId={userId}
         PId={PId}
-        onScan={handleQRScan}
       />
     </>
   );

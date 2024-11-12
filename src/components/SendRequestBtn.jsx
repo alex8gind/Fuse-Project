@@ -176,7 +176,7 @@ const SendRequestBtn = ({
           isHomePage={isHomePage}
           contactName={contactName || (selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : '')}
           requestSent={isRequestSent}
-          userId={userId}  // Pass user ID
+          userId={userId} 
           PId={PId} 
         />
       )}
