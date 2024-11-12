@@ -86,6 +86,7 @@ const SendRequestBtn = ({
   isContactsPage, 
   contactName, 
   selectedUser, 
+  PId,
   userId, 
   connectionId,
   isRequestSent,
@@ -175,6 +176,8 @@ const SendRequestBtn = ({
           isHomePage={isHomePage}
           contactName={contactName || (selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : '')}
           requestSent={isRequestSent}
+          userId={userId}  // Pass user ID
+          PId={PId} 
         />
       )}
     </ButtonContainer>

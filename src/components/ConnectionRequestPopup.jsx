@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import QRConnection from './QRConnection/QRConnection'; 
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -107,9 +108,19 @@ const ContactMessage = styled.p`
 `;
 
 
-const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnections, isContactsPage, isHomePage, contactName }) => {
+const ConnectionRequestPopup = ({ 
+  onClose, 
+  onSendRequest, 
+  onNavigateToConnections, 
+  isContactsPage, 
+  isHomePage, 
+  contactName,
+  userId,
+  PId
+}) => {
   const [username, setUsername] = useState('');
   const popupRef = useRef(null);
+  const [showQRModal, setShowQRModal] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -133,7 +144,18 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
     onClose();
   };
 
+  const handleQRScan = async (qrData) => {
+    try {
+      await onSendRequest(qrData.userId);
+      setShowQRModal(false);
+      onClose();
+    } catch (error) {
+      console.error('Failed to process QR connection:', error);
+    }
+  };
+
   return (
+    <>
     <PopupOverlay>
       <PopupContent ref={popupRef} $isContactsPage={isContactsPage} $isHomePage={isHomePage}>
         <CloseButton $isContactsPage={isContactsPage} onClick={onClose}>&times;</CloseButton>
@@ -142,7 +164,7 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
         </Title>
         {isHomePage ? (
           <>
-            <Button onClick={() => alert('QR code connection not implemented')}>
+            <Button onClick={() => setShowQRModal(true)}>
               Connect with QR code
             </Button>
             <OrDivider>OR</OrDivider>
@@ -164,7 +186,7 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
             />
             <Button onClick={handleSendRequest}>Send Request</Button>
             <OrDivider>OR</OrDivider>
-            <Button onClick={() => alert('QR code connection not implemented')}>
+            <Button onClick={()=> setShowQRModal(true)}>
               Connect with QR code
             </Button>
             <Button onClick={onClose}>Cancel</Button>
@@ -172,6 +194,16 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
         )}
       </PopupContent>
     </PopupOverlay>
+
+    <QRConnection
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        mode="generate"
+        userId={userId}
+        PId={PId}
+        onScan={handleQRScan}
+      />
+    </>
   );
 };
 

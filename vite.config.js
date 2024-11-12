@@ -10,10 +10,15 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 5173, 
-      strictPort: true, // don't automatically try another port if 5173 is in use
+      strictPort: true, 
+      cors: true, // Enable CORS for QR scanner
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
     },
     define: {
-      'process.env': env
+      'process.env': env,
+      global: {},  // for qrcode package compatibility
     },
     build: {
       rollupOptions: {
@@ -21,9 +26,20 @@ export default defineConfig(({ mode }) => {
           main: './index.html',
         },
       },
+      commonjsOptions: {
+        include: [/qrcode/, /node_modules/]
+      }
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', 'react-toastify']
-    }
+      include: [
+        'react', 
+        'react-dom', 
+        'react-router-dom', 
+        'react-toastify',
+        'qrcode',
+        '@yudiel/react-qr-scanner'
+      ]
+    },
+    
   }
 })
