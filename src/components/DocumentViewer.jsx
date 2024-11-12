@@ -113,7 +113,6 @@ const RetryButton = styled.button`
 `;
 
 const DocumentViewer = ({ docId, fileName, connectionId }) => {
-  const { viewDocument } = useContext(ConnectionContext);
   const [fileType, setFileType] = useState(null);
   const [documentUrl, setDocumentUrl] = useState(null);
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -124,6 +123,7 @@ const DocumentViewer = ({ docId, fileName, connectionId }) => {
   const [error, setError] = useState(null);
   const [loadingPage, setLoadingPage] = useState(false);
   const canvasRef = useRef(null);
+  const { viewDocument } = useContext(ConnectionContext);
 
   useEffect(() => {
     const loadDocument = async () => {

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { X, FileText, Eye } from 'lucide-react';
 import api from '../services/api'; 
 import DocumentViewer from './DocumentViewer';
+import { useConnectionContext } from '../contexts/connection.context'; 
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -128,27 +129,32 @@ const SharedDocumentsPopup = ({ onClose, connectionId, userName }) => {
   const [error, setError] = useState(null);
   const [viewerDocument, setViewerDocument] = useState(null);
   const [showViewer, setShowViewer] = useState(false);
+  const { getSharedDocuments } = useConnectionContext(); 
+
+  const fetchSharedDocuments = async () => {
+    try {
+      setLoading(true);
+      // const documents = await getSharedDocuments(connectionId);
+      const response = await api.get(`/connection/${connectionId}/shared-documents`);
+    
+      console.log('Shared documents response:', response.data.data); 
+      
+      if (response.data.data) {
+        setSharedDocuments(response.data.data);
+      }
+      // setSharedDocuments(documents);
+    } catch (error) {
+      console.error('Error fetching shared documents:', error);
+      setError(error.message || 'Failed to fetch shared documents');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSharedDocuments = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/shared-documents?connectionId=${connectionId}`);
-        console.log('Shared documents response:', response.data); 
-        
-        if (response.data.success) {
-          setSharedDocuments(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching shared documents:', error);
-        setError(error.response?.data?.error || error.message || 'Failed to fetch shared documents');
-      } finally {
-        setLoading(false);
-      }
-    };
-
+   
     fetchSharedDocuments();
-  }, [connectionId]);
+  }, []);
 
 
   const handleViewDocument = async (document) => {
@@ -240,15 +246,23 @@ const SharedDocumentsPopup = ({ onClose, connectionId, userName }) => {
                 <CloseButton onClick={handleCloseViewer}>
                     <X size={20} />
                 </CloseButton>
-                <DocumentViewer 
-                    docId={viewerDocument.docId} // Make sure this matches your document structure
-                    fileName={viewerDocument.docName}
-                    connectionId={connectionId}
-                />
+                {viewerDocument.fileType.toLowerCase() === 'pdf' ? (
+                    <DocumentViewer 
+                        docId={viewerDocument.docId} // Make sure this matches your document structure
+                        fileName={viewerDocument.docName}
+                        connectionId={connectionId}
+                    />
+                ) : (
+          <ImageViewer 
+            docId={viewerDocument.docId}
+            fileName={viewerDocument.docName}
+            connectionId={connectionId}
+          />
+        )}
             </PopupContent>
         </PopupOverlay>
-    )}
-</>
+)}
+    </>
 );    
 };
 

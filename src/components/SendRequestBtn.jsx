@@ -85,9 +85,9 @@ const SendRequestBtn = ({
   isHomePage, 
   isContactsPage, 
   contactName, 
-  onClick, 
   selectedUser, 
   userId, 
+  connectionId,
   isRequestSent,
   disabled,
   $disabled 
@@ -95,7 +95,7 @@ const SendRequestBtn = ({
   const [showPopup, setShowPopup] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const buttonRef = useRef(null);
-  const { sendConnectionRequest, cancelSentRequest } = useContext(ConnectionContext);
+  const { sendConnectionRequest, cancelConnectionRequest } = useContext(ConnectionContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,12 +133,9 @@ const SendRequestBtn = ({
     if (userId) {
       try {
         if (isRequestSent) {
-          await cancelSentRequest(userId);
+          await cancelConnectionRequest(connectionId);
         } else {
           await sendConnectionRequest(userId);
-        }
-        if (onClick) {
-          onClick();
         }
         setShowPopup(false);
       } catch (error) {

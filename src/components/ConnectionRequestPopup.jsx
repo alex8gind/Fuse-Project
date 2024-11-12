@@ -142,8 +142,8 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
         </Title>
         {isHomePage ? (
           <>
-            <Button onClick={() => alert('Bluetooth connection not implemented')}>
-              Connect via Bluetooth
+            <Button onClick={() => alert('QR code connection not implemented')}>
+              Connect with QR code
             </Button>
             <OrDivider>OR</OrDivider>
             <Button onClick={onNavigateToConnections}>Send Request from Your Connections</Button>
@@ -164,8 +164,8 @@ const ConnectionRequestPopup = ({ onClose, onSendRequest, onNavigateToConnection
             />
             <Button onClick={handleSendRequest}>Send Request</Button>
             <OrDivider>OR</OrDivider>
-            <Button onClick={() => alert('Bluetooth connection not implemented')}>
-              Connect via Bluetooth
+            <Button onClick={() => alert('QR code connection not implemented')}>
+              Connect with QR code
             </Button>
             <Button onClick={onClose}>Cancel</Button>
           </>

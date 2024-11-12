@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import ConnectionCard from '../../components/ConnectionCard/ConnectionCard';
+import RequestCard from '../../components/RequestCard/RequestCard';
 import BackBtn from "../../components/BackBtn";
 import { ConnectionContext } from '../../contexts/connection.context';
 import { UserContext } from '../../contexts/user.context';
@@ -230,18 +231,25 @@ const handleCloseSuccessPopup = () => {
       </FilterContainer>
 
       {filteredConnections.length === 0 ? (
-        <div>No connections found. Use the search above to find and add connections.</div>
+  <div>No connections found. Use the search above to find and add connections.</div>
+) : (
+  <ConnectionsList>
+    {filteredConnections.map(connection => (
+      filterStatus === 'pending' ? (
+        <RequestCard
+          key={connection.connectionId}
+          request={connection}
+        />
       ) : (
-        <ConnectionsList>
-          {filteredConnections.map(connection => (
-            <ConnectionCard
-              key={connection.connectionId}
-              connection={connection}
-              onClick={() => handleCardClick(connection)} 
-            />
-          ))}
-        </ConnectionsList>
-      )}
+        <ConnectionCard
+          key={connection.connectionId}
+          connection={connection}
+          onClick={() => handleCardClick(connection)} 
+        />
+      )
+    ))}
+  </ConnectionsList>
+)}
 
       {showConfirmPopup && selectedUser && (
         <PopupOverlay>

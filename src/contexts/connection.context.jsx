@@ -4,6 +4,7 @@ import api from "../services/api";
 
 export const ConnectionContext = createContext(null);
 
+
 export const ConnectionProvider = ({ children }) => {
   const [connections, setConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -404,6 +405,7 @@ export const ConnectionProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await api.get('/shared-documents');
+      // const response = await api.get(`/connection/${connectionId}/shared-documents`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching shared documents:', error);
@@ -559,3 +561,7 @@ export const ConnectionProvider = ({ children }) => {
     </ConnectionContext.Provider>
   );
 };
+
+export const useConnectionContext = () => useContext(ConnectionContext)
+
+export default ConnectionProvider

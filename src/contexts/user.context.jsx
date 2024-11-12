@@ -197,18 +197,19 @@ const loginWithGoogle = async () => {
       // Get the Google ID token (this is what we need to verify on backend)
       const idToken = await result.user.getIdToken();
       
-      // Send the token to your backend
-      const response = await api.post('/login-google', {
-        idToken,
-        email: result.user.email,
-        name: result.user.displayName,
-        photoURL: result.user.photoURL
-      });
-
+      const response = await api.post('/google-login', { token: idToken });
+      
       // Handle the response similar to your regular login
       setUser(response.data.user);
       localStorage.setItem('accessToken', response.data.accessToken);
       localStorage.setItem('refreshToken', response.data.refreshToken);
+      
+      // Route new users to ID verification
+    if (response.data.isNewUser || !response.data.user.isOnboardingComplete) {
+      navigate('/id-verification');
+    } else {
+      navigate('/');
+    }
 
       return response.data.user;
   } catch (error) {
