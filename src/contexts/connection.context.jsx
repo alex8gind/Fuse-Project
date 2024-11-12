@@ -255,37 +255,57 @@ export const ConnectionProvider = ({ children }) => {
 
   const acceptConnectionRequest = async (connectionId) => {
     try {
-      setLoading(true);
-      const response = await api.patch(`/connection/${connectionId}/accept`);
-      
-      if (!response.data.success) {
-        throw new Error(response.data.message);
-      }
+        setLoading(true);
+        setError(null);
 
-      const updatedConnection = response.data.data;
+        // Verify we have the connection in our pending requests
+        const pendingRequest = pendingRequests.find(req => req.connectionId === connectionId);
+        if (!pendingRequest) {
+            throw new Error('Connection request not found in pending requests');
+        }
 
-      // Remove from pending requests
-      setPendingRequests(prev => 
-        prev.filter(req => req.connectionId !== connectionId)
-      );
+        const response = await api.put(`/connection/${connectionId}/accept`);
+        
+        if (!response?.data?.success) {
+            throw new Error(response?.data?.message || 'Failed to accept connection request');
+        }
 
-      // Update connections list
-      await getUserConnections();
+        const acceptedConnection = response.data.data;
 
-      return updatedConnection;
-    } catch (err) {
-      console.error('Error accepting connection request:', err);
-      setError(err.message || 'Failed to accept connection request');
-      throw err;
+        // Transform the connection
+        const transformedConnection = {
+            connectionId: acceptedConnection.connectionId,
+            userId: acceptedConnection.otherUser.userId,
+            PId: acceptedConnection.otherUser.PId,
+            name: `${acceptedConnection.otherUser.firstName} ${acceptedConnection.otherUser.lastName}`,
+            profilePicture: acceptedConnection.otherUser.profilePicture,
+            isActive: acceptedConnection.otherUser.isActive,
+            status: 'accepted',
+            lastInteraction: new Date().toISOString()
+        };
+
+        // Update local state
+        setPendingRequests(prev => prev.filter(req => req.connectionId !== connectionId));
+        setConnections(prev => [...prev, transformedConnection]);
+        console.log("🦻🦻🦻");
+        // Refresh connections to ensure consistency
+        await getUserConnections();
+
+        return transformedConnection;
+    } catch (error) {
+        const errorMessage = error?.response?.data?.message || error.message;
+        console.error('Error accepting connection request:', errorMessage);
+        setError(errorMessage);
+        throw new Error(errorMessage);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
   const declineConnectionRequest = async (connectionId) => {
   try {
     setLoading(true);
-    const response = await api.patch(`/connection/${connectionId}/decline`);
+    const response = await api.put(`/connection/${connectionId}/decline`);
     
     if (!response.data.success) {
       throw new Error(response.data.message);
@@ -401,11 +421,11 @@ export const ConnectionProvider = ({ children }) => {
     }
   };
 
-  const getSharedDocuments = async () => {
+  const getSharedDocuments = async (connectionId) => {
     try {
       setLoading(true);
-      const response = await api.get('/shared-documents');
-      // const response = await api.get(`/connection/${connectionId}/shared-documents`);
+      // const response = await api.get('/shared-documents');
+      const response = await api.get(`/connection/${connectionId}/shared-documents`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching shared documents:', error);

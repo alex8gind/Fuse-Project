@@ -1,5 +1,13 @@
-// RequestCard.style.jsx
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const spin = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
 
 export const RequestCardContainer = styled.div`
   display: flex;
@@ -20,6 +28,7 @@ export const UserPhoto = styled.img`
   height: 50px;
   border-radius: 25px;
   object-fit: cover;
+  background-color: ${props => props.theme.colors.backgroundHover};
 `;
 
 export const UserInfo = styled.div`
@@ -33,6 +42,7 @@ export const UserName = styled.h3`
   margin: 0;
   font-size: 1rem;
   color: ${props => props.theme.colors.text};
+  font-weight: 500;
 `;
 
 export const PersonalId = styled.p`
@@ -44,28 +54,37 @@ export const PersonalId = styled.p`
 export const RequestStatus = styled.span`
   font-size: 0.875rem;
   color: ${props => props.theme.colors.primaryOrange};
+  font-weight: 500;
 `;
 
 export const ActionButtons = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
+  margin-left: auto;
 `;
 
 const BaseButton = styled.button`
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.5rem;
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
+  min-width: 100px;
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  .animate-spin {
+    animation: ${spin} 1s linear infinite;
   }
 `;
 
@@ -75,6 +94,11 @@ export const AcceptButton = styled(BaseButton)`
 
   &:hover:not(:disabled) {
     opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `;
 
@@ -85,6 +109,11 @@ export const DeclineButton = styled(BaseButton)`
 
   &:hover:not(:disabled) {
     background-color: ${props => props.theme.colors.backgroundHover};
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `;
 
@@ -92,4 +121,5 @@ export const MessageContainer = styled.div`
   color: ${props => props.theme.colors.error};
   font-size: 0.875rem;
   margin-top: 0.5rem;
+  font-weight: 500;
 `;

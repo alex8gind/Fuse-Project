@@ -142,7 +142,6 @@ const SharedDocumentsPopup = ({ onClose, connectionId, userName }) => {
       if (response.data.data) {
         setSharedDocuments(response.data.data);
       }
-      // setSharedDocuments(documents);
     } catch (error) {
       console.error('Error fetching shared documents:', error);
       setError(error.message || 'Failed to fetch shared documents');
