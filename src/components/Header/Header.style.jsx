@@ -222,3 +222,20 @@ export const MenuButton = styled.button`
   }
 `;
 
+export const UnreadBadge = styled.span`
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: ${props => props.theme.colors.primaryOrange};
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  padding: 2px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(25%, -25%);
+`;
+

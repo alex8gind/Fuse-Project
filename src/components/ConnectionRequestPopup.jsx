@@ -110,7 +110,7 @@ const ContactMessage = styled.p`
 
 
 const ConnectionRequestPopup = ({ 
-  onClose, 
+  onCloseConnectionRequest, 
   onSendRequest, 
   onNavigateToConnections, 
   isContactsPage, 
@@ -122,20 +122,20 @@ const ConnectionRequestPopup = ({
   const [username, setUsername] = useState('');
   const popupRef = useRef(null);
   const [showQRModal, setShowQRModal] = useState(false);
-  const { sendConnectionRequest } = useContext(ConnectionContext);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     console.log("🛑🛑🛑");
+  //     if (popupRef.current && !popupRef.current.contains(event.target)) {
+  //       // onCloseConnectionRequest();
+  //     }
+  //   };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, [onCloseConnectionRequest]);
 
   const handleSendRequest = () => {
     if (isContactsPage) {
@@ -143,24 +143,14 @@ const ConnectionRequestPopup = ({
     } else {
       onSendRequest(username);
     }
-    onClose();
-  };
-
-  const handleQRScan = async (qrData) => {
-    try {
-      await sendConnectionRequest(qrData.userId);
-      setShowQRModal(false);
-      onClose();
-    } catch (error) {
-      console.error('Failed to process QR connection:', error);
-    }
+    onCloseConnectionRequest();
   };
 
   return (
     <>
     <PopupOverlay>
       <PopupContent ref={popupRef} $isContactsPage={isContactsPage} $isHomePage={isHomePage}>
-        <CloseButton $isContactsPage={isContactsPage} onClick={onClose}>&times;</CloseButton>
+        <CloseButton $isContactsPage={isContactsPage} onClick={onCloseConnectionRequest}>&times;</CloseButton>
         <Title $isContactsPage={isContactsPage} $isHomePage={isHomePage}>
           {isHomePage ? 'Connect with Others' : 'Send Connection Request'}
         </Title>
@@ -176,7 +166,7 @@ const ConnectionRequestPopup = ({
           <>
             <ContactMessage>Send request to {contactName}?</ContactMessage>
             <Button $isContactsPage={isContactsPage} onClick={handleSendRequest}>Yes</Button>
-            <Button $isContactsPage={isContactsPage} onClick={onClose}>Cancel</Button>
+            <Button $isContactsPage={isContactsPage} onClick={onCloseConnectionRequest}>Cancel</Button>
           </>
         ) : (
           <>
@@ -191,18 +181,17 @@ const ConnectionRequestPopup = ({
             <Button onClick={()=> setShowQRModal(true)}>
               Connect with QR code
             </Button>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onCloseConnectionRequest}>Cancel</Button>
           </>
         )}
       </PopupContent>
     </PopupOverlay>
 
-    <QRConnection
-        isOpen={showQRModal}
+    {showQRModal && <QRConnection
         onClose={() => setShowQRModal(false)}
         userId={userId}
         PId={PId}
-      />
+      />}
     </>
   );
 };

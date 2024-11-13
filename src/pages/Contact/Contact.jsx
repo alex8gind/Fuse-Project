@@ -222,6 +222,7 @@ const Contact = () => {
             contactName={connectionData.name}
             connectionId={connectionData.connectionId}
             userId={connectionData.userId}
+            onClick={isRequestSent ? handleCancelRequest : handleSendRequest}
             isRequestSent={isRequestSent}
           />
         )}

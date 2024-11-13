@@ -1,30 +1,27 @@
 import styled from 'styled-components';
 
-export const Modal = styled.div`
+export const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 1rem;
-  z-index: 1000;
+  align-items: center;
 `;
 
 export const ModalContent = styled.div`
-   background-color: ${props => props.theme.colors.navigation_bg};
+  background-color: ${props => props.theme.colors.navigation_bg};
   padding: 1.5rem;
   border-radius: 12px;
-  width: 90%;
+  width: 80%;
   max-width: 500px;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  z-index: 1001; 
 `;
 
 export const TabContainer = styled.div`

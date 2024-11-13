@@ -3,27 +3,34 @@ import { Link, useLocation } from 'react-router-dom';
 import { Bell, Menu, X, Search } from 'lucide-react';
 import Logo from '../Logo.jsx';
 import SideMenu from '../SideMenu/SideMenu.jsx';
+import NotificationsPopup from '../NotificationPopUp/NotificationPopUp.jsx';
+import { useNotification } from '../../contexts/notification.context.jsx'; 
 import {
   HeaderWrapper, Container, MenuButton, LogoWrapper, DesktopNav, NavList, NavItem, 
   SearchWrapper, ButtonsIcon, SearchInput, SearchIcon, 
-  DesktopIcons, TabletIcons, MobileIcons
+  DesktopIcons, TabletIcons, MobileIcons, UnreadBadge
 } from './Header.style.jsx';
 
 const Header = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [activeButtons, setActiveButtons] = useState({});
   const location = useLocation();
+  const { unreadCount } = useNotification();  
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const toggleSideMenu = () => {
     setIsSideMenuOpen(!isSideMenuOpen);
-    // setActiveButtons(prev => ({ ...prev, menu: !prev.menu }));
   };
 
   const handleButtonClick = (buttonName) => {
-    setActiveButtons(prev => ({
+    if (buttonName === 'notifications') {
+      setShowNotifications(!showNotifications);
+    } else {
+      setActiveButtons(prev => ({
       ...prev,
       [buttonName]: !prev[buttonName]
     }));
+  }
   };
 
   const handleLogout = () => {
@@ -42,7 +49,6 @@ const Header = () => {
             onClick={toggleSideMenu} 
             aria-expanded={isSideMenuOpen} 
             aria-label="Toggle side menu"
-            // $isActive={activeButtons.menu}
           >
             <Menu size={27} />
           </MenuButton>
@@ -69,9 +75,11 @@ const Header = () => {
             <ButtonsIcon 
               aria-label="Notifications" 
               onClick={() => handleButtonClick('notifications')}
-              $isActive={activeButtons.notifications}
+              $isActive={showNotifications}
+              style={{ position: 'relative' }}
             >
               <Bell size={27} />
+              {unreadCount > 0  && <UnreadBadge>{unreadCount}</UnreadBadge>}
             </ButtonsIcon>
           </DesktopIcons>
 
@@ -86,29 +94,38 @@ const Header = () => {
             <ButtonsIcon 
               aria-label="Notifications"
               onClick={() => handleButtonClick('notifications')}
-              $isActive={activeButtons.notifications}
+              $isActive={showNotifications}
+              style={{ position: 'relative' }}
             >
               <Bell size={27} />
+              {unreadCount > 0  && <UnreadBadge>{unreadCount}</UnreadBadge>}
             </ButtonsIcon>
           </TabletIcons>
 
           <MobileIcons>
             <ButtonsIcon 
-              aria-label="Notifications"
-              onClick={() => handleButtonClick('notifications')}
-              $isActive={activeButtons.notifications}
+                aria-label="Notifications"
+                onClick={() => handleButtonClick('notifications')}
+                $isActive={showNotifications}
+                style={{ position: 'relative' }}
             >
               <Bell size={27} />
+              {unreadCount > 0  && <UnreadBadge>{unreadCount}</UnreadBadge>}
             </ButtonsIcon>
           </MobileIcons>
         </Container>
       </HeaderWrapper>
 
       <SideMenu 
-        userName="John Doe" // Replace with actual user name
+        userName="John Doe" 
         onLogout={handleLogout}
         isOpen={isSideMenuOpen}
         onClose={() => setIsSideMenuOpen(false)}
+      />
+
+      <NotificationsPopup 
+          isOpen={showNotifications}
+          onClose={() => setShowNotifications(false)}
       />
     </>
   );

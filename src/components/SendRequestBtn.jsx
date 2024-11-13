@@ -113,6 +113,7 @@ const SendRequestBtn = ({
   }, []);
 
   const handleClick = (e) => {
+    console.log("🚦🚦🚦");
     if (disabled) {
       e.preventDefault();
       return;
@@ -169,7 +170,7 @@ const SendRequestBtn = ({
       )}
       {showPopup && !disabled && (
         <ConnectionRequestPopup
-          onClose={() => setShowPopup(false)}
+          onCloseConnectionRequest={() => setShowPopup(false)}
           onSendRequest={handleSendRequest}
           onNavigateToConnections={handleNavigateToConnections}
           isContactsPage={isContactsPage}

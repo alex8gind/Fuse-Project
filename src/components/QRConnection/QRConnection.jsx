@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { AlertCircle, QrCode, Check, X, Loader } from 'lucide-react';
 import { ConnectionContext } from '../../contexts/connection.context';
 import {
-  Modal,
+  PopupOverlay,
   ModalContent,
   CloseButton,
   Title,
@@ -26,15 +26,18 @@ import {
   UserPId
 } from './QRConnection.style';
 
-const QRConnection = ({ isOpen, onClose, userId, PId }) => {
+const QRConnection = ({ 
+  onClose, 
+  userId, 
+  PId }) => {
   const [qrUrl, setQrUrl] = useState('');
-  const [copied, setCopied] = useState(false);
   const [error, setError] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [activeMode, setActiveMode] = useState('generate');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [scannedUserData, setScannedUserData] = useState(null);
   const { searchUserByPId, sendConnectionRequest } = useContext(ConnectionContext)
+  const popupRef = useRef(null);
 
   useEffect(() => {
     if (activeMode === 'generate') {
@@ -42,14 +45,14 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
     }
   }, [activeMode, userId, PId]);
 
+
   const generateQR = async () => {
     try {
       const QRCode = await import('qrcode');
       const connectionData = {
         type: 'fuse-connection-request',
         userId,
-        PId,
-        timestamp: Date.now()
+        PId
       };
 
       const canvas = document.createElement('canvas');
@@ -69,15 +72,16 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
     }
   };
 
-  const handleScan = async (data) => {
-    if (!data?.text) return
+  const handleScan = async (data, fulldata) => {
+    console.log("📸📸📸", data, fulldata);
+    if (!data) return
 
     setScanning(true);
     setError(null);
 
     try {
-      console.log('Raw scanned data:', data.text);
-      const parsedData = JSON.parse(data.text);
+      console.log('Raw scanned data:', data);
+      const parsedData = JSON.parse(data);
       console.log('Scanned QR Code Data:', parsedData); 
 
       if (parsedData.type !== 'fuse-connection-request') {
@@ -90,13 +94,6 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
 
       if (parsedData.userId === userId) {
         throw new Error('Cannot connect with yourself');
-      }
-
-      // Verify timestamp is recent (within last hour)
-      const timestamp = parsedData.timestamp;
-      const now = Date.now();
-      if (now - timestamp > 3600000) { // 1 hour
-        throw new Error('QR code has expired - please generate a new one');
       }
 
       // Search for user using PId
@@ -126,7 +123,6 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
     }
   };
 
-
   const handleConfirmConnection = async () => {
         try {
 
@@ -144,23 +140,6 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
         }
   };
 
-  const handleCopy = async () => {
-    const connectionData = {
-      type: 'fuse-connection-request',
-      userId,
-      PId,
-      timestamp: Date.now()
-    };
-
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(connectionData));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      setError('Failed to copy connection data');
-    }
-  };
-
   const handleModeChange = (newMode) => {
     setError(null);
     setShowConfirmation(false);
@@ -168,18 +147,20 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
     setActiveMode(newMode);
   };
 
-  const handleBackgroundClick = (e) => {
+  const handleOverlayClick = (e) => {
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
-
-  if (!isOpen) return null;
-
   return (
-    <Modal onClick={handleBackgroundClick}>
-      <ModalContent>
+  <>
+  <PopupOverlay onClick={handleOverlayClick}>
+      <ModalContent 
+      onClick={(e) => e.stopPropagation()}
+      ref={popupRef} 
+      >
 
       <CloseButton onClick={onClose}>
           <X size={20} />
@@ -219,15 +200,11 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
         ) : activeMode === 'generate' ? (
           <QRContainer>
             {qrUrl && <QRImage src={qrUrl} alt="Connection QR Code" />}
-            <ActionButton onClick={handleCopy}>
-              {copied ? <Check size={20} /> : <QrCode size={20} />}
-              {copied ? 'Copied!' : 'Copy Connection Data'}
-            </ActionButton>
           </QRContainer>
         ) : (
           <ScannerContainer>
             <Scanner
-              onResult={(result) => {
+              onScan={(result) => {
                 if (result?.text) {
                   handleScan(result.text);
                 }
@@ -274,7 +251,9 @@ const QRConnection = ({ isOpen, onClose, userId, PId }) => {
           </ConfirmationOverlay>
         )}
       </ModalContent>
-    </Modal>
+
+  </PopupOverlay>
+  </>
   );
 };
 

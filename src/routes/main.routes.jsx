@@ -9,8 +9,6 @@ import Notifications from "../pages/Notifications/Notifications";
 import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import PageNotFound from "../pages/PageNotFound/PageNotFound";
-import ContextProvider from "../contexts/context.provider";
-import UserProvider from "../contexts/user.context";
 import ForgotPassword from "../pages/ResetPassword/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import IdVerification from "../pages/IdentityVarification/1.IdVerification/IdVerification";
@@ -31,14 +29,15 @@ import NotificationsSettings from "../pages/Settings/NotificationSettings";
 import PrivacyAndSecurity from "../pages/Settings/Privacy&Security";
 import HelpAndSupport from "../pages/Settings/SupportSettings";
 import EditProfile from "../pages/EditProfile/EditProfile";
+import ContextProvider from "../contexts/context.provider";
+import UserProvider from "../contexts/user.context";
 import { ConnectionProvider } from "../contexts/connection.context";
-// import DigitalSignature from "../pages/DigitalSignature/DigitalSignature";
+import NotificationProvider from '../contexts/notification.context';
 import { RegisterInterceptors } from "../services/api";
-
 
 export const router = createBrowserRouter(
         createRoutesFromElements(
-                <Route element={<ContextProvider providers={[UserProvider, ConnectionProvider]} />}>
+                <Route element={<ContextProvider providers={[UserProvider, ConnectionProvider, NotificationProvider]} />}>
                     <Route element ={<RegisterInterceptors />}>
                         <Route element={<App />}>                           
                             <Route path="/" element={<Private><Home/></Private>}/>   
