@@ -1,6 +1,6 @@
 import React, { useRef, useContext} from 'react';
 import { Bell, Check, X, Calendar, UserPlus, CheckCircle, XCircle } from 'lucide-react';
-import { useNotification } from '../../contexts/notification.context.jsx';
+import { NotificationContext} from '../../contexts/notification.context.jsx';
 import { ConnectionContext } from '../../contexts/connection.context';
 import {
   Container,
@@ -26,15 +26,17 @@ import {
   StatusIcon,
   StatusMessage
 } from './NotificationPopUp.style.jsx';
+import { use } from 'framer-motion/client';
 
 const NotificationsPopup = ({ isOpen, onClose }) => {
   const { 
     notifications, 
     markAsRead, 
     clearAll, 
+    deleteAllNotifications,
     unreadCount,
     markAllAsRead
-  } = useNotification(); 
+  } = useContext(NotificationContext); 
 
 const { 
     acceptConnectionRequest, 
@@ -82,7 +84,7 @@ const handleDeclineRequest = async (notification) => {
 
 const renderNotificationContent = (notification) => {
     switch (notification.type) {
-        case 'connection_request':
+        case 'sentRequest':
     return (
       <>
         <IconWrapper>
@@ -91,11 +93,11 @@ const renderNotificationContent = (notification) => {
         <NotificationContent>
           <UserInfo>
             <UserAvatar 
-              src={notification.data.profilePicture} 
-              alt={notification.data.name} 
+              src={notification.senderId.profilePicture} 
+              alt={notification.senderId.firstName} 
             />
             <div>
-              <UserName>{notification.data.name}</UserName>
+              <UserName>{notification.senderId.firstName}</UserName>
               <NotificationMessage>
                 sent you a connection request
               </NotificationMessage>
@@ -121,21 +123,21 @@ const renderNotificationContent = (notification) => {
       </>
     );
 
-    case 'connection_accepted':
+    case 'acceptedRequest':
         return (
           <>
-            <StatusIcon type="connection_accepted">
-              <CheckCircle size={20} />
+            <StatusIcon type="acceptedRequest">
+              {notification.status === 'unread' && <CheckCircle size={20} />}
             </StatusIcon>
             <NotificationContent>
               <UserInfo>
                 <UserAvatar 
-                  src={notification.data.profilePicture} 
-                  alt={notification.data.name} 
+                  src={notification.senderId.profilePicture} 
+                  alt={notification.senderId.firstName} 
                 />
                 <div>
-                  <UserName>{notification.data.name}</UserName>
-                  <StatusMessage type="connection_accepted">
+                  <UserName>{notification.senderId.firstName}</UserName>
+                  <StatusMessage type="acceptedRequest">
                     accepted your connection request
                   </StatusMessage>
                 </div>
@@ -144,30 +146,7 @@ const renderNotificationContent = (notification) => {
           </>
         );
 
-      case 'connection_declined':
-        return (
-          <>
-            <StatusIcon type="connection_declined">
-              <XCircle size={20} />
-            </StatusIcon>
-            <NotificationContent>
-              <UserInfo>
-                <UserAvatar 
-                  src={notification.data.profilePicture} 
-                  alt={notification.data.name} 
-                />
-                <div>
-                  <UserName>{notification.data.name}</UserName>
-                  <StatusMessage type="connection_declined">
-                    declined your connection request
-                  </StatusMessage>
-                </div>
-              </UserInfo>
-            </NotificationContent>
-          </>
-        );
-      
-        case 'document_shared':
+        case 'sharedDocument':
         return (
           <>
             <IconWrapper>
@@ -176,13 +155,13 @@ const renderNotificationContent = (notification) => {
             <NotificationContent>
               <UserInfo>
                 <UserAvatar 
-                  src={notification.data.senderPicture} 
-                  alt={notification.data.senderName} 
+                  src={notification.senderId.senderPicture} 
+                  alt={notification.senderId.firstName} 
                 />
                 <div>
-                  <UserName>{notification.data.senderName}</UserName>
+                  <UserName>{notification.senderId.firstName}</UserName>
                   <NotificationMessage>
-                    shared a document with you: {notification.data.documentName}
+                    shared a document with you.
                   </NotificationMessage>
                 </div>
               </UserInfo>

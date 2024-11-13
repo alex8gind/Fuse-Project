@@ -8,6 +8,7 @@ import { ConnectionContext } from '../../contexts/connection.context';
 import { UserContext } from '../../contexts/user.context';
 import {
   PageContainer, 
+  ContentWrapper,
   SearchContainer,
   SearchInputWrapper,
   SearchInput, 
@@ -157,6 +158,7 @@ const handleCloseSuccessPopup = () => {
 
   return (
     <PageContainer>
+       <ContentWrapper>
       <BackBtn/>
       <ConnectionsHeader> 
         <Title>Connections</Title>
@@ -280,7 +282,7 @@ const handleCloseSuccessPopup = () => {
         </PopupOverlay>
       )}
 
-
+</ContentWrapper>
     </PageContainer>
   );
 };

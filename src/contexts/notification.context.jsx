@@ -1,145 +1,111 @@
-import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { initializeSocket, disconnectSocket } from '../services/socketClient';
+import { createContext, useState, useEffect, useContext } from 'react';
 import { UserContext } from './user.context';
+import api from '../services/api';
 
-// Create the context with a default value that matches the shape of your context
-const NotificationContext = createContext({
-  notifications: [],
-  unreadCount: 0,
-  isConnected: false,
-  markAsRead: () => {},
-  markAllAsRead: () => {},
-  clearAll: () => {}
-});
+export const NotificationContext = createContext();
 
-// Custom hook for using the notification context
-export const useNotification = () => {
-  const context = useContext(NotificationContext);
-  if (context === undefined) {
-    throw new Error('useNotification must be used within a NotificationProvider');
-  }
-  return context;
-};
-
-// Main provider component as default export
 const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('notifications');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isConnected, setIsConnected] = useState(false);
   const { user } = useContext(UserContext);
 
-  // Persist notifications
   useEffect(() => {
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-    setUnreadCount(notifications.filter(n => !n.read).length);
+    console.log("🔔🔔🔔", notifications);
   }, [notifications]);
 
-  const createNotification = useCallback((type, payload) => {
-    const notification = {
-      id: Date.now(),
-      type,
-      data: payload.data,
-      connectionId: payload.connectionId,
-      documents: payload.documents,
-      read: false,
-      createdAt: new Date(payload.createdAt),
-      responded: type === 'connection_request' ? false : undefined
-    };
-
-    setNotifications(prev => [notification, ...prev]);
-  }, []);
-
-  // Socket event handlers
-  const notificationHandlers = useCallback(() => ({
-    connection_request: (payload) => {
-      console.log('Received connection request:', payload);
-      createNotification('connection_request', payload);
-    },
-    connection_accepted: (payload) => {
-      console.log('Connection request accepted:', payload);
-      createNotification('connection_accepted', payload);
-    },
-    connection_declined: (payload) => {
-      console.log('Connection request declined:', payload);
-      createNotification('connection_declined', payload);
-    },
-    document_shared: (payload) => {
-      console.log('Document shared:', payload);
-      createNotification('document_shared', payload);
-    }
-  }), [createNotification]);
-
-  // Socket connection management
-  useEffect(() => {
-    let mounted = true;
-
-    const connectSocket = async () => {
-      if (!user) return;
-
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
-
-      const newSocket = await initializeSocket(token);
-      if (!newSocket || !mounted) return;
-
-      setSocket(newSocket);
-      setIsConnected(newSocket.connected);
-
-      // Set up event handlers
-      const handlers = notificationHandlers();
-      Object.entries(handlers).forEach(([event, handler]) => {
-        newSocket.on(event, handler);
-      });
-
-      newSocket.on('connect', () => mounted && setIsConnected(true));
-      newSocket.on('disconnect', () => mounted && setIsConnected(false));
-    };
-
-    connectSocket();
-
-    return () => {
-      mounted = false;
-      if (socket) {
-        const handlers = notificationHandlers();
-        Object.keys(handlers).forEach(event => {
-          socket.off(event);
-        });
-        disconnectSocket();
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get('/notifications');
+      
+      if (response.data.success) {
+        setNotifications(response.data.notifications);
+        setUnreadCount(response.data.notifications.filter(n => n.status === 'unread').length);
       }
-    };
-  }, [user, notificationHandlers]);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
-  const markAsRead = useCallback((notificationId) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId ? { ...notif, read: true } : notif
-      )
-    );
-  }, []);
+  const markAsRead = async (notificationId) => {
+    try {
+      const { data: response } = await api.put(`/notifications/${notificationId}/read`);
+      
+      if (response.success) {
+        setNotifications(prev => 
+          prev.map(notif => 
+            notif.id === notificationId ? { ...notif, status: 'read' } : notif
+          )
+        );
+        setUnreadCount(prev => Math.max(prev - 1, 0));
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
 
-  const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
-  }, []);
+  const markAllAsRead = async () => {
+    try {
+      const response = await api.put('/notifications');
+      
+      if (response.data.success) {
+        setNotifications(prev => prev.map(notif => ({ ...notif, status: 'read' })));
+        setUnreadCount(0);
+      }
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
 
-  const clearAll = useCallback(() => {
-    setNotifications([]);
-  }, []);
+  const deleteNotification = async (notificationId) => {
+    try {
+      const { data: response } = await api.delete(`/notifications/${notificationId}`);
+      
+      if (response.success) {
+        setNotifications(prev => {
+          const updatedNotifications = prev.filter(notif => notif.id !== notificationId);
+          setUnreadCount(updatedNotifications.filter(n => n.status === 'unread').length);
+          return updatedNotifications;
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  const deleteAllNotifications = async () => {
+    try {
+      const { data: response } = await api.delete('/notifications');
+      
+      if (response.success) {
+        setNotifications([]);
+        setUnreadCount(0);
+      }
+    } catch (error) {
+      console.error('Error deleting all notifications:', error);
+    }
+  };
+
+  // Fetch notifications when user changes
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+    } else {
+      // Clear notifications when user logs out
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  }, [user]);
 
   return (
-    <NotificationContext.Provider value={
-      {
-        notifications,
-        unreadCount,
-        isConnected,
-        markAsRead,
-        markAllAsRead,
-        clearAll
-      }
-    }>
+    <NotificationContext.Provider value={{
+      notifications,
+      unreadCount,
+      fetchNotifications,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
+      deleteAllNotifications
+    }}>
       {children}
     </NotificationContext.Provider>
   );

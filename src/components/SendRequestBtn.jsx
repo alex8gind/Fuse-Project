@@ -15,28 +15,34 @@ const StyledButton = styled.button`
   width: fit-content;
   background-color: ${props => props.$requestSent ? props.theme.colors.background : props.theme.colors.primaryOrange};
   color: ${props => props.$requestSent ? props.theme.colors.primaryOrange : props.theme.colors.background};
-  border: 2px solid ${props => props.theme.colors.primaryOrange};
-  outline: ${props => props.$requestSent ? 'none' : `2px solid ${props.theme.colors.primaryOrange}`};
+  border: 2px solid ${props => props.theme.colors.navigation_bg};
+  outline: 2px solid ${props => props.theme.colors.primaryOrange};
   border-radius: 1.1vh;
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-family: ${props => props.theme.fonts.main};
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   opacity: ${props => props.$disabled ? '0.5' : '1'};
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${props => !props.$disabled && (props.$requestSent ? props.theme.colors.primaryOrange : props.theme.colors.background)};
-    color: ${props => !props.$disabled && (props.$requestSent ? props.theme.colors.background : props.theme.colors.primaryOrange)};
+    background-color: ${props => 
+      !props.$disabled && (props.$requestSent 
+        ? props.theme.colors.primaryOrange 
+        : props.theme.colors.background)};
+    color: ${props => 
+      !props.$disabled && (props.$requestSent 
+        ? props.theme.colors.background 
+        : props.theme.colors.primaryOrange)};
+  }
+
+  &:active {
+    transform: ${props => !props.$disabled && 'scale(0.98)'};
+    box-shadow: ${props => !props.$disabled && '0 0 4px rgba(0, 0, 0, 0.2)'};
   }
 
   @media (min-width: ${props => props.theme.breakpoints.md}) {
-    font-size: 1.3rem;
-    padding: .7em 1.3em;
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.lg}) {
-    font-size: 1.5rem;
-    padding: .9em 1.4em;
+    font-size: 1.8rem;
+    padding: 1em 1.7em;
   }
 `;
 

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Bell, Menu, X, Search } from 'lucide-react';
 import Logo from '../Logo.jsx';
 import SideMenu from '../SideMenu/SideMenu.jsx';
 import NotificationsPopup from '../NotificationPopUp/NotificationPopUp.jsx';
-import { useNotification } from '../../contexts/notification.context.jsx'; 
+import { NotificationContext } from '../../contexts/notification.context'; 
 import {
   HeaderWrapper, Container, MenuButton, LogoWrapper, DesktopNav, NavList, NavItem, 
   SearchWrapper, ButtonsIcon, SearchInput, SearchIcon, 
@@ -15,7 +15,7 @@ const Header = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [activeButtons, setActiveButtons] = useState({});
   const location = useLocation();
-  const { unreadCount } = useNotification();  
+  const { unreadCount } = useContext(NotificationContext);  
   const [showNotifications, setShowNotifications] = useState(false);
 
   const toggleSideMenu = () => {
