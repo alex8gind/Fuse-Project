@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import ConnectionCard from '../../components/ConnectionCard/ConnectionCard';
@@ -42,6 +42,7 @@ const Connections = () => {
     sentRequests,
     pendingRequests,
     searchUserByPId,
+    error,
     sendConnectionRequest, 
     cancelConnectionRequest,
     blockedUsers 
@@ -49,7 +50,7 @@ const Connections = () => {
 
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
-
+  const searchContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -66,6 +67,21 @@ const Connections = () => {
     console.log("Connections component: blockedUsers", blockedUsers);
   }, [user, connections, blockedUsers]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setSearchResults([]);
+        setHasSearched(false);
+        setSearchTerm(''); // Clear search input
+        setMessage(''); // Clear any error messages
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = async () => {
     if (!searchTerm) {
@@ -101,10 +117,25 @@ const Connections = () => {
     }
   };
 
+   const handleSearchInputKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    } else if (e.key === 'Escape') {
+      setSearchResults([]);
+      setHasSearched(false);
+      setSearchTerm(''); 
+      setMessage('');
+      e.target.blur();
+    }
+  };
+
   const handleSelectUser = (result) => {
     setSelectedUser(result);
     setShowConfirmPopup(true);
+    setSearchResults([]); 
+    setHasSearched(false);
   };
+
 
   const handleConfirmRequest = async () => {
     if (!selectedUser?.otherUser?.userId) return;
@@ -175,7 +206,7 @@ const handleCloseSuccessPopup = () => {
           placeholder="Enter a PID to connect..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyDown={handleSearchInputKeyPress}
         />
         <SearchButton onClick={handleSearch}>Search</SearchButton>
       </SearchInputWrapper>
@@ -192,7 +223,9 @@ const handleCloseSuccessPopup = () => {
                   </SearchResultItem>
                 ))
               ) : (
-                  <NoResultsMessage>No results found.</NoResultsMessage>
+                  <NoResultsMessage>
+                    {error || 'No results found.'}
+                  </NoResultsMessage>
               )}
           </SearchResults>
         )}     

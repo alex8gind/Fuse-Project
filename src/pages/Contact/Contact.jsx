@@ -11,12 +11,14 @@ import { ConnectionContext } from '../../contexts/connection.context';
 import { UserContext} from '../../contexts/user.context';
 import {
   PageContainer, 
+  ContentWrapper,
   Header, 
   UserPhoto, 
   UserInfo, 
   UserName, 
   UserStatus, 
   ReportBtn, 
+  BlockButton,
   BlockedBadge, 
   RequestMessage,
   ActionButtonsContainer,
@@ -199,6 +201,7 @@ const Contact = () => {
  
     return (
       <PageContainer>
+        <ContentWrapper>
         <BackBtn/>
         <Header>
           <UserPhoto 
@@ -245,13 +248,14 @@ const Contact = () => {
       )}
             
         <ActionButtonsContainer>
-          {!isBlocked && (
-            <ReportBtn onClick={() => setShowPopUp(true)}>Report</ReportBtn>
-          )}
-          <ActionButton onClick={handleBlockToggle} disabled={loading}>
-            {loading ? 'Processing...' : (isBlocked ? 'Unblock User' : 'Block User')}
-          </ActionButton>
+        {!isBlocked && (
+          <ReportBtn onClick={() => setShowPopUp(true)}>Report</ReportBtn>
+        )}
+        <BlockButton onClick={handleBlockToggle} disabled={loading}>
+        {loading ? 'Processing...' : (isBlocked ? 'Unblock User' : 'Block User')}
+          </BlockButton>
         </ActionButtonsContainer>
+        </ContentWrapper>
 
         {showPopUp && (
           <PopUp 
@@ -284,6 +288,7 @@ const Contact = () => {
           {message.text}
         </MessageContainer>
       )}
+      
       </PageContainer>
     );
 };

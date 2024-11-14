@@ -8,48 +8,62 @@ const fadeIn = keyframes`
 
 export const Container = styled.div`
   position: absolute;
-  top: 60px;
-  right: 20px;
-  width: 380px;
-  max-height: 500px;
+  width: 100%;
+  right: 0;
+  top: 0;
+  height: fit-content;
+  max-height: none;
+  /* padding-bottom: 1em; */
   background: ${props => props.theme.colors.navigation_bg};
-  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  overflow-y: auto;
   animation: ${fadeIn} 0.2s ease-out;
   z-index: 1000;
+  border-radius: 0;
+ 
 
-  @media (max-width: ${props => props.theme.breakpoints.sm}) {
-    width: 100%;
-    right: 0;
-    top: 0;
-    height: 100vh;
-    max-height: none;
-    border-radius: 0;
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: 380px;
+    top: 60px;
+    right: 20px;
+    max-height: 500px;
+    border-radius: 12px;
   }
 `;
 
+
 export const Header = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding: 16px 20px;
+  padding: .2em;
   border-bottom: 1px solid ${props => props.theme.colors.border};
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    align-items: center;
+  }
 `;
 
 export const Title = styled.h2`
   font-size: 1.1rem;
   font-weight: 600;
   color: ${props => props.theme.colors.text};
-  margin: 0;
+  padding: .5em;
+  margin: 0;  
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: auto;
+  }
 `;
 
-export const NotificationList = styled.div`
-  max-height: calc(500px - 60px);
-  overflow-y: auto;
 
-  @media (max-width: ${props => props.theme.breakpoints.sm}) {
-    max-height: calc(100vh - 60px);
+export const NotificationList = styled.div`
+  height: fit-content;
+  background-color: blue;
+  overflow-y: auto;
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    max-height: calc(500px - 60px);
   }
 `;
 
@@ -91,10 +105,19 @@ export const NotificationContent = styled.div`
 
 export const UserInfo = styled.div`
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   margin-bottom: 8px;
+
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
 `;
+
 
 export const UserAvatar = styled.img`
   width: 40px;
@@ -128,13 +151,19 @@ export const ActionButtons = styled.div`
   display: flex;
   gap: 8px;
   margin-top: 12px;
+  width: 100%;
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: auto;
+  }
 `;
 
 const ButtonBase = styled.button`
-  padding: 6px 16px;
+  width: 100%;
+  padding: 10px 16px;
   border-radius: 6px;
   border: none;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -142,6 +171,12 @@ const ButtonBase = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    width: auto;
+    padding: 6px 16px;
+    font-size: 0.9rem;
   }
 `;
 
@@ -194,31 +229,37 @@ export const EmptyMessage = styled.div`
 `;
 
 export const CloseButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
   background: none;
   border: none;
   color: ${props => props.theme.colors.textSecondary};
   cursor: pointer;
-  padding: 8px;
-  margin: -8px;
+  padding: 12px;
   border-radius: 6px;
 
-  &:hover {
-    background: ${props => props.theme.colors.backgroundHover};
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    position: static;
+    padding: 8px;
+    margin: -8px;
   }
 `;
 
 export const ReadAllButton = styled.button`
+  width: fit-content;
+  margin-right: 1em;
   background: none;
   border: none;
   color: ${props => props.theme.colors.primaryOrange};
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 8px 12px;
-  margin-right: 8px;
+  padding: 12px;
   border-radius: 6px;
+  text-align: center;
 
-  &:hover {
-    background: ${props => props.theme.colors.backgroundHover};
+  @media (min-width: ${props => props.theme.breakpoints.md}) {
+    font-size: 1.2em;
   }
 `;
 

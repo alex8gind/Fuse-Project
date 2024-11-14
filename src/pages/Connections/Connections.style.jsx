@@ -17,6 +17,7 @@ export const PageContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
   display: flex;
   gap: 12px;
+  /* background-color: yellow; */
   
   @media (min-width: ${props => props.theme.breakpoints.md}) {
     padding: 80px 40px 40px;

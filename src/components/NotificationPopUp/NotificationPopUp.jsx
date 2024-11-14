@@ -94,10 +94,10 @@ const renderNotificationContent = (notification) => {
           <UserInfo>
             <UserAvatar 
               src={notification.senderId.profilePicture} 
-              alt={notification.senderId.firstName} 
+              alt={notification.senderId.firstName}
             />
             <div>
-              <UserName>{notification.senderId.firstName}</UserName>
+              <UserName>{`${notification.senderId.firstName} ${notification.senderId.lastName}`}</UserName>
               <NotificationMessage>
                 sent you a connection request
               </NotificationMessage>
@@ -133,10 +133,10 @@ const renderNotificationContent = (notification) => {
               <UserInfo>
                 <UserAvatar 
                   src={notification.senderId.profilePicture} 
-                  alt={notification.senderId.firstName} 
+                  alt={notification.senderId.firstName}
                 />
                 <div>
-                  <UserName>{notification.senderId.firstName}</UserName>
+                  <UserName>{`${notification.senderId.firstName} ${notification.senderId.lastName}`}</UserName>
                   <StatusMessage type="acceptedRequest">
                     accepted your connection request
                   </StatusMessage>
@@ -159,7 +159,7 @@ const renderNotificationContent = (notification) => {
                   alt={notification.senderId.firstName} 
                 />
                 <div>
-                  <UserName>{notification.senderId.firstName}</UserName>
+                  <UserName>{`${notification.senderId.firstName} ${notification.senderId.lastName}`}</UserName>
                   <NotificationMessage>
                     shared a document with you.
                   </NotificationMessage>
@@ -188,7 +188,7 @@ return (
     {notifications.length > 0 && (
       <>
         {unreadCount > 0 && (
-          <ReadAllButton onClick={markAllAsRead}> {/* Using new markAllAsRead */}
+          <ReadAllButton onClick={markAllAsRead}> 
             Mark all as read
           </ReadAllButton>
         )}
@@ -211,7 +211,7 @@ return (
         $unread={!notification.read}
         onClick={() => !notification.read && markAsRead(notification.id)}
       >
-        {!notification.read && <UnreadIndicator />}
+        {/* {!notification.read && <UnreadIndicator />} */}
         {renderNotificationContent(notification)}
         <NotificationTime>
           {formatTime(notification.createdAt)}

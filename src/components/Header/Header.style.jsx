@@ -224,8 +224,8 @@ export const MenuButton = styled.button`
 
 export const UnreadBadge = styled.span`
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   background-color: ${props => props.theme.colors.primaryOrange};
   color: white;
   border-radius: 50%;
